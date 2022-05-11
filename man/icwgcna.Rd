@@ -2,7 +2,7 @@
 % Please edit documentation in R/icwgcna.R
 \name{icwgcna}
 \alias{icwgcna}
-\title{icwgcna Iterative Correcting Weighted Gene Co-expression Network Analysis function constructing a network from an expresion matrix.}
+\title{icwgcna}
 \usage{
 icwgcna(
   ex,
@@ -33,5 +33,23 @@ icwgcna(
 
 }
 \description{
-icwgcna Iterative Correcting Weighted Gene Co-expression Network Analysis function constructing a network from an expresion matrix.
+Iterative Correcting Weighted Gene Co-expression Network Analysis function constructing a network from an expresion matrix.
+}
+\details{
+Iterative Correcting Weighted Gene Co-expression Network Analysis function for constructing a gene network from a gene expression matrix. The algorithm:
+\enumerate{
+\item Constructs a signed wgcna network
+\item Drops correltated modules basedon kurtosis.
+\item Regresses out the largest community from the expression data.
+\item Repeats steps 1-3 untile a maximum number of communities or iterations is reached.
+}
+
+Some differences from standard WGNCA (Horvath/Langfelder)
+\itemize{
+\item Makes heavy use of (Rfast package)\link{https://cran.r-project.org/web/packages/Rfast/} to compute adjacencies and TOM to enable iterative network creation on > 20K features.
+\item Uses signed adjacency in order to avoid possible distortions of community signatures (eigengenes).
+\item Iteratively regresses out strongest community in order to facilitate discovery of communties possibly obscured larger module(s).
+\item Clustering does not focus on merging communities but dropping to identify strongest module(s).
+\item Enables Spearman correlation for constructing adjacency matrix instead of Pearson to enable robust application in RNA-seq and micro-array data. Future updates may include mutual information
+}
 }
