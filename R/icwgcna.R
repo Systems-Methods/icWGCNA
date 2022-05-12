@@ -40,7 +40,7 @@ icwgcna <- function(ex, expo = 6,
                     maxComm = 100,
                     corCut = .6) {
   if (maxIt > 25 | maxIt < 1) {
-    print("maxIt must be between 1 and 25")
+    stop("maxIt must be between 1 and 25")
     return(NA)
   }
   # average expression of each gene
@@ -102,17 +102,17 @@ icwgcna <- function(ex, expo = 6,
       leaveOut <- CoV[, i] < stats::quantile(CoV[, i], .66)
     }
 
-    cat(paste("Done with iteration:", i,
+    message(paste("Done with iteration:", i,
               ": current number of gene communities is",
               nrow(eigenGenes), "\n\n"))
     if (nrow(eigenGenes) >= maxComm) {
-      print(paste("Number of modules", nrow(eigenGenes),
+      message(paste("Number of modules", nrow(eigenGenes),
                   "is >=", maxComm,
                   "the maximum number of modules. -- Stopping Iterations --"))
       break()
     }
     if (i == maxIt) {
-      print("Reached maximimum number of iterations")
+      message("Reached maximimum number of iterations")
       break()
     }
   }

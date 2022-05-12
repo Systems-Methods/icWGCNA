@@ -135,7 +135,7 @@ dropModuels <- function(eigenGenes,
       {
         if (eigen_Cors[i, j] > corCut) {
           if (verbose) {
-            print(paste("threshold", corCut, "exceeded for mods",
+            message(paste("threshold", corCut, "exceeded for mods",
                         rownames(eigenGenes)[i], ",",
                         rownames(eigenGenes)[j]))
           }
@@ -164,7 +164,7 @@ dropModuels <- function(eigenGenes,
   }
   eigen_Cors <- stats::cor(t(eigenGenes))
   diag(eigen_Cors) <- 0
-  print(paste("eigegenes trimmed to", nrow(eigenGenes),
+  message(paste("eigegenes trimmed to", nrow(eigenGenes),
               "due to correlation >", corCut,
               "max eigenCor =", max(signif(eigen_Cors, 2))))
   return(eigenGenes)
@@ -179,7 +179,7 @@ simpWGCNAsubNet <- function(tEx,
                             n = 15,
                             minMods = 5,
                             corCut = .6) {
-  print(paste("Computing", nrow(tEx),
+  message(paste("Computing", nrow(tEx),
               "x", nrow(tEx),
               "TOM distance for subset of genes with higher variance"))
 
@@ -197,7 +197,7 @@ simpWGCNAsubNet <- function(tEx,
 
   # omit the catch all module for genes that do not belong to a community
   retMods <- retMods[retMods != "0"]
-  print(paste("number of modules found is", length(retMods)))
+  message(paste("number of modules found is", length(retMods)))
 
   eigenGenes <- as.matrix(plyr::ldply(.data = retMods,
                                       .fun = function(m) {
@@ -211,7 +211,7 @@ simpWGCNAsubNet <- function(tEx,
                             Kurts = modSz[names(modSz) %in% retMods],
                             corCut = corCut)
   tPc <- stats::prcomp(t(tEx))
-  print(summary(tPc)$importance[2, 1:3])
+  message(summary(tPc)$importance[2, 1:3])
   corPC <- stats::cor(tPc$x[, 1], t(eigenGenes))
   eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ]
 
