@@ -29,56 +29,98 @@
 #' - Enables Spearman correlation for constructing adjacency matrix instead of Pearson to enable robust application in RNA-seq and micro-array data. Future updates may include mutual information
 #'
 #'
-icwgcna <- function(ex, expo=6 ,Method = "pearson", q=.5, maxIt=25, maxComm = 100, corCut=.6)
-{
-  if(maxIt > 25 | maxIt < 1){ print("maxIt must be between 1 and 25"); return(NA);}
-  M         <- apply(ex, 1, mean); # average expression of each gene
-  SD        <- matrix(NA,nrow(ex), maxIt); SD[,1]  <- apply(ex, 1, sd); # standard deviation of each gene
-  leaveOut  <- M < quantile(M, q) | SD[,1] < quantile(SD[,1],q) # identify genes that should simply not be part of the first round due to low signal
-  tEx       <- ex
-  cont_for  <- c()
+icwgcna <- function(ex, expo = 6,
+                    Method = "pearson",
+                    q = .5,
+                    maxIt = 25,
+                    maxComm = 100,
+                    corCut = .6) {
+  if (maxIt > 25 | maxIt < 1) {
+    print("maxIt must be between 1 and 25")
+    return(NA)
+  }
+  # average expression of each gene
+  M <- apply(ex, 1, mean)
+  SD <- matrix(NA, nrow(ex), maxIt)
+  # standard deviation of each gene
+  SD[, 1] <- apply(ex, 1, sd)
+  # identify genes that should simply not be part of the first round due to low signal
+  leaveOut <- M < quantile(M, q) | SD[, 1] < quantile(SD[, 1], q)
+  tEx <- ex
+  cont_for <- c()
 
-  for(i in 1:maxIt)
-  {
-    tEigenGenes           <- simpWGCNAsubNet(tEx[!leaveOut,],expo=expo,Method = Method,n = 5,corCut = corCut) # returns eigengenes for modules, orderd by |correlation to first pc of subsetted expression|
-    rownames(tEigenGenes) <- paste0(LETTERS[i],1:nrow(tEigenGenes))
-    tMetaGenes            <- as.data.frame(cor(t(tEx),t(tEigenGenes), method = Method))
+  for (i in 1:maxIt) {
+    # returns eigengenes for modules, orderd by |correlation to first pc of subsetted expression|
+    tEigenGenes <- simpWGCNAsubNet(tEx[!leaveOut, ],
+                                   expo = expo,
+                                   Method = Method,
+                                   n = 5,
+                                   corCut = corCut
+    )
+    rownames(tEigenGenes) <- paste0(LETTERS[i], 1:nrow(tEigenGenes))
+    tMetaGenes <- as.data.frame(cor(t(tEx), t(tEigenGenes), method = Method))
     gc()
 
-    if(i == 1)
-    {
-      eigenGenes      <- tEigenGenes
-      metaGenes       <- tMetaGenes
+    if (i == 1) {
+      eigenGenes <- tEigenGenes
+      metaGenes <- tMetaGenes
       full_eigenGenes <- tEigenGenes
-      full_metaGenes  <- tMetaGenes
-    }else
-    {
-      eigenGenes      <- rbind(eigenGenes,tEigenGenes)
-      metaGenes       <- cbind(metaGenes,tMetaGenes)
-      full_eigenGenes <- rbind(full_eigenGenes,tEigenGenes)
-      full_metaGenes  <- cbind(full_metaGenes,tMetaGenes)
-      clust_kurt      <- apply(metaGenes,2,Rfast::kurt) # not really size of community but more a measure of tightness
-      eigenGenes      <- dropModuels(eigenGenes=eigenGenes, Kurts = clust_kurt, corCut = corCut, verbose=F)
-      metaGenes       <- metaGenes[,colnames(metaGenes) %in% rownames(eigenGenes)]
+      full_metaGenes <- tMetaGenes
+    } else {
+      eigenGenes <- rbind(eigenGenes, tEigenGenes)
+      metaGenes <- cbind(metaGenes, tMetaGenes)
+      full_eigenGenes <- rbind(full_eigenGenes, tEigenGenes)
+      full_metaGenes <- cbind(full_metaGenes, tMetaGenes)
+      # not really size of community but more a measure of tightness
+      clust_kurt <- apply(metaGenes, 2, Rfast::kurt)
+      eigenGenes <- dropModuels(eigenGenes = eigenGenes,
+                                Kurts = clust_kurt,
+                                corCut = corCut,
+                                verbose = FALSE)
+      metaGenes <- metaGenes[, colnames(metaGenes) %in% rownames(eigenGenes)]
     }
 
-    if(i < maxIt) # this is the iterative correcting/controlled step were we regress out the largerst signal (the eigengene from the largest module)
-    {
-      cont_for    <- c(cont_for,row.names(tEigenGenes)[1])
-      x           <- tEigenGenes[1,] # regress out 1st/largest eigen gene from this iteration
-      tEx         <- aaply(.data = as.matrix(tEx),.margins = 1, .fun = function(y){residuals.lm(lm(y~x))+mean(y)})
-      CoV[,i+1]   <- apply(tEx, 1, function(x){abs(sd(x)/mean(x))}) # filter on top third of genes based on coefficient of variation
-      leaveOut    <- CoV[,i] < quantile(CoV[,i],.66) # identify genes that should not be used to build the next sub-network due to low signal
+    # this is the iterative correcting/controlled step were we regress out the largest signal (the eigengene from the largest module)
+    if (i < maxIt) {
+      cont_for <- c(cont_for, row.names(tEigenGenes)[1])
+      # regress out 1st/largest eigen gene from this iteration
+      x <- tEigenGenes[1, ]
+      tEx <- aaply(.data = as.matrix(tEx),
+                   .margins = 1,
+                   .fun = function(y) {
+                     residuals.lm(lm(y ~ x)) + mean(y)
+                   })
+      # filter on top third of genes based on coefficient of variation
+      CoV[, i + 1] <- apply(tEx, 1, function(x) {
+        abs(sd(x) / mean(x))
+      })
+      # identify genes that should not be used to build the next sub-network due to low signal
+      leaveOut <- CoV[, i] < quantile(CoV[, i], .66)
     }
 
-    cat(paste("Done with iteration:",i, ": current number of gene communities is" , nrow(eigenGenes),"\n\n"))
-    if(nrow(eigenGenes) >= maxComm){print(paste("Number of modules",nrow(eigenGenes),"is >=",maxComm,"the maximum number of modules. -- Stopping Iterations --")); break();}
-    if(i == maxIt){print("Reached maximimum number of iterations");break()}
+    cat(paste("Done with iteration:", i,
+              ": current number of gene communities is",
+              nrow(eigenGenes), "\n\n"))
+    if (nrow(eigenGenes) >= maxComm) {
+      print(paste("Number of modules", nrow(eigenGenes),
+                  "is >=", maxComm,
+                  "the maximum number of modules. -- Stopping Iterations --"))
+      break()
+    }
+    if (i == maxIt) {
+      print("Reached maximimum number of iterations")
+      break()
+    }
   }
 
-  rm(ex); gc();
-  colnames(metaGenes)  <- paste0("m",colnames(metaGenes))
-  return(list(community_membership = metaGenes, community_signature = eigenGenes, full_community_membership = full_metaGenes, full_community_signature = full_eigenGenes, controlled_for = cont_for))
-
+  rm(ex)
+  gc()
+  colnames(metaGenes) <- paste0("m", colnames(metaGenes))
+  return(
+    list(community_membership = metaGenes,
+         community_signature = eigenGenes,
+         full_community_membership = full_metaGenes,
+         full_community_signature = full_eigenGenes,
+         controlled_for = cont_for)
+  )
 }
-
