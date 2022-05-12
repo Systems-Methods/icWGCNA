@@ -91,8 +91,8 @@ calcEigenGene <- function(tEx) {
     return(unlist(tEx))
   }
   tEx <- as.matrix(tEx)
-  pc1 <- prcomp(t(tEx))$x[, 1]
-  if (sum(cor(t(tEx), pc1) < 0, na.rm = TRUE) / nrow(tEx) > .5) {
+  pc1 <- stats::prcomp(t(tEx))$x[, 1]
+  if (sum(stats::cor(t(tEx), pc1) < 0, na.rm = TRUE) / nrow(tEx) > .5) {
     pc1 <- -pc1
   }
   return(pc1)
@@ -104,8 +104,8 @@ calcEigenGene <- function(tEx) {
 # i.e. we'll be selecting between two correlated modules
 cutreeHybridWrapper <- function(d,
                                 quantCut = 0.75) {
-  dend <- hclust(as.dist(d), method = "average")
-  refHeight <- quantile(dend$height, .05, type = 1)
+  dend <- stats::hclust(stats::as.dist(d), method = "average")
+  refHeight <- stats::quantile(dend$height, .05, type = 1)
   cutHeight <- as.numeric(quantCut * (max(dend$height) - refHeight) + refHeight)
   modules <- dynamicTreeCut::cutreeHybrid(dendro = dend,
                                           distM = d,
@@ -124,7 +124,7 @@ dropModuels <- function(eigenGenes,
                         Kurts = NULL,
                         corCut = .95,
                         verbose = FALSE) {
-  eigen_Cors <- cor(t(eigenGenes))
+  eigen_Cors <- stats::cor(t(eigenGenes))
   diag(eigen_Cors) <- 0
   while (any(eigen_Cors > corCut)) {
     doubleBreak <- FALSE
@@ -151,7 +151,7 @@ dropModuels <- function(eigenGenes,
           }
 
           eigenGenes <- eigenGenes[-removeInd, ]
-          eigen_Cors <- cor(t(eigenGenes))
+          eigen_Cors <- stats::cor(t(eigenGenes))
           diag(eigen_Cors) <- 0
           doubleBreak <- TRUE
           break()
@@ -162,7 +162,7 @@ dropModuels <- function(eigenGenes,
       }
     }
   }
-  eigen_Cors <- cor(t(eigenGenes))
+  eigen_Cors <- stats::cor(t(eigenGenes))
   diag(eigen_Cors) <- 0
   print(paste("eigegenes trimmed to", nrow(eigenGenes),
               "due to correlation >", corCut,
@@ -210,9 +210,9 @@ simpWGCNAsubNet <- function(tEx,
   eigenGenes <- dropModuels(eigenGenes = eigenGenes,
                             Kurts = modSz[names(modSz) %in% retMods],
                             corCut = corCut)
-  tPc <- prcomp(t(tEx))
+  tPc <- stats::prcomp(t(tEx))
   print(summary(tPc)$importance[2, 1:3])
-  corPC <- cor(tPc$x[, 1], t(eigenGenes))
+  corPC <- stats::cor(tPc$x[, 1], t(eigenGenes))
   eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ]
 
   gc()
@@ -234,7 +234,6 @@ simpWGCNAsubNet <- function(tEx,
 #' @param pc_flag indicator. T (default) means to use the 1st principal component (corrected for direction). FALSE uses the mean of scaled and centered top genes.
 #'
 #' @return A matrix with rows being the community signature and columns being samples
-#' @export
 #'
 #' @details Computes the community signatures (eigengenes) for an expression matrix given a particular community membership (kME) matrix. This
 #' can be used to compute community signatures in a new expression dataset.
@@ -243,12 +242,12 @@ simpWGCNAsubNet <- function(tEx,
 #' When using these community signatures for modeling it may be best to include interaction terms or use tree based
 #' methods since dependencies are not addressed in this output matrix.
 #'
-#' @examples
+#' @export
 compute_eigengene_matrix <- function(ex,
                                      membership_matrix,
                                      cutoff = 5,
                                      pc_flag = TRUE) {
-  ex <- ex[apply(as.matrix(ex), 1, sd) != 0, ]
+  ex <- ex[apply(as.matrix(ex), 1, stats::sd) != 0, ]
   meta <- meta[rownames(meta) %in% rownames(ex), ]
   m_genes <- rownames(meta)
   e_genes <- rownames(ex)
@@ -264,8 +263,8 @@ compute_eigengene_matrix <- function(ex,
     if (pc_flag == FALSE) {
       return(scaled_ave)
     } else {
-      pc1 <- prcomp(t(tEx))$x[, 1]
-      if (cor(scaled_ave, pc1) < 0) {
+      pc1 <- stats::prcomp(t(tEx))$x[, 1]
+      if (stats::cor(scaled_ave, pc1) < 0) {
         pc1 <- -pc1
       }
       return(pc1)

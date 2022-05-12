@@ -4,7 +4,7 @@
 \alias{compute_eigengene_matrix}
 \title{compute_eigengene_matrix}
 \usage{
-compute_eigengene_matrix(ex, membership_matrix, cutoff = 5, pc_flag = T)
+compute_eigengene_matrix(ex, membership_matrix, cutoff = 5, pc_flag = TRUE)
 }
 \arguments{
 \item{ex}{gene expression matrix with genes as rows and samples as columns}
@@ -13,10 +13,10 @@ compute_eigengene_matrix(ex, membership_matrix, cutoff = 5, pc_flag = T)
 
 \item{cutoff}{number of top genes to use when computing community signatures}
 
-\item{pc_flag}{indicator. T (default) means to use the 1st principal component (corrected for direction). F uses the mean of scaled and centered top genes.}
+\item{pc_flag}{indicator. T (default) means to use the 1st principal component (corrected for direction). FALSE uses the mean of scaled and centered top genes.}
 }
 \value{
-a matrix with rows being the community signature and columns being samples
+A matrix with rows being the community signature and columns being samples
 }
 \description{
 compute_eigengene_matrix
