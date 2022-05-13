@@ -30,9 +30,18 @@ RfastCor_wrapper <- function(x,
 }
 
 
-# TOM: topological overlap map from Ravasz, E., Somera, A., Mongru, D., Oltvai, Z. and Barab´asi, A. (2002). Science
-# using Rfast package functions to  speed things up since we will be running wgcna up to 25 times
-# A is a weighted adjacenty matrix
+
+#' RfastTOMdist
+#'
+#' @param A A N x N adjacency matrix where N is the number of genes. values range from -1:1 with higher values indicating highly similar genes. Often correlation ^exponent, but could be angular distance, mutual information or Euclidean distance
+#'
+#' @return A N x N distance matrix with smaller values indicating more related genes.
+#' @export
+#'
+#' @description distance based on the topological overlap map from [Ravasz, E., Somera, A., Mongru, D., Oltvai, Z. and Barab´asi, A. (2002). Science](https://pubmed.ncbi.nlm.nih.gov/12202830/)
+#' Implemented to using the [Rfast package](https://cran.r-project.org/web/packages/Rfast/) functions to  speed things up since we will be computing this up to 25 times
+#'
+#' @examples
 RfastTOMdist <- function(A) {
   diag(A) <- 0
   A[is.na(A)] <- 0
@@ -52,13 +61,24 @@ RfastTOMdist <- function(A) {
 }
 
 
-# Topological overlap map (TOM) wrapper using Rfast package to speed up calculations,
-# X is expression matrix w each column being one sample
-# This function can compute TOM for 24K gene matrix in 8 minute of an AWS-EC2 c5.18xlarge instance,
-# though in practice we run it on subsets of most variable genes
-# note that we only use signed and weighted adjacencies
+#
+#' fastTOMwrapper
+#'
+#' @param X a gene expression matrix w each column being one sample and N rows representing genes. X should be in log space (usually between 0 and 20)
+#' @param expo the power to raise the similarity measure to default = 6. If set to NULL, angular distance is used to applied to the similarity measure ( asin(x) / (pi/2) ).
+#' @param Method "pearson" or "spearman" the similarty measure to use
+#'
+#' @return A N x N distance matrix with smaller values indicating more related genes.
+#' @export
+#' @description Topological overlap map (TOM, from [Ravasz, et al (2002). Science](https://pubmed.ncbi.nlm.nih.gov/12202830/)) wrapper using the [Rfast package](https://cran.r-project.org/web/packages/Rfast/)
+#' to speed up calculations. This function can compute TOM for 24K gene matrix in 8 minute of an AWS-EC2 c5.18xlarge instance, though in practice we run it on subsets of most variable genes.
+#' Adjacenty measur options are Pearson or Spearman correlation raised to a power and angular distance. Note that we only use signed and weighted adjacencies. If users are interested in genes negatively associated
+#' with a community they should check community memberships (kME) output from the main function icwgcna().
+#'
+#'
+#' @examples
 fastTOMwrapper <- function(X,
-                           expo = NULL,
+                           expo = 6,
                            Method = c("pearson", "spearman")) {
   Method <- match.arg(Method)
 
