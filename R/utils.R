@@ -38,20 +38,13 @@ RfastTOMdist <- function(A) {
   denomHelp <- matrix(kk, ncol = length(kk), nrow = length(kk))
   denomTOM <- Rfast::Pmin(denomHelp, Rfast::transpose(denomHelp)) + (1 - A)
   rm(denomHelp, kk)
-  gc()
 
   # Rfast::mat.mult appear to be unstable in current release, coded in Rcpp from stack exchange
   # numTOM <- eigenMapMatMult(A,A) + A;
   numTOM <- Rfast::mat.mult(A, A) + A
   rm(A)
-  gc()
-
 
   out <- 1 - as.matrix(numTOM / denomTOM)
-  rm(denomTOM)
-  gc()
-  rm(numTOM)
-  gc()
   diag(out) <- 0
   return(out)
 }
@@ -76,11 +69,8 @@ fastTOMwrapper <- function(X, expo = NULL, Method = "pearson") {
     A[X < 0] <- 0
   }
   rm(X)
-  gc()
 
   tom <- RfastTOMdist(A)
-  rm(A)
-  gc()
   return(tom)
 }
 
@@ -186,7 +176,6 @@ simpWGCNAsubNet <- function(tEx,
   TOMd <- fastTOMwrapper(tEx,
                          expo = expo,
                          Method = Method)
-  gc()
   mods <- cutreeHybridWrapper(TOMd)$labels
   modSz <- table(mods)
   if (sum(modSz >= n) < minMods) {
@@ -215,7 +204,6 @@ simpWGCNAsubNet <- function(tEx,
   corPC <- stats::cor(tPc$x[, 1], t(eigenGenes))
   eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ]
 
-  gc()
   return(eigenGenes)
 }
 

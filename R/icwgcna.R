@@ -63,7 +63,6 @@ icwgcna <- function(ex, expo = 6,
     )
     rownames(tEigenGenes) <- paste0(LETTERS[i], 1:nrow(tEigenGenes))
     tMetaGenes <- as.data.frame(stats::cor(t(tEx), t(tEigenGenes), method = Method))
-    gc()
 
     if (i == 1) {
       eigenGenes <- tEigenGenes
@@ -117,8 +116,6 @@ icwgcna <- function(ex, expo = 6,
     }
   }
 
-  rm(ex)
-  gc()
   colnames(metaGenes) <- paste0("m", colnames(metaGenes))
   return(
     list(community_membership = metaGenes,
