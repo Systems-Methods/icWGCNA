@@ -7,7 +7,7 @@
 icwgcna(
   ex,
   expo = 6,
-  Method = "pearson",
+  Method = c("pearson", "spearman"),
   q = 0.5,
   maxIt = 25,
   maxComm = 100,

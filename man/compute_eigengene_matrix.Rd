@@ -9,11 +9,11 @@ compute_eigengene_matrix(ex, membership_matrix, cutoff = 5, pc_flag = TRUE)
 \arguments{
 \item{ex}{gene expression matrix with genes as rows and samples as columns}
 
-\item{membership_matrix, }{a community membership (kME) matrix with genes as rows and commutities as columns.}
+\item{membership_matrix, }{a community membership (kME) matrix with genes as rows and communities as columns.}
 
 \item{cutoff}{number of top genes to use when computing community signatures}
 
-\item{pc_flag}{indicator. T (default) means to use the 1st principal component (corrected for direction). FALSE uses the mean of scaled and centered top genes.}
+\item{pc_flag}{indicator. TRUE (default) means to use the 1st principal component (corrected for direction). FALSE uses the mean of scaled and centered top genes.}
 }
 \value{
 A matrix with rows being the community signature and columns being samples
@@ -25,7 +25,7 @@ compute_eigengene_matrix
 Computes the community signatures (eigengenes) for an expression matrix given a particular community membership (kME) matrix. This
 can be used to compute community signatures in a new expression dataset.
 Note, community signatures are not corrected by icWGCNA iterations so it will not match signatures output from icWGCNA
-if it is run on the network constuction dataset.
+if it is run on the network construction dataset.
 When using these community signatures for modeling it may be best to include interaction terms or use tree based
 methods since dependencies are not addressed in this output matrix.
 }

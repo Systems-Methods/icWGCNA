@@ -12,7 +12,9 @@ angularDist <- function(x) {
 # Wrapper of Rfast cora function to include spearman method which is used in calculating adjacency.
 # x is a gene expression matrix with rows = genes and columns = samples.
 RfastCor_wrapper <- function(x,
-                             Method = "pearson") {
+                             Method = c("pearson", "spearman")) {
+  Method <- match.arg(Method)
+
   gene_names <- rownames(x)
   x <- as.matrix(x)
   if (Method == "spearman") {
@@ -52,10 +54,14 @@ RfastTOMdist <- function(A) {
 
 # Topological overlap map (TOM) wrapper using Rfast package to speed up calculations,
 # X is expression matrix w each column being one sample
-# This funcion can compute TOM for 24K gene matrix in 8 minute of an AWS-EC2 c5.18xlarge instance,
-# though in practice we run it on subsets of most varialbe genes
+# This function can compute TOM for 24K gene matrix in 8 minute of an AWS-EC2 c5.18xlarge instance,
+# though in practice we run it on subsets of most variable genes
 # note that we only use signed and weighted adjacencies
-fastTOMwrapper <- function(X, expo = NULL, Method = "pearson") {
+fastTOMwrapper <- function(X,
+                           expo = NULL,
+                           Method = c("pearson", "spearman")) {
+  Method <- match.arg(Method)
+
   # compute weighted adjacency matrix using Rfast package
   X <- RfastCor_wrapper(X,
                         Method = Method)
@@ -89,7 +95,7 @@ calcEigenGene <- function(tEx) {
 }
 
 
-# wrapper of cutreeHybrid from Langfelder and Horvath's dynamic tree cutting pacakge.(https://cran.r-project.org/web/packages/dynamicTreeCut/)
+# wrapper of cutreeHybrid from Langfelder and Horvath's dynamic tree cutting package.(https://cran.r-project.org/web/packages/dynamicTreeCut/)
 # Instead of merging modules like they do, we'll be dropping correlated modules based on kME kurtosis
 # i.e. we'll be selecting between two correlated modules
 cutreeHybridWrapper <- function(d,
@@ -165,10 +171,12 @@ dropModuels <- function(eigenGenes,
 # Rfast is used to speed up both the adjacency calculation and the TOM computation
 simpWGCNAsubNet <- function(tEx,
                             expo = 6,
-                            Method = "pearson",
+                            Method = c("pearson", "spearman"),
                             n = 15,
                             minMods = 5,
                             corCut = .6) {
+  Method <- match.arg(Method)
+
   message(paste("Computing", nrow(tEx),
               "x", nrow(tEx),
               "TOM distance for subset of genes with higher variance"))
@@ -217,16 +225,16 @@ simpWGCNAsubNet <- function(tEx,
 #' compute_eigengene_matrix
 #'
 #' @param ex gene expression matrix with genes as rows and samples as columns
-#' @param membership_matrix, a community membership (kME) matrix with genes as rows and commutities as columns.
+#' @param membership_matrix, a community membership (kME) matrix with genes as rows and communities as columns.
 #' @param cutoff number of top genes to use when computing community signatures
-#' @param pc_flag indicator. T (default) means to use the 1st principal component (corrected for direction). FALSE uses the mean of scaled and centered top genes.
+#' @param pc_flag indicator. TRUE (default) means to use the 1st principal component (corrected for direction). FALSE uses the mean of scaled and centered top genes.
 #'
 #' @return A matrix with rows being the community signature and columns being samples
 #'
 #' @details Computes the community signatures (eigengenes) for an expression matrix given a particular community membership (kME) matrix. This
 #' can be used to compute community signatures in a new expression dataset.
 #' Note, community signatures are not corrected by icWGCNA iterations so it will not match signatures output from icWGCNA
-#' if it is run on the network constuction dataset.
+#' if it is run on the network construction dataset.
 #' When using these community signatures for modeling it may be best to include interaction terms or use tree based
 #' methods since dependencies are not addressed in this output matrix.
 #'

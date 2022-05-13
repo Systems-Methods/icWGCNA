@@ -34,15 +34,20 @@
 #'
 #' @export
 icwgcna <- function(ex, expo = 6,
-                    Method = "pearson",
+                    Method = c("pearson", "spearman"),
                     q = .5,
                     maxIt = 25,
                     maxComm = 100,
                     corCut = .6) {
+  # param checking
   if (maxIt > 25 | maxIt < 1) {
     stop("maxIt must be between 1 and 25")
-    return(NA)
   }
+  if (q >= 1 | q <= 0) {
+    stop("q must be >0 and <1")
+  }
+  Method <- match.arg(Method)
+
   # average expression of each gene
   M <- apply(ex, 1, mean)
   SD <- matrix(NA, nrow(ex), maxIt)
