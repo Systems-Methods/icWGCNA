@@ -10,7 +10,7 @@ Authors@R:
            ),
     person(given = "Jimmy",
            family = "Fulp",
-           role = c("ctb"),
+           role = c("aut"),
            email = "william.fulp@bms.com",
            comment = c(ORCID = "0000-0001-6888-0794")
     )
