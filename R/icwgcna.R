@@ -54,6 +54,7 @@ icwgcna <- function(ex, expo = 6,
   # standard deviation of each gene
   SD[, 1] <- apply(ex, 1, stats::sd)
   # identify genes that should simply not be part of the first round due to low signal
+  CoV      <- matrix(NA,nrow(ex), maxIt); CoV[,1] <- abs(SD[,1]/M)
   leaveOut <- M < stats::quantile(M, q) | SD[, 1] < stats::quantile(SD[, 1], q)
   tEx <- ex
   cont_for <- c()
