@@ -194,7 +194,8 @@ simpWGCNAsubNet <- function(tEx,
                             Method = c("pearson", "spearman"),
                             n = 15,
                             minMods = 5,
-                            corCut = .6) {
+                            corCut = .6,
+                            intCorCut = NULL) {
   Method <- match.arg(Method)
 
   message(paste("Computing", nrow(tEx),
@@ -223,14 +224,16 @@ simpWGCNAsubNet <- function(tEx,
                                       }))
   rownames(eigenGenes) <- retMods
 
-  # subsetting modSz to match eigenGenes
-  eigenGenes <- dropModuels(eigenGenes = eigenGenes,
-                            Kurts = modSz[names(modSz) %in% retMods],
-                            corCut = corCut)
+  if(!is.null(intCorCut)){
+    eigenGenes <- dropModuels(eigenGenes = eigenGenes,
+                              Kurts = modSz[names(modSz) %in% retMods], # subsetting modSz to match eigenGenes. For droppig communities within an iteration we use size and keep the larger
+                              corCut = intCorCut)
+  }
+
   tPc <- stats::prcomp(t(tEx))
   message(summary(tPc)$importance[2, 1:3])
   corPC <- stats::cor(tPc$x[, 1], t(eigenGenes))
-  eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ]
+  eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ] # order by cor w PC1 so that we regress out the eigengene most strongly associated with PC1.
 
   return(eigenGenes)
 }

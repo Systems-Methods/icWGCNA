@@ -10,6 +10,7 @@
 #' @param maxComm maximum number of communities to be found
 #' @param corCut correlation threshold used for dropping communities
 #' @param covCut coeficient of variation (CoV) quantile threshold to use at each iteration  for selecting genes to build network. covCut = .667 would use the top third of genes based on CoV after regressing out largest community
+#' @param internalCorCut correlation threshold for interal drop (withing a wgcna iteration as oposed to between iterations). If NULL (default) there is no community dropping within an iteration.
 #'
 #' @return Returns a list with the following items:
 #' * `community_membership` -
@@ -40,7 +41,8 @@ icwgcna <- function(ex, expo = 6,
                     maxIt = 25,
                     maxComm = 100,
                     corCut = .75,
-                    covCut = .66) {
+                    covCut = .66,
+                    internalCorCut = NULL) {
   # param checking
   if (maxIt > 25 | maxIt < 1) {
     stop("maxIt must be between 1 and 25")
@@ -67,7 +69,8 @@ icwgcna <- function(ex, expo = 6,
                                    expo = expo,
                                    Method = Method,
                                    n = 5,
-                                   corCut = corCut
+                                   corCut = corCut,
+                                   intCorCut = internalCorCut
     )
     rownames(tEigenGenes) <- paste0(LETTERS[i], 1:nrow(tEigenGenes))
     tMetaGenes <- as.data.frame(stats::cor(t(tEx), t(tEigenGenes), method = Method))
