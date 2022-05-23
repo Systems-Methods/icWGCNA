@@ -215,23 +215,28 @@ simpWGCNAsubNet <- function(tEx,
   # omit the catch all module for genes that do not belong to a community
   retMods <- retMods[retMods != "0"]
   message(paste("number of modules found is", length(retMods)))
-
-  eigenGenes <- as.matrix(plyr::ldply(.data = retMods,
-                                      .fun = function(m) {
-                                        eg <- calcEigenGene(tEx[mods == m, ])
-                                        return(eg)
-                                      }))
-  rownames(eigenGenes) <- retMods
-
-  # subsetting modSz to match eigenGenes
-  eigenGenes <- dropModuels(eigenGenes = eigenGenes,
-                            Kurts = modSz[names(modSz) %in% retMods], # For droppig communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
-                            corCut = corCut)                          # when we drop between rounds we use kurtosis since we don't have access to topology at that point.
-  tPc <- stats::prcomp(t(tEx))
-  message(summary(tPc)$importance[2, 1:3])
-  corPC <- stats::cor(tPc$x[, 1], t(eigenGenes))
-  eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ] # order by cor with PC1 so that we regress out the eigengene most strongly associated with PC1.
-
+  
+  if(length(retMods) == 0)
+  {
+    eigenGenes <- NULL
+  }else
+  {
+    eigenGenes <- as.matrix(plyr::ldply(.data = retMods,
+                                         .fun = function(m) {
+                                         eg <- calcEigenGene(tEx[mods == m, ])
+                                         return(eg)
+                                       }))
+    rownames(eigenGenes) <- retMods
+  
+    # subsetting modSz to match eigenGenes
+    eigenGenes <- dropModuels(eigenGenes = eigenGenes,
+                             Kurts = modSz[names(modSz) %in% retMods], # For droppig communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
+                              corCut = corCut)                          # when we drop between rounds we use kurtosis since we don't have access to topology at that point.
+    tPc <- stats::prcomp(t(tEx))
+    message(summary(tPc)$importance[2, 1:3])
+    corPC <- stats::cor(tPc$x[, 1], t(eigenGenes))
+    eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ] # order by cor with PC1 so that we regress out the eigengene most strongly associated with PC1.
+  }
   return(eigenGenes)
 }
 
