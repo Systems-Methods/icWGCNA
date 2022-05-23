@@ -46,8 +46,15 @@ icwgcna <- function(ex, expo = 6,
     stop("maxIt must be between 1 and 25")
   }
   if (q >= 1 | q <= 0) {
-    stop("q must be >0 and <1")
+    stop("q must be > 0 and <1 ")
   }
+  if (corCut >= 1 | corCut <= 0) {
+    stop("corCut must be > 0 and < 1")
+  }
+  if (covCut >= 1 | covCut <= 0) {
+    stop("covCut must be > 0 and < 1")
+  }
+
   Method <- match.arg(Method)
 
   # average expression of each gene
@@ -69,6 +76,9 @@ icwgcna <- function(ex, expo = 6,
                                    n = 5,
                                    corCut = corCut
     )
+    
+    if(is.null(tEigenGenes)){print("No more modules to be added. -- Stopping Iterations --");break()}
+    
     rownames(tEigenGenes) <- paste0(LETTERS[i], 1:nrow(tEigenGenes))
     tMetaGenes <- as.data.frame(stats::cor(t(tEx), t(tEigenGenes), method = Method))
 
