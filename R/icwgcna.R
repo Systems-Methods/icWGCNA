@@ -36,11 +36,11 @@
 #' @export
 icwgcna <- function(ex, expo = 6,
                     Method = c("pearson", "spearman"),
-                    q = .5,
-                    maxIt = 25,
+                    q = .3,
+                    maxIt = 10,
                     maxComm = 100,
-                    corCut = .75,
-                    covCut = .66) {
+                    corCut = .8,
+                    covCut = .33) {
   # param checking
   if (maxIt > 25 | maxIt < 1) {
     stop("maxIt must be between 1 and 25")
