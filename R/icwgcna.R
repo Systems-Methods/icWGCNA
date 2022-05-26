@@ -33,6 +33,13 @@
 #' - Clustering does not focus on merging communities but dropping to identify strongest module(s).
 #' - Enables Spearman correlation for constructing adjacency matrix instead of Pearson to enable robust application in RNA-seq and micro-array data. Future updates may include mutual information
 #'
+#' @example
+#'
+#'
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized")
+#'
+#'
 #' @export
 icwgcna <- function(ex, expo = 6,
                     Method = c("pearson", "spearman"),
@@ -76,9 +83,9 @@ icwgcna <- function(ex, expo = 6,
                                    n = 5,
                                    corCut = corCut
     )
-    
+
     if(is.null(tEigenGenes)){print("No more modules to be added. -- Stopping Iterations --");break()}
-    
+
     rownames(tEigenGenes) <- paste0(LETTERS[i], 1:nrow(tEigenGenes))
     tMetaGenes <- as.data.frame(stats::cor(t(tEx), t(tEigenGenes), method = Method))
 

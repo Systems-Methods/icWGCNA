@@ -50,8 +50,6 @@ RfastTOMdist <- function(A) {
   denomTOM <- Rfast::Pmin(denomHelp, Rfast::transpose(denomHelp)) + (1 - A)
   rm(denomHelp, kk)
 
-  # Rfast::mat.mult appear to be unstable in current release, coded in Rcpp from stack exchange
-  # numTOM <- eigenMapMatMult(A,A) + A;
   numTOM <- Rfast::mat.mult(A, A) + A
   rm(A)
 
@@ -215,7 +213,7 @@ simpWGCNAsubNet <- function(tEx,
   # omit the catch all module for genes that do not belong to a community
   retMods <- retMods[retMods != "0"]
   message(paste("number of modules found is", length(retMods)))
-  
+
   if(length(retMods) == 0)
   {
     eigenGenes <- NULL
@@ -227,7 +225,7 @@ simpWGCNAsubNet <- function(tEx,
                                          return(eg)
                                        }))
     rownames(eigenGenes) <- retMods
-  
+
     # subsetting modSz to match eigenGenes
     eigenGenes <- dropModuels(eigenGenes = eigenGenes,
                              Kurts = modSz[names(modSz) %in% retMods], # For droppig communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
