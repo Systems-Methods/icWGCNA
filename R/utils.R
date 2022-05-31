@@ -21,7 +21,7 @@ RfastCor_wrapper <- function(x,
     x <- Rfast::rowRanks(x)
   }
 
-  Cor <- Rfast::cora(t(x))
+  Cor <- Rfast::cora(Rfast::transpose(x), large = TRUE)
 
   rownames(Cor) <- gene_names
   colnames(Cor) <- gene_names
@@ -34,7 +34,7 @@ RfastCor_wrapper <- function(x,
 #' RfastTOMdist
 #'
 #' @param A A N x N adjacency matrix where N is the number of genes. values range from -1:1 with higher values indicating highly similar genes. Often correlation ^exponent, but could be angular distance, mutual information or Euclidean distance
-#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "penppml" (see `details` in `icwgcna()`)
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `details` in `icwgcna()`)
 #'
 #' @return A N x N distance matrix with smaller values indicating more related genes.
 #' @export
@@ -44,7 +44,7 @@ RfastCor_wrapper <- function(x,
 #'
 #' @examples
 RfastTOMdist <- function(A,
-                         mat_mult_method = c('Rfast', 'penppml')) {
+                         mat_mult_method = c('Rfast', 'RcppEigen')) {
   mat_mult_method <- match.arg(mat_mult_method)
 
   diag(A) <- 0
@@ -54,11 +54,10 @@ RfastTOMdist <- function(A,
   denomTOM <- Rfast::Pmin(denomHelp, Rfast::transpose(denomHelp)) + (1 - A)
   rm(denomHelp, kk)
 
-
   if (mat_mult_method == 'Rfast') {
     numTOM <- Rfast::mat.mult(A, A) + A
   } else {
-    numTOM <- penppml:::eigenMapMatMult(A, A) + A
+    numTOM <- eigenMapMatMult(A, A) + A
   }
 
   out <- 1 - as.matrix(numTOM / denomTOM)
@@ -73,7 +72,7 @@ RfastTOMdist <- function(A,
 #' @param X a gene expression matrix w each column being one sample and N rows representing genes. X should be in log space (usually between 0 and 20)
 #' @param expo the power to raise the similarity measure to default = 6. If set to NULL, angular distance is used to applied to the similarity measure ( asin(x) / (pi/2) ).
 #' @param Method "pearson" or "spearman" the similarty measure to use
-#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "penppml" (see `details` in `icwgcna()`)
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `details` in `icwgcna()`)
 #'
 #' @return A N x N distance matrix with smaller values indicating more related genes.
 #' @export
@@ -87,7 +86,7 @@ RfastTOMdist <- function(A,
 fastTOMwrapper <- function(X,
                            expo = 6,
                            Method = c("pearson", "spearman"),
-                           mat_mult_method = c('Rfast', 'penppml')) {
+                           mat_mult_method = c('Rfast', 'RcppEigen')) {
   Method <- match.arg(Method)
   mat_mult_method <- match.arg(mat_mult_method)
 
@@ -105,7 +104,7 @@ fastTOMwrapper <- function(X,
   }
   rm(X)
 
-  tom <- RfastTOMdist(A)
+  tom <- RfastTOMdist(A, mat_mult_method = mat_mult_method)
   return(tom)
 }
 
@@ -204,7 +203,7 @@ simpWGCNAsubNet <- function(tEx,
                             n = 15,
                             minMods = 5,
                             corCut = .6,
-                            mat_mult_method = c('Rfast', 'penppml')) {
+                            mat_mult_method = c('Rfast', 'RcppEigen')) {
   Method <- match.arg(Method)
   mat_mult_method <- match.arg(mat_mult_method)
 

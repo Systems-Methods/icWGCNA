@@ -10,7 +10,7 @@
 #' @param maxComm maximum number of communities to be found
 #' @param corCut correlation threshold used for dropping communities
 #' @param covCut coeficient of variation (CoV) quantile threshold to use at each iteration  for selecting genes to build network. covCut = .667 would use the top third of genes based on CoV after regressing out largest community
-#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "penppml" (see `details`)
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see {details})
 #'
 #' @return Returns a list with the following items:
 #' * `community_membership` -
@@ -36,14 +36,13 @@
 #'
 #' For matrix multiplication the option "Rfast" will use [Rfast::mat.mult()],
 #' which takes advantage of parallel processing across multiple cores. The option
-#' "penppml" will use \code{\link[penppml::eigenMapMatMult]{penppml:::eigenMapMatMult()}},
-#' which tends to be faster when using
-#' a single core, but does not take advantage of parallel processing across
+#' "RcppEigen" will use the RcppEigen engine for C++ code, which tends to be faster
+#' when using a single core, but does not take advantage of parallel processing across
 #' multiple cores. If running this on a cluster with access to many computer core
 #' there is a significant performance advantage to using [Rfast::mat.mult()]
 #'
 #'
-#' @example
+#' @examples
 #'
 #'
 #' library("UCSCXenaTools")
@@ -58,7 +57,7 @@ icwgcna <- function(ex, expo = 6,
                     maxComm = 100,
                     corCut = .8,
                     covCut = .33,
-                    mat_mult_method = c('Rfast', 'penppml')) {
+                    mat_mult_method = c('Rfast', 'RcppEigen')) {
   # param checking
   if (maxIt > 25 | maxIt < 1) {
     stop("maxIt must be between 1 and 25")

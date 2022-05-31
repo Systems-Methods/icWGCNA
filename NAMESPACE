@@ -2,5 +2,9 @@
 
 export(RfastTOMdist)
 export(compute_eigengene_matrix)
+export(eigenMapMatMult)
 export(fastTOMwrapper)
 export(icwgcna)
+import(RcppEigen)
+importFrom(Rcpp,sourceCpp)
+useDynLib(icWGCNA, .registration=TRUE)

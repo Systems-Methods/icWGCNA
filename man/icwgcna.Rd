@@ -13,7 +13,7 @@ icwgcna(
   maxComm = 100,
   corCut = 0.8,
   covCut = 0.33,
-  mat_mult_method = c("Rfast", "penppml")
+  mat_mult_method = c("Rfast", "RcppEigen")
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ icwgcna(
 
 \item{covCut}{coeficient of variation (CoV) quantile threshold to use at each iteration  for selecting genes to build network. covCut = .667 would use the top third of genes based on CoV after regressing out largest community}
 
-\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "penppml" (see \code{details})}
+\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see {details})}
 }
 \value{
 Returns a list with the following items:
@@ -68,9 +68,16 @@ Some differences from standard WGNCA (Horvath/Langfelder)
 
 For matrix multiplication the option "Rfast" will use \code{\link[Rfast:mat.mult]{Rfast::mat.mult()}},
 which takes advantage of parallel processing across multiple cores. The option
-"penppml" will use \code{\link[penppml::eigenMapMatMult]{penppml:::eigenMapMatMult()}},
-which tends to be faster when using
-a single core, but does not take advantage of parallel processing across
+"RcppEigen" will use the RcppEigen engine for C++ code, which tends to be faster
+when using a single core, but does not take advantage of parallel processing across
 multiple cores. If running this on a cluster with access to many computer core
 there is a significant performance advantage to using \code{\link[Rfast:mat.mult]{Rfast::mat.mult()}}
+}
+\examples{
+
+
+library("UCSCXenaTools")
+luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized")
+
+
 }
