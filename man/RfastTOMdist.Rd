@@ -4,10 +4,12 @@
 \alias{RfastTOMdist}
 \title{RfastTOMdist}
 \usage{
-RfastTOMdist(A)
+RfastTOMdist(A, mat_mult_method = c("Rfast", "penppml"))
 }
 \arguments{
 \item{A}{A N x N adjacency matrix where N is the number of genes. values range from -1:1 with higher values indicating highly similar genes. Often correlation ^exponent, but could be angular distance, mutual information or Euclidean distance}
+
+\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "penppml" (see \code{details} in \code{icwgcna()})}
 }
 \value{
 A N x N distance matrix with smaller values indicating more related genes.

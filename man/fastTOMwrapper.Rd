@@ -4,7 +4,12 @@
 \alias{fastTOMwrapper}
 \title{fastTOMwrapper}
 \usage{
-fastTOMwrapper(X, expo = 6, Method = c("pearson", "spearman"))
+fastTOMwrapper(
+  X,
+  expo = 6,
+  Method = c("pearson", "spearman"),
+  mat_mult_method = c("Rfast", "penppml")
+)
 }
 \arguments{
 \item{X}{a gene expression matrix w each column being one sample and N rows representing genes. X should be in log space (usually between 0 and 20)}
@@ -12,6 +17,8 @@ fastTOMwrapper(X, expo = 6, Method = c("pearson", "spearman"))
 \item{expo}{the power to raise the similarity measure to default = 6. If set to NULL, angular distance is used to applied to the similarity measure ( asin(x) / (pi/2) ).}
 
 \item{Method}{"pearson" or "spearman" the similarty measure to use}
+
+\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "penppml" (see \code{details} in \code{icwgcna()})}
 }
 \value{
 A N x N distance matrix with smaller values indicating more related genes.

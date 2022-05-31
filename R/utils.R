@@ -34,6 +34,7 @@ RfastCor_wrapper <- function(x,
 #' RfastTOMdist
 #'
 #' @param A A N x N adjacency matrix where N is the number of genes. values range from -1:1 with higher values indicating highly similar genes. Often correlation ^exponent, but could be angular distance, mutual information or Euclidean distance
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "penppml" (see `details` in `icwgcna()`)
 #'
 #' @return A N x N distance matrix with smaller values indicating more related genes.
 #' @export
@@ -42,7 +43,10 @@ RfastCor_wrapper <- function(x,
 #' Implemented to using the [Rfast package](https://cran.r-project.org/web/packages/Rfast/) functions to  speed things up since we will be computing this up to 25 times
 #'
 #' @examples
-RfastTOMdist <- function(A) {
+RfastTOMdist <- function(A,
+                         mat_mult_method = c('Rfast', 'penppml')) {
+  mat_mult_method <- match.arg(mat_mult_method)
+
   diag(A) <- 0
   A[is.na(A)] <- 0
   kk <- Rfast::colsums(A)
@@ -50,8 +54,12 @@ RfastTOMdist <- function(A) {
   denomTOM <- Rfast::Pmin(denomHelp, Rfast::transpose(denomHelp)) + (1 - A)
   rm(denomHelp, kk)
 
-  numTOM <- Rfast::mat.mult(A, A) + A
-  rm(A)
+
+  if (mat_mult_method == 'Rfast') {
+    numTOM <- Rfast::mat.mult(A, A) + A
+  } else {
+    numTOM <- penppml:::eigenMapMatMult(A, A) + A
+  }
 
   out <- 1 - as.matrix(numTOM / denomTOM)
   diag(out) <- 0
@@ -65,6 +73,7 @@ RfastTOMdist <- function(A) {
 #' @param X a gene expression matrix w each column being one sample and N rows representing genes. X should be in log space (usually between 0 and 20)
 #' @param expo the power to raise the similarity measure to default = 6. If set to NULL, angular distance is used to applied to the similarity measure ( asin(x) / (pi/2) ).
 #' @param Method "pearson" or "spearman" the similarty measure to use
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "penppml" (see `details` in `icwgcna()`)
 #'
 #' @return A N x N distance matrix with smaller values indicating more related genes.
 #' @export
@@ -77,8 +86,10 @@ RfastTOMdist <- function(A) {
 #' @examples
 fastTOMwrapper <- function(X,
                            expo = 6,
-                           Method = c("pearson", "spearman")) {
+                           Method = c("pearson", "spearman"),
+                           mat_mult_method = c('Rfast', 'penppml')) {
   Method <- match.arg(Method)
+  mat_mult_method <- match.arg(mat_mult_method)
 
   # compute weighted adjacency matrix using Rfast package
   X <- RfastCor_wrapper(X,
@@ -192,8 +203,10 @@ simpWGCNAsubNet <- function(tEx,
                             Method = c("pearson", "spearman"),
                             n = 15,
                             minMods = 5,
-                            corCut = .6) {
+                            corCut = .6,
+                            mat_mult_method = c('Rfast', 'penppml')) {
   Method <- match.arg(Method)
+  mat_mult_method <- match.arg(mat_mult_method)
 
   message(paste("Computing", nrow(tEx),
               "x", nrow(tEx),
@@ -201,7 +214,8 @@ simpWGCNAsubNet <- function(tEx,
 
   TOMd <- fastTOMwrapper(tEx,
                          expo = expo,
-                         Method = Method)
+                         Method = Method,
+                         mat_mult_method = mat_mult_method)
   mods <- cutreeHybridWrapper(TOMd)$labels
   modSz <- table(mods)
   if (sum(modSz >= n) < minMods) {

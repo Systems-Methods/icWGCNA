@@ -8,10 +8,12 @@ icwgcna(
   ex,
   expo = 6,
   Method = c("pearson", "spearman"),
-  q = 0.5,
-  maxIt = 25,
+  q = 0.3,
+  maxIt = 10,
   maxComm = 100,
-  corCut = 0.6
+  corCut = 0.8,
+  covCut = 0.33,
+  mat_mult_method = c("Rfast", "penppml")
 )
 }
 \arguments{
@@ -28,6 +30,10 @@ icwgcna(
 \item{maxComm}{maximum number of communities to be found}
 
 \item{corCut}{correlation threshold used for dropping communities}
+
+\item{covCut}{coeficient of variation (CoV) quantile threshold to use at each iteration  for selecting genes to build network. covCut = .667 would use the top third of genes based on CoV after regressing out largest community}
+
+\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "penppml" (see \code{details})}
 }
 \value{
 Returns a list with the following items:
@@ -59,4 +65,12 @@ Some differences from standard WGNCA (Horvath/Langfelder)
 \item Clustering does not focus on merging communities but dropping to identify strongest module(s).
 \item Enables Spearman correlation for constructing adjacency matrix instead of Pearson to enable robust application in RNA-seq and micro-array data. Future updates may include mutual information
 }
+
+For matrix multiplication the option "Rfast" will use \code{\link[Rfast:mat.mult]{Rfast::mat.mult()}},
+which takes advantage of parallel processing across multiple cores. The option
+"penppml" will use \code{\link[penppml::eigenMapMatMult]{penppml:::eigenMapMatMult()}},
+which tends to be faster when using
+a single core, but does not take advantage of parallel processing across
+multiple cores. If running this on a cluster with access to many computer core
+there is a significant performance advantage to using \code{\link[Rfast:mat.mult]{Rfast::mat.mult()}}
 }
