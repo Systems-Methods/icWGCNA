@@ -37,6 +37,6 @@ compute cell type enrichments using \href{https://academic.oup.com/database/arti
 
 \dontrun{
 pangDB <- data.table::fread(pangDB_link)
-compute_panglaoDB_enrichment()}
+compute_panglaoDB_enrichment(tcell_net$community_membership)}
 
 }

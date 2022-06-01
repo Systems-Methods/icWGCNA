@@ -349,7 +349,7 @@ prolif_names <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20",
 #'
 #'\dontrun{
 #' pangDB <- data.table::fread(pangDB_link)
-#' compute_panglaoDB_enrichment()}
+#' compute_panglaoDB_enrichment(tcell_net$community_membership)}
 #'
 compute_panglaoDB_enrichment <- function(t_memb,
                                          K = 100,

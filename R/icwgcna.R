@@ -44,10 +44,12 @@
 #'
 #' @examples
 #'
-#'
+#'\dontrun{
 #' library("UCSCXenaTools")
-#' luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized")
-#'
+#' luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'                   clinical = FALSE, download = TRUE)
+#' ex <- data.table::fread(luad$destfiles)
+#' results <- icwgcna(ex)}
 #'
 #' @export
 icwgcna <- function(ex,
