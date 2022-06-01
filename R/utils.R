@@ -23,8 +23,7 @@ RfastCor_wrapper <- function(x,
 
   Cor <- Rfast::cora(Rfast::transpose(x), large = TRUE)
 
-  rownames(Cor) <- gene_names
-  colnames(Cor) <- gene_names
+  rownames(Cor) <- colnames(Cor) <- gene_names
 
   return(Cor)
 }
@@ -34,7 +33,7 @@ RfastCor_wrapper <- function(x,
 #' RfastTOMdist
 #'
 #' @param A A N x N adjacency matrix where N is the number of genes. values range from -1:1 with higher values indicating highly similar genes. Often correlation ^exponent, but could be angular distance, mutual information or Euclidean distance
-#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `details` in `icwgcna()`)
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `details` in [`icwgcna()`])
 #'
 #' @return A N x N distance matrix with smaller values indicating more related genes.
 #' @export
@@ -72,7 +71,7 @@ RfastTOMdist <- function(A,
 #' @param X a gene expression matrix w each column being one sample and N rows representing genes. X should be in log space (usually between 0 and 20)
 #' @param expo the power to raise the similarity measure to default = 6. If set to NULL, angular distance is used to applied to the similarity measure ( asin(x) / (pi/2) ).
 #' @param Method "pearson" or "spearman" the similarty measure to use
-#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `details` in `icwgcna()`)
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `details` in [`icwgcna()`])
 #'
 #' @return A N x N distance matrix with smaller values indicating more related genes.
 #' @export
@@ -91,8 +90,7 @@ fastTOMwrapper <- function(X,
   mat_mult_method <- match.arg(mat_mult_method)
 
   # compute weighted adjacency matrix using Rfast package
-  X <- RfastCor_wrapper(X,
-                        Method = Method)
+  X <- RfastCor_wrapper(X, Method = Method)
   X[is.na(X)] <- 0
   X[X < 0] <- 0
 
@@ -123,7 +121,7 @@ calcEigenGene <- function(tEx) {
 }
 
 
-# wrapper of cutreeHybrid from Langfelder and Horvath's dynamic tree cutting package.(https://cran.r-project.org/web/packages/dynamicTreeCut/)
+# wrapper of [dynamicTreeCut::cutreeHybrid] from Langfelder and Horvath's dynamic tree cutting package.
 # Instead of merging modules like they do, we'll be dropping correlated modules based on kME kurtosis
 # i.e. we'll be selecting between two correlated modules
 cutreeHybridWrapper <- function(d,
@@ -240,13 +238,16 @@ simpWGCNAsubNet <- function(tEx,
     rownames(eigenGenes) <- retMods
 
     # subsetting modSz to match eigenGenes
+    # For droppig communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
     eigenGenes <- dropModuels(eigenGenes = eigenGenes,
-                             Kurts = modSz[names(modSz) %in% retMods], # For droppig communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
-                              corCut = corCut)                          # when we drop between rounds we use kurtosis since we don't have access to topology at that point.
+                             Kurts = modSz[names(modSz) %in% retMods],
+                              corCut = corCut)
+    # when we drop between rounds we use kurtosis since we don't have access to topology at that point.
     tPc <- stats::prcomp(t(tEx))
     message(summary(tPc)$importance[2, 1:3])
     corPC <- stats::cor(tPc$x[, 1], t(eigenGenes))
-    eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ] # order by cor with PC1 so that we regress out the eigengene most strongly associated with PC1.
+    # order by cor with PC1 so that we regress out the eigengene most strongly associated with PC1.
+    eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ]
   }
   return(eigenGenes)
 }

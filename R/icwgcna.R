@@ -3,7 +3,7 @@
 #' Iterative Correcting Weighted Gene Co-expression Network Analysis function constructing a network from an expression matrix.
 #'
 #' @param ex matrix of bulk RNA-seq or microarray gene expression data
-#' @param expo exponted to use for soft thresholding
+#' @param expo exponted to use for soft thresholding. If NULL will use angular distance
 #' @param Method correlation to use for distance measure, "pearson" (default) or "spearman"
 #' @param q quantile (0-1) for first round filtering based on mean expression and standard deviation
 #' @param maxIt maximum number of iterations must be 25 or less
@@ -28,7 +28,7 @@
 #'
 #' Some differences from standard WGNCA (Horvath/Langfelder)
 #'
-#' - Makes heavy use of [Rfast package](https://cran.r-project.org/web/packages/Rfast/) to compute adjacencies and TOM to enable iterative network creation on > 20K features.
+#' - Makes heavy use of [Rfast][Rfast::Rfast-package] to compute adjacencies and TOM to enable iterative network creation on > 20K features.
 #' - Uses signed adjacency in order to avoid possible distortions of community signatures (eigengenes).
 #' - Iteratively regresses out strongest community in order to facilitate discovery of communities possibly obscured larger module(s).
 #' - Clustering does not focus on merging communities but dropping to identify strongest module(s).
@@ -50,7 +50,8 @@
 #'
 #'
 #' @export
-icwgcna <- function(ex, expo = 6,
+icwgcna <- function(ex,
+                    expo = 6,
                     Method = c("pearson", "spearman"),
                     q = .3,
                     maxIt = 10,
@@ -96,7 +97,10 @@ icwgcna <- function(ex, expo = 6,
                                    mat_mult_method = mat_mult_method
     )
 
-    if(is.null(tEigenGenes)){print("No more modules to be added. -- Stopping Iterations --");break()}
+    if (is.null(tEigenGenes)) {
+      message("No more modules to be added. -- Stopping Iterations --")
+      break()
+    }
 
     rownames(tEigenGenes) <- paste0(LETTERS[i], 1:nrow(tEigenGenes))
     tMetaGenes <- as.data.frame(stats::cor(t(tEx), t(tEigenGenes), method = Method))

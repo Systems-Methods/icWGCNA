@@ -9,7 +9,7 @@ RfastTOMdist(A, mat_mult_method = c("Rfast", "RcppEigen"))
 \arguments{
 \item{A}{A N x N adjacency matrix where N is the number of genes. values range from -1:1 with higher values indicating highly similar genes. Often correlation ^exponent, but could be angular distance, mutual information or Euclidean distance}
 
-\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see \code{details} in \code{icwgcna()})}
+\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see \code{details} in \code{\link[=icwgcna]{icwgcna()}})}
 }
 \value{
 A N x N distance matrix with smaller values indicating more related genes.

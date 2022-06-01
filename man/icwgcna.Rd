@@ -19,7 +19,7 @@ icwgcna(
 \arguments{
 \item{ex}{matrix of bulk RNA-seq or microarray gene expression data}
 
-\item{expo}{exponted to use for soft thresholding}
+\item{expo}{exponted to use for soft thresholding. If NULL will use angular distance}
 
 \item{Method}{correlation to use for distance measure, "pearson" (default) or "spearman"}
 
@@ -59,7 +59,7 @@ Iterative Correcting Weighted Gene Co-expression Network Analysis function for c
 
 Some differences from standard WGNCA (Horvath/Langfelder)
 \itemize{
-\item Makes heavy use of \href{https://cran.r-project.org/web/packages/Rfast/}{Rfast package} to compute adjacencies and TOM to enable iterative network creation on > 20K features.
+\item Makes heavy use of \link[Rfast:Rfast-package]{Rfast} to compute adjacencies and TOM to enable iterative network creation on > 20K features.
 \item Uses signed adjacency in order to avoid possible distortions of community signatures (eigengenes).
 \item Iteratively regresses out strongest community in order to facilitate discovery of communities possibly obscured larger module(s).
 \item Clustering does not focus on merging communities but dropping to identify strongest module(s).

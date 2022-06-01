@@ -18,7 +18,7 @@ fastTOMwrapper(
 
 \item{Method}{"pearson" or "spearman" the similarty measure to use}
 
-\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see \code{details} in \code{icwgcna()})}
+\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see \code{details} in \code{\link[=icwgcna]{icwgcna()}})}
 }
 \value{
 A N x N distance matrix with smaller values indicating more related genes.
