@@ -3,7 +3,7 @@
 \docType{data}
 \name{pangDB_link}
 \alias{pangDB_link}
-\title{pangDB_link}
+\title{Current link used to connect to \href{https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true}{panglaoDB cell markers}}
 \format{
 An object of class \code{character} of length 1.
 }
@@ -11,6 +11,11 @@ An object of class \code{character} of length 1.
 pangDB_link
 }
 \description{
-Current link used to connect to panglaoDB cell markers
+Current link used to connect to \href{https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true}{panglaoDB cell markers}
+}
+\examples{
+
+pangDB_link
+
 }
 \keyword{datasets}

@@ -3,7 +3,7 @@
 \docType{data}
 \name{prolif_names}
 \alias{prolif_names}
-\title{prolif_names}
+\title{Current list of proliferation genes to check}
 \format{
 An object of class \code{character} of length 27.
 }

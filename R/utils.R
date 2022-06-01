@@ -304,16 +304,16 @@ compute_eigengene_matrix <- function(ex,
 }
 
 
-#' pangDB_link
+#' Current link used to connect to [panglaoDB cell markers](https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true)
 #'
-#' Current link used to connect to panglaoDB cell markers
+#' @examples
+#'
+#' pangDB_link
 #'
 #' @export
 #'
 pangDB_link <- "https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz"
 
-#' prolif_names
-#'
 #' Current list of proliferation genes to check
 #'
 #' @examples
@@ -349,7 +349,7 @@ prolif_names <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20",
 #'
 #'\dontrun{
 #' pangDB <- data.table::fread(pangDB_link)
-#' compute_panglaoDB_enrichment(tcell_net$community_membership)}
+#' compute_panglaoDB_enrichment(tcell_net$community_membership, pangDB = pangDB)}
 #'
 compute_panglaoDB_enrichment <- function(t_memb,
                                          K = 100,
