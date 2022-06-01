@@ -16,5 +16,5 @@ A N x N distance matrix with smaller values indicating more related genes.
 }
 \description{
 distance based on the topological overlap map from \href{https://pubmed.ncbi.nlm.nih.gov/12202830/}{Ravasz, E., Somera, A., Mongru, D., Oltvai, Z. and Barab´asi, A. (2002). Science}
-Implemented to using the \href{https://cran.r-project.org/web/packages/Rfast/}{Rfast package} functions to  speed things up since we will be computing this up to 25 times
+Implemented to using the \link[Rfast:Rfast-package]{Rfast} functions to  speed things up since we will be computing this up to 25 times
 }

@@ -16,7 +16,7 @@ fastTOMwrapper(
 
 \item{expo}{the power to raise the similarity measure to default = 6. If set to NULL, angular distance is used to applied to the similarity measure ( asin(x) / (pi/2) ).}
 
-\item{Method}{"pearson" or "spearman" the similarty measure to use}
+\item{Method}{"pearson" or "spearman" the similarity measure to use}
 
 \item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see \code{details} in \code{\link[=icwgcna]{icwgcna()}})}
 }
@@ -24,8 +24,8 @@ fastTOMwrapper(
 A N x N distance matrix with smaller values indicating more related genes.
 }
 \description{
-Topological overlap map (TOM, from \href{https://pubmed.ncbi.nlm.nih.gov/12202830/}{Ravasz, et al (2002). Science}) wrapper using the \href{https://cran.r-project.org/web/packages/Rfast/}{Rfast package}
+Topological overlap map (TOM, from \href{https://pubmed.ncbi.nlm.nih.gov/12202830/}{Ravasz, et al (2002). Science}) wrapper using the \link[Rfast:Rfast-package]{Rfast}
 to speed up calculations. This function can compute TOM for 24K gene matrix in 8 minute of an AWS-EC2 c5.18xlarge instance, though in practice we run it on subsets of most variable genes.
-Adjacenty measur options are Pearson or Spearman correlation raised to a power and angular distance. Note that we only use signed and weighted adjacencies. If users are interested in genes negatively associated
+Adjacently measure options are Pearson or Spearman correlation raised to a power and angular distance. Note that we only use signed and weighted adjacencies. If users are interested in genes negatively associated
 with a community they should check community memberships (kME) output from the main function icwgcna().
 }

@@ -31,7 +31,7 @@ icwgcna(
 
 \item{corCut}{correlation threshold used for dropping communities}
 
-\item{covCut}{coeficient of variation (CoV) quantile threshold to use at each iteration  for selecting genes to build network. covCut = .667 would use the top third of genes based on CoV after regressing out largest community}
+\item{covCut}{coefficient of variation (CoV) quantile threshold to use at each iteration  for selecting genes to build network. covCut = .667 would use the top third of genes based on CoV after regressing out largest community}
 
 \item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see {details})}
 }

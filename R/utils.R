@@ -38,7 +38,7 @@ RfastCor_wrapper <- function(x,
 #' @export
 #'
 #' @description distance based on the topological overlap map from [Ravasz, E., Somera, A., Mongru, D., Oltvai, Z. and Barab´asi, A. (2002). Science](https://pubmed.ncbi.nlm.nih.gov/12202830/)
-#' Implemented to using the [Rfast package](https://cran.r-project.org/web/packages/Rfast/) functions to  speed things up since we will be computing this up to 25 times
+#' Implemented to using the [Rfast][Rfast::Rfast-package] functions to  speed things up since we will be computing this up to 25 times
 #'
 #' @examples
 RfastTOMdist <- function(A,
@@ -70,14 +70,14 @@ RfastTOMdist <- function(A,
 #'
 #' @param X a gene expression matrix w each column being one sample and N rows representing genes. X should be in log space (usually between 0 and 20)
 #' @param expo the power to raise the similarity measure to default = 6. If set to NULL, angular distance is used to applied to the similarity measure ( asin(x) / (pi/2) ).
-#' @param Method "pearson" or "spearman" the similarty measure to use
+#' @param Method "pearson" or "spearman" the similarity measure to use
 #' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `details` in [`icwgcna()`])
 #'
 #' @return A N x N distance matrix with smaller values indicating more related genes.
 #' @export
-#' @description Topological overlap map (TOM, from [Ravasz, et al (2002). Science](https://pubmed.ncbi.nlm.nih.gov/12202830/)) wrapper using the [Rfast package](https://cran.r-project.org/web/packages/Rfast/)
+#' @description Topological overlap map (TOM, from [Ravasz, et al (2002). Science](https://pubmed.ncbi.nlm.nih.gov/12202830/)) wrapper using the [Rfast][Rfast::Rfast-package]
 #' to speed up calculations. This function can compute TOM for 24K gene matrix in 8 minute of an AWS-EC2 c5.18xlarge instance, though in practice we run it on subsets of most variable genes.
-#' Adjacenty measur options are Pearson or Spearman correlation raised to a power and angular distance. Note that we only use signed and weighted adjacencies. If users are interested in genes negatively associated
+#' Adjacently measure options are Pearson or Spearman correlation raised to a power and angular distance. Note that we only use signed and weighted adjacencies. If users are interested in genes negatively associated
 #' with a community they should check community memberships (kME) output from the main function icwgcna().
 #'
 #'
@@ -225,11 +225,9 @@ simpWGCNAsubNet <- function(tEx,
   retMods <- retMods[retMods != "0"]
   message(paste("number of modules found is", length(retMods)))
 
-  if(length(retMods) == 0)
-  {
+  if (length(retMods) == 0) {
     eigenGenes <- NULL
-  }else
-  {
+  } else {
     eigenGenes <- as.matrix(plyr::ldply(.data = retMods,
                                          .fun = function(m) {
                                          eg <- calcEigenGene(tEx[mods == m, ])
@@ -238,7 +236,7 @@ simpWGCNAsubNet <- function(tEx,
     rownames(eigenGenes) <- retMods
 
     # subsetting modSz to match eigenGenes
-    # For droppig communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
+    # For dropping communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
     eigenGenes <- dropModuels(eigenGenes = eigenGenes,
                              Kurts = modSz[names(modSz) %in% retMods],
                               corCut = corCut)
