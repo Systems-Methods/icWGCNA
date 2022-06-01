@@ -2,9 +2,12 @@
 
 export(RfastTOMdist)
 export(compute_eigengene_matrix)
+export(compute_panglaoDB_enrichment)
 export(eigenMapMatMult)
 export(fastTOMwrapper)
 export(icwgcna)
+export(pangDB_link)
+export(prolif_names)
 import(RcppEigen)
 importFrom(Rcpp,sourceCpp)
 useDynLib(icWGCNA, .registration=TRUE)

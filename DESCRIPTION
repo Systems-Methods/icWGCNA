@@ -17,6 +17,7 @@ Imports:
     Rcpp,
     Rfast
 Suggests:
+    data.table,
     UCSCXenaTools
 LinkingTo: 
     Rcpp,

@@ -38,11 +38,11 @@ icwgcna(
 \value{
 Returns a list with the following items:
 \itemize{
-\item \code{community_membership} -
-\item \code{community_signature} -
-\item \code{full_community_membership} -
-\item \code{full_community_signature} -
-\item \code{controlled_for} -
+\item \code{community_membership} - ???
+\item \code{community_signature} - ???
+\item \code{full_community_membership} - ???
+\item \code{full_community_signature} - ???
+\item \code{controlled_for} - ???
 }
 }
 \description{

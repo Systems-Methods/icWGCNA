@@ -13,11 +13,11 @@
 #' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see {details})
 #'
 #' @return Returns a list with the following items:
-#' * `community_membership` -
-#' * `community_signature` -
-#' * `full_community_membership` -
-#' * `full_community_signature` -
-#' * `controlled_for` -
+#' * `community_membership` - ???
+#' * `community_signature` - ???
+#' * `full_community_membership` - ???
+#' * `full_community_signature` - ???
+#' * `controlled_for` - ???
 #'
 #' @details Iterative Correcting Weighted Gene Co-expression Network Analysis function for constructing a gene network from a gene expression matrix. The algorithm:
 #'
