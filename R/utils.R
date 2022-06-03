@@ -304,32 +304,75 @@ compute_eigengene_matrix <- function(ex,
 }
 
 
+#' Current link used to connect to [panglaoDB cell markers](https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true)
+#'
+#' @examples
+#'
+#' pangDB_link
+#'
+#' @export
+#'
+pangDB_link <- "https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz"
 
-# compute cell type enrichments using [panglaoDB cell markers](https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true)
-compute_panglaoDB_enrichment <- function(t_memb, K = 100, memb_cut = .65, pangDB = NULL)
+#' Current list of proliferation genes to check
+#'
+#' @examples
+#'
+#' prolif_names
+#'
+#' @export
+#'
+prolif_names <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20",
+                  "MCM10","HJURP","FOXM1","TOP2A","DLGAP5","KIF2C","KIF14",
+                  "ASPM","NEK2","CDCA8","CDKN3","NUF2","CDCA3",
+                  "CCNA2","CDCA5","CCNB1","ANLN","TTK","KIF20A","CCNB2")
+
+
+#' Compute Cell Type Enrichments Using panglaoDB Cell Markers
+#'
+#' compute cell type enrichments using [panglaoDB cell markers](https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true)
+#' using Fisher test.
+#' @param t_memb `community_membership` or `full_community_membership` values from [icwgcna()]
+#' @param K cutoff for top community genes to include for computing enrichment. Used in an AND condition with memb_cut.
+#' @param memb_cut cutoff as a membership score threshold for determining top community genes for computing enrichment.  Used in an AND condition with K.
+#' @param pangDB panglaoDB cell markers database. Default is to read data from the url [pangDB_link]
+#' @param prolif list of proliferation genes to check. Default is to use [prolif_names]
+#'
+#' @return Returns a list with the following items:
+#' * `top_enr` - the most significant cell type from the enrichment scores.
+#' * `full_enr` - all panglaoDB cell type enrichment scores for all communities.
+#'
+#'
+#' @export
+#'
+#' @examples
+#'
+#'\dontrun{
+#' pangDB <- data.table::fread(pangDB_link)
+#' compute_panglaoDB_enrichment(tcell_net$community_membership, pangDB = pangDB)}
+#'
+compute_panglaoDB_enrichment <- function(t_memb,
+                                         K = 100,
+                                         memb_cut = .65,
+                                         pangDB = data.table::fread(pangDB_link),
+                                         prolif = prolif_names)
 {
-  if(is.null(pangDB))
-  {
-    library(curl)
-    library(data.table)
-    pangDB <- fread("https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz")
-  }
 
-  # some cell types (gamma delta t-cells) get called when there is clearly just a proliferation signature
-  # gene list for checking
-  prolif <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20","MCM10","HJURP","FOXM1",
-              "TOP2A","DLGAP5","KIF2C","KIF14","ASPM","NEK2","CDCA8","CDKN3","NUF2","CDCA3",
-              "CCNA2","CDCA5","CCNB1","ANLN","TTK","KIF20A","CCNB2")
-  enr <- plyr::adply(t_memb,2, function(x)
-  {
-    c.types <- as.vector(na.omit(unique(pangDB$`cell type`)))
+  enr <- plyr::adply(t_memb,2, function(x) {
+    c.types <- as.vector(stats::na.omit(unique(pangDB$`cell type`)))
     prolif_overlap <- table(rank(-x) <= K & x > memb_cut, rownames(t_memb) %in% prolif)
-    ret <- t(plyr::ldply(c.types,function(ct)
-    {
-      if(ncol(prolif_overlap) > 1){if(prolif_overlap[2,2] > floor(.33 * length(prolif))){return(1)}}
-      overlap <- table(rank(-x) <= K & x > memb_cut, rownames(t_memb) %in% pangDB$`official gene symbol`[pangDB$`cell type` == ct])
-      if(ncol(overlap) == 1){return(1)}
-      ret2    <- fisher.test(overlap,)$p.val
+    ret <- t(plyr::ldply(c.types,function(ct) {
+      if (ncol(prolif_overlap) > 1 &
+          (prolif_overlap[2,2] > floor(.33 * length(prolif)))) {
+        return(1)
+      }
+
+      overlap <- table(rank(-x) <= K & x > memb_cut,
+                       rownames(t_memb) %in% pangDB$`official gene symbol`[pangDB$`cell type` == ct])
+      if (ncol(overlap) == 1) {
+        return(1)
+      }
+      ret2 <- stats::fisher.test(overlap,)$p.val
       return(unlist(ret2))
     }))
 
@@ -341,7 +384,9 @@ compute_panglaoDB_enrichment <- function(t_memb, K = 100, memb_cut = .65, pangDB
   enr           <- as.data.frame(t(enr[,-1]))
 
   top_enr <- plyr::ldply(apply(enr,2,function(x){
-    if(min(x) > 0.001){return(data.frame(cell_type = NA,p = NA))}
+    if (min(x) > 0.001) {
+      return(data.frame(cell_type = NA,p = NA))
+    }
 
     i <- which(x == min(x))
 
@@ -350,7 +395,8 @@ compute_panglaoDB_enrichment <- function(t_memb, K = 100, memb_cut = .65, pangDB
   }))
   names(top_enr)[1] <- "community"
 
-  return(list(top_enr = top_enr, full_enr = enr))
+  return(list(top_enr = top_enr,
+              full_enr = enr))
 }
 
 
