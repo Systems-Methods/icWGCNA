@@ -38,11 +38,11 @@ icwgcna(
 \value{
 Returns a list with the following items:
 \itemize{
-\item \code{community_membership} - ???
-\item \code{community_signature} - ???
-\item \code{full_community_membership} - ???
-\item \code{full_community_signature} - ???
-\item \code{controlled_for} - ???
+\item \code{community_membership} - community membership score (kME). Analogous to loadings in PCA.
+\item \code{community_signature} - community eigengene, the first principal component the expression of genes in this community. This can be thought of as the average of the scaled expression of top community genes.
+\item \code{full_community_membership} -  similar to community_membership but includes communities that were dropped in the iterative process.
+\item \code{full_community_signature} - similar to community_signature but includes communities that were dropped in the iterative process.
+\item \code{controlled_for} - The communities whose signatures were regressed out at each iteration.
 }
 }
 \description{

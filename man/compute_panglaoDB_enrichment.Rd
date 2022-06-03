@@ -15,9 +15,9 @@ compute_panglaoDB_enrichment(
 \arguments{
 \item{t_memb}{\code{community_membership} or \code{full_community_membership} values from \code{\link[=icwgcna]{icwgcna()}}}
 
-\item{K}{cutoff for ???}
+\item{K}{cutoff for top community genes to include for computing enrichment. Used in an AND condition with memb_cut.}
 
-\item{memb_cut}{cutoff for ???}
+\item{memb_cut}{cutoff as a membership score threshold for determining top community genes for computing enrichment.  Used in an AND condition with K.}
 
 \item{pangDB}{panglaoDB cell markers database. Default is to read data from the url \link{pangDB_link}}
 
@@ -26,12 +26,13 @@ compute_panglaoDB_enrichment(
 \value{
 Returns a list with the following items:
 \itemize{
-\item \code{top_enr} - ???
-\item \code{full_enr} - ???
+\item \code{top_enr} - the most significant cell type from the enrichment scores.
+\item \code{full_enr} - all panglaoDB cell type enrichment scores for all communities.
 }
 }
 \description{
 compute cell type enrichments using \href{https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true}{panglaoDB cell markers}
+using Fisher test.
 }
 \examples{
 
