@@ -14,6 +14,11 @@ Authors@R:
            role = c("aut"),
            email = "william.fulp@bms.com",
            comment = c(ORCID = "0000-0001-6888-0794")
+    ),
+    person(given = "Alexandre",
+           family = "Alloy",
+           role = c("aut"),
+           email = "alexandre.alloy@bms.com"
     )
   )
 Description: Iterative Correcting Weighted Gene Co-expression Network Analysis function for constructing a gene network from a gene expression matrix. The algorithm: 
@@ -25,5 +30,5 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-URL: https://biogit.pri.bms.com/masonm3/icWGCNA
-BugReports: https://biogit.pri.bms.com/masonm3/icWGCNA/issues
+URL: https://biogit.pri.bms.com/Systems-Immunology/icWGCNA
+BugReports: https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/issues
