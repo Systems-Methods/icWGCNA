@@ -267,11 +267,11 @@ compute_eigengene_matrix <- function(ex,
                                      cutoff = 5,
                                      pc_flag = TRUE) {
   ex <- ex[apply(as.matrix(ex), 1, stats::sd) != 0, ]
-  meta <- meta[rownames(meta) %in% rownames(ex), ]
-  m_genes <- rownames(meta)
+  membership_matrix <- membership_matrix[rownames(membership_matrix) %in% rownames(ex), ]
+  m_genes <- rownames(membership_matrix)
   e_genes <- rownames(ex)
 
-  tEigen <- plyr::aaply(as.matrix(meta), 2, function(k) {
+  tEigen <- plyr::aaply(as.matrix(membership_matrix), 2, function(k) {
     tInds <- rank(-k) <= cutoff
     tEx <- ex[e_genes %in% m_genes[tInds], ]
     if (all(tEx == 0)) {
