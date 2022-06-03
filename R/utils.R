@@ -331,16 +331,16 @@ prolif_names <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20",
 #' Compute Cell Type Enrichments Using panglaoDB Cell Markers
 #'
 #' compute cell type enrichments using [panglaoDB cell markers](https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true)
-#'
+#' using Fisher test.
 #' @param t_memb `community_membership` or `full_community_membership` values from [icwgcna()]
-#' @param K cutoff for ???
-#' @param memb_cut cutoff for ???
+#' @param K cutoff for top community genes to include for computing enrichment. Used in an AND condition with memb_cut.
+#' @param memb_cut cutoff as a membership score threshold for determining top community genes for computing enrichment.  Used in an AND condition with K.
 #' @param pangDB panglaoDB cell markers database. Default is to read data from the url [pangDB_link]
 #' @param prolif list of proliferation genes to check. Default is to use [prolif_names]
 #'
 #' @return Returns a list with the following items:
-#' * `top_enr` - ???
-#' * `full_enr` - ???
+#' * `top_enr` - the most significant cell type from the enrichment scores.
+#' * `full_enr` - all panglaoDB cell type enrichment scores for all communities.
 #'
 #'
 #' @export

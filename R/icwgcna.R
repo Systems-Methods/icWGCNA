@@ -13,11 +13,11 @@
 #' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see {details})
 #'
 #' @return Returns a list with the following items:
-#' * `community_membership` - ???
-#' * `community_signature` - ???
-#' * `full_community_membership` - ???
-#' * `full_community_signature` - ???
-#' * `controlled_for` - ???
+#' * `community_membership` - community membership score (kME). Analogous to loadings in PCA. 
+#' * `community_signature` - community eigengene, the first principal component the expression of genes in this community. This can be thought of as the average of the scaled expression of top community genes.
+#' * `full_community_membership` -  similar to community_membership but includes communities that were dropped in the iterative process.
+#' * `full_community_signature` - similar to community_signature but includes communities that were dropped in the iterative process.
+#' * `controlled_for` - The communities whose signatures were regressed out at each iteration.
 #'
 #' @details Iterative Correcting Weighted Gene Co-expression Network Analysis function for constructing a gene network from a gene expression matrix. The algorithm:
 #'
