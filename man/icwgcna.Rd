@@ -8,16 +8,18 @@ icwgcna(
   ex,
   expo = 6,
   Method = c("pearson", "spearman"),
-  q = 0.5,
-  maxIt = 25,
+  q = 0.3,
+  maxIt = 10,
   maxComm = 100,
-  corCut = 0.6
+  corCut = 0.8,
+  covCut = 0.33,
+  mat_mult_method = c("Rfast", "RcppEigen")
 )
 }
 \arguments{
 \item{ex}{matrix of bulk RNA-seq or microarray gene expression data}
 
-\item{expo}{exponted to use for soft thresholding}
+\item{expo}{exponted to use for soft thresholding. If NULL will use angular distance}
 
 \item{Method}{correlation to use for distance measure, "pearson" (default) or "spearman"}
 
@@ -28,15 +30,19 @@ icwgcna(
 \item{maxComm}{maximum number of communities to be found}
 
 \item{corCut}{correlation threshold used for dropping communities}
+
+\item{covCut}{coefficient of variation (CoV) quantile threshold to use at each iteration  for selecting genes to build network. covCut = .667 would use the top third of genes based on CoV after regressing out largest community}
+
+\item{mat_mult_method}{method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see {details})}
 }
 \value{
 Returns a list with the following items:
 \itemize{
-\item \code{community_membership} -
-\item \code{community_signature} -
-\item \code{full_community_membership} -
-\item \code{full_community_signature} -
-\item \code{controlled_for} -
+\item \code{community_membership} - community membership score (kME). Analogous to loadings in PCA.
+\item \code{community_signature} - community eigengene, the first principal component the expression of genes in this community. This can be thought of as the average of the scaled expression of top community genes.
+\item \code{full_community_membership} -  similar to community_membership but includes communities that were dropped in the iterative process.
+\item \code{full_community_signature} - similar to community_signature but includes communities that were dropped in the iterative process.
+\item \code{controlled_for} - The communities whose signatures were regressed out at each iteration.
 }
 }
 \description{
@@ -53,10 +59,27 @@ Iterative Correcting Weighted Gene Co-expression Network Analysis function for c
 
 Some differences from standard WGNCA (Horvath/Langfelder)
 \itemize{
-\item Makes heavy use of \href{https://cran.r-project.org/web/packages/Rfast/}{Rfast package} to compute adjacencies and TOM to enable iterative network creation on > 20K features.
+\item Makes heavy use of \link[Rfast:Rfast-package]{Rfast} to compute adjacencies and TOM to enable iterative network creation on > 20K features.
 \item Uses signed adjacency in order to avoid possible distortions of community signatures (eigengenes).
 \item Iteratively regresses out strongest community in order to facilitate discovery of communities possibly obscured larger module(s).
 \item Clustering does not focus on merging communities but dropping to identify strongest module(s).
 \item Enables Spearman correlation for constructing adjacency matrix instead of Pearson to enable robust application in RNA-seq and micro-array data. Future updates may include mutual information
 }
+
+For matrix multiplication the option "Rfast" will use \code{\link[Rfast:mat.mult]{Rfast::mat.mult()}},
+which takes advantage of parallel processing across multiple cores. The option
+"RcppEigen" will use the RcppEigen engine for C++ code, which tends to be faster
+when using a single core, but does not take advantage of parallel processing across
+multiple cores. If running this on a cluster with access to many computer core
+there is a significant performance advantage to using \code{\link[Rfast:mat.mult]{Rfast::mat.mult()}}
+}
+\examples{
+
+\dontrun{
+library("UCSCXenaTools")
+luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+                  clinical = FALSE, download = TRUE)
+ex <- data.table::fread(luad$destfiles)
+results <- icwgcna(ex)}
+
 }

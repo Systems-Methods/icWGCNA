@@ -12,5 +12,13 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
     dynamicTreeCut,
+    RcppEigen,
     plyr,
+    Rcpp,
     Rfast
+Suggests:
+    data.table,
+    UCSCXenaTools
+LinkingTo: 
+    Rcpp,
+    RcppEigen

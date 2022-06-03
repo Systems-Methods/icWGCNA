@@ -21,10 +21,9 @@ RfastCor_wrapper <- function(x,
     x <- Rfast::rowRanks(x)
   }
 
-  Cor <- Rfast::cora(t(x),large = F)
+  Cor <- Rfast::cora(Rfast::transpose(x), large = TRUE)
 
-  rownames(Cor) <- gene_names
-  colnames(Cor) <- gene_names
+  rownames(Cor) <- colnames(Cor) <- gene_names
 
   return(Cor)
 }
@@ -33,15 +32,19 @@ RfastCor_wrapper <- function(x,
 #' RfastTOMdist
 #'
 #' @param A A N x N adjacency matrix where N is the number of genes. values range from -1:1 with higher values indicating highly similar genes. Often correlation ^exponent, but could be angular distance, mutual information or Euclidean distance
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `details` in [`icwgcna()`])
 #'
 #' @return A N x N distance matrix with smaller values indicating more related genes.
 #' @export
 #'
 #' @description distance based on the topological overlap map from [Ravasz, E., Somera, A., Mongru, D., Oltvai, Z. and Barab´asi, A. (2002). Science](https://pubmed.ncbi.nlm.nih.gov/12202830/)
-#' Implemented to using the [Rfast package](https://cran.r-project.org/web/packages/Rfast/) functions to  speed things up since we will be computing this up to 25 times
+#' Implemented to using the [Rfast][Rfast::Rfast-package] functions to  speed things up since we will be computing this up to 25 times
 #'
 #' @examples
-RfastTOMdist <- function(A) {
+RfastTOMdist <- function(A,
+                         mat_mult_method = c('Rfast', 'RcppEigen')) {
+  mat_mult_method <- match.arg(mat_mult_method)
+
   diag(A) <- 0
   A[is.na(A)] <- 0
   kk <- Rfast::colsums(A)
@@ -49,9 +52,12 @@ RfastTOMdist <- function(A) {
   denomTOM <- Rfast::Pmin(denomHelp, Rfast::transpose(denomHelp)) + (1 - A)
   rm(denomHelp, kk)
 
-  numTOM <- Rfast::mat.mult(A, A) + A
+  if (mat_mult_method == 'Rfast') {
+    numTOM <- Rfast::mat.mult(A, A) + A
+  } else {
+    numTOM <- eigenMapMatMult(A, A) + A
+  }
 
-  rm(A)
 
   out <- 1 - as.matrix(numTOM / denomTOM)
   diag(out) <- 0
@@ -64,25 +70,27 @@ RfastTOMdist <- function(A) {
 #'
 #' @param X a gene expression matrix w each column being one sample and N rows representing genes. X should be in log space (usually between 0 and 20)
 #' @param expo the power to raise the similarity measure to default = 6. If set to NULL, angular distance is used to applied to the similarity measure ( asin(x) / (pi/2) ).
-#' @param Method "pearson" or "spearman" the similarty measure to use
+#' @param Method "pearson" or "spearman" the similarity measure to use
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `details` in [`icwgcna()`])
 #'
 #' @return A N x N distance matrix with smaller values indicating more related genes.
 #' @export
-#' @description Topological overlap map (TOM, from [Ravasz, et al (2002). Science](https://pubmed.ncbi.nlm.nih.gov/12202830/)) wrapper using the [Rfast package](https://cran.r-project.org/web/packages/Rfast/)
+#' @description Topological overlap map (TOM, from [Ravasz, et al (2002). Science](https://pubmed.ncbi.nlm.nih.gov/12202830/)) wrapper using the [Rfast][Rfast::Rfast-package]
 #' to speed up calculations. This function can compute TOM for 24K gene matrix in 8 minute of an AWS-EC2 c5.18xlarge instance, though in practice we run it on subsets of most variable genes.
-#' Adjacenty measur options are Pearson or Spearman correlation raised to a power and angular distance. Note that we only use signed and weighted adjacencies. If users are interested in genes negatively associated
+#' Adjacently measure options are Pearson or Spearman correlation raised to a power and angular distance. Note that we only use signed and weighted adjacencies. If users are interested in genes negatively associated
 #' with a community they should check community memberships (kME) output from the main function icwgcna().
 #'
 #'
 #' @examples
 fastTOMwrapper <- function(X,
                            expo = 6,
-                           Method = c("pearson", "spearman")) {
+                           Method = c("pearson", "spearman"),
+                           mat_mult_method = c('Rfast', 'RcppEigen')) {
   Method <- match.arg(Method)
+  mat_mult_method <- match.arg(mat_mult_method)
 
   # compute weighted adjacency matrix using Rfast package
-  X <- RfastCor_wrapper(X,
-                        Method = Method)
+  X <- RfastCor_wrapper(X, Method = Method)
   X[is.na(X)] <- 0
   X[X < 0] <- 0
 
@@ -94,7 +102,7 @@ fastTOMwrapper <- function(X,
   }
   rm(X)
 
-  tom <- RfastTOMdist(A)
+  tom <- RfastTOMdist(A, mat_mult_method = mat_mult_method)
   return(tom)
 }
 
@@ -113,7 +121,7 @@ calcEigenGene <- function(tEx) {
 }
 
 
-# wrapper of cutreeHybrid from Langfelder and Horvath's dynamic tree cutting package.(https://cran.r-project.org/web/packages/dynamicTreeCut/)
+# wrapper of [dynamicTreeCut::cutreeHybrid] from Langfelder and Horvath's dynamic tree cutting package.
 # Instead of merging modules like they do, we'll be dropping correlated modules based on kME kurtosis
 # i.e. we'll be selecting between two correlated modules
 cutreeHybridWrapper <- function(d,
@@ -192,8 +200,10 @@ simpWGCNAsubNet <- function(tEx,
                             Method = c("pearson", "spearman"),
                             n = 15,
                             minMods = 5,
-                            corCut = .6) {
+                            corCut = .6,
+                            mat_mult_method = c('Rfast', 'RcppEigen')) {
   Method <- match.arg(Method)
+  mat_mult_method <- match.arg(mat_mult_method)
 
   message(paste("Computing", nrow(tEx),
               "x", nrow(tEx),
@@ -201,7 +211,8 @@ simpWGCNAsubNet <- function(tEx,
 
   TOMd <- fastTOMwrapper(tEx,
                          expo = expo,
-                         Method = Method)
+                         Method = Method,
+                         mat_mult_method = mat_mult_method)
   mods <- cutreeHybridWrapper(TOMd)$labels
   modSz <- table(mods)
   if (sum(modSz >= n) < minMods) {
@@ -214,11 +225,9 @@ simpWGCNAsubNet <- function(tEx,
   retMods <- retMods[retMods != "0"]
   message(paste("number of modules found is", length(retMods)))
 
-  if(length(retMods) == 0)
-  {
+  if (length(retMods) == 0) {
     eigenGenes <- NULL
-  }else
-  {
+  } else {
     eigenGenes <- as.matrix(plyr::ldply(.data = retMods,
                                          .fun = function(m) {
                                          eg <- calcEigenGene(tEx[mods == m, ])
@@ -227,13 +236,16 @@ simpWGCNAsubNet <- function(tEx,
     rownames(eigenGenes) <- retMods
 
     # subsetting modSz to match eigenGenes
+    # For dropping communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
     eigenGenes <- dropModuels(eigenGenes = eigenGenes,
-                             Kurts = modSz[names(modSz) %in% retMods], # For droppig communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
-                              corCut = corCut)                          # when we drop between rounds we use kurtosis since we don't have access to topology at that point.
+                             Kurts = modSz[names(modSz) %in% retMods],
+                              corCut = corCut)
+    # when we drop between rounds we use kurtosis since we don't have access to topology at that point.
     tPc <- stats::prcomp(t(tEx))
     message(summary(tPc)$importance[2, 1:3])
     corPC <- stats::cor(tPc$x[, 1], t(eigenGenes))
-    eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ] # order by cor with PC1 so that we regress out the eigengene most strongly associated with PC1.
+    # order by cor with PC1 so that we regress out the eigengene most strongly associated with PC1.
+    eigenGenes <- eigenGenes[order(abs(corPC), decreasing = TRUE), ]
   }
   return(eigenGenes)
 }
@@ -292,32 +304,75 @@ compute_eigengene_matrix <- function(ex,
 }
 
 
+#' Current link used to connect to [panglaoDB cell markers](https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true)
+#'
+#' @examples
+#'
+#' pangDB_link
+#'
+#' @export
+#'
+pangDB_link <- "https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz"
 
-# compute cell type enrichments using [panglaoDB cell markers](https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true)
-compute_panglaoDB_enrichment <- function(t_memb, K = 100, memb_cut = .65, pangDB = NULL)
+#' Current list of proliferation genes to check
+#'
+#' @examples
+#'
+#' prolif_names
+#'
+#' @export
+#'
+prolif_names <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20",
+                  "MCM10","HJURP","FOXM1","TOP2A","DLGAP5","KIF2C","KIF14",
+                  "ASPM","NEK2","CDCA8","CDKN3","NUF2","CDCA3",
+                  "CCNA2","CDCA5","CCNB1","ANLN","TTK","KIF20A","CCNB2")
+
+
+#' Compute Cell Type Enrichments Using panglaoDB Cell Markers
+#'
+#' compute cell type enrichments using [panglaoDB cell markers](https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true)
+#' using Fisher test.
+#' @param t_memb `community_membership` or `full_community_membership` values from [icwgcna()]
+#' @param K cutoff for top community genes to include for computing enrichment. Used in an AND condition with memb_cut.
+#' @param memb_cut cutoff as a membership score threshold for determining top community genes for computing enrichment.  Used in an AND condition with K.
+#' @param pangDB panglaoDB cell markers database. Default is to read data from the url [pangDB_link]
+#' @param prolif list of proliferation genes to check. Default is to use [prolif_names]
+#'
+#' @return Returns a list with the following items:
+#' * `top_enr` - the most significant cell type from the enrichment scores.
+#' * `full_enr` - all panglaoDB cell type enrichment scores for all communities.
+#'
+#'
+#' @export
+#'
+#' @examples
+#'
+#'\dontrun{
+#' pangDB <- data.table::fread(pangDB_link)
+#' compute_panglaoDB_enrichment(tcell_net$community_membership, pangDB = pangDB)}
+#'
+compute_panglaoDB_enrichment <- function(t_memb,
+                                         K = 100,
+                                         memb_cut = .65,
+                                         pangDB = data.table::fread(pangDB_link),
+                                         prolif = prolif_names)
 {
-  if(is.null(pangDB))
-  {
-    library(curl)
-    library(data.table)
-    pangDB <- fread("https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz")
-  }
 
-  # some cell types (gamma delta t-cells) get called when there is clearly just a proliferation signature
-  # gene list for checking
-  prolif <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20","MCM10","HJURP","FOXM1",
-              "TOP2A","DLGAP5","KIF2C","KIF14","ASPM","NEK2","CDCA8","CDKN3","NUF2","CDCA3",
-              "CCNA2","CDCA5","CCNB1","ANLN","TTK","KIF20A","CCNB2")
-  enr <- plyr::adply(t_memb,2, function(x)
-  {
-    c.types <- as.vector(na.omit(unique(pangDB$`cell type`)))
+  enr <- plyr::adply(t_memb,2, function(x) {
+    c.types <- as.vector(stats::na.omit(unique(pangDB$`cell type`)))
     prolif_overlap <- table(rank(-x) <= K & x > memb_cut, rownames(t_memb) %in% prolif)
-    ret <- t(plyr::ldply(c.types,function(ct)
-    {
-      if(ncol(prolif_overlap) > 1){if(prolif_overlap[2,2] > floor(.33 * length(prolif))){return(1)}}
-      overlap <- table(rank(-x) <= K & x > memb_cut, rownames(t_memb) %in% pangDB$`official gene symbol`[pangDB$`cell type` == ct])
-      if(ncol(overlap) == 1){return(1)}
-      ret2    <- fisher.test(overlap,)$p.val
+    ret <- t(plyr::ldply(c.types,function(ct) {
+      if (ncol(prolif_overlap) > 1 &
+          (prolif_overlap[2,2] > floor(.33 * length(prolif)))) {
+        return(1)
+      }
+
+      overlap <- table(rank(-x) <= K & x > memb_cut,
+                       rownames(t_memb) %in% pangDB$`official gene symbol`[pangDB$`cell type` == ct])
+      if (ncol(overlap) == 1) {
+        return(1)
+      }
+      ret2 <- stats::fisher.test(overlap,)$p.val
       return(unlist(ret2))
     }))
 
@@ -329,7 +384,9 @@ compute_panglaoDB_enrichment <- function(t_memb, K = 100, memb_cut = .65, pangDB
   enr           <- as.data.frame(t(enr[,-1]))
 
   top_enr <- plyr::ldply(apply(enr,2,function(x){
-    if(min(x) > 0.001){return(data.frame(cell_type = NA,p = NA))}
+    if (min(x) > 0.001) {
+      return(data.frame(cell_type = NA,p = NA))
+    }
 
     i <- which(x == min(x))
 
@@ -338,7 +395,8 @@ compute_panglaoDB_enrichment <- function(t_memb, K = 100, memb_cut = .65, pangDB
   }))
   names(top_enr)[1] <- "community"
 
-  return(list(top_enr = top_enr, full_enr = enr))
+  return(list(top_enr = top_enr,
+              full_enr = enr))
 }
 
 
