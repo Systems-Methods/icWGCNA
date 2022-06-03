@@ -25,5 +25,17 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-URL: https://biogit.pri.bms.com/masonm3/icWGCNA
-BugReports: https://biogit.pri.bms.com/masonm3/icWGCNA/issues
+URL: https://biogit.pri.bms.com/Systems-Immunology/icWGCNA
+BugReports: https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/issues
+Imports: 
+    dynamicTreeCut,
+    RcppEigen,
+    plyr,
+    Rcpp,
+    Rfast
+Suggests:
+    data.table,
+    UCSCXenaTools
+LinkingTo: 
+    Rcpp,
+    RcppEigen
