@@ -22,6 +22,30 @@
     <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/news/index.html</loc>
   </url>
   <url>
+    <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/reference/RfastTOMdist.html</loc>
+  </url>
+  <url>
+    <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/reference/compute_eigengene_matrix.html</loc>
+  </url>
+  <url>
+    <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/reference/compute_panglaoDB_enrichment.html</loc>
+  </url>
+  <url>
+    <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/reference/eigenMapMatMult.html</loc>
+  </url>
+  <url>
+    <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/reference/fastTOMwrapper.html</loc>
+  </url>
+  <url>
+    <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/reference/icwgcna.html</loc>
+  </url>
+  <url>
     <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/reference/pangDB_link.html</loc>
+  </url>
+  <url>
+    <loc>https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/reference/prolif_names.html</loc>
   </url>
 </urlset>
