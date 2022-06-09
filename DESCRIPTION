@@ -1,12 +1,47 @@
 Package: icWGCNA
-Title: What the Package Does (One Line, Title Case)
+Title: Iterative Correcting Weighted Gene Co-expression Network Analysis
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+  c(
+    person(given = "Mike",
+           family = "Mason",
+           role = c("aut", "cre"),
+           email = "mike.mason@bms.com",
+           comment = c(ORCID = "0000-0002-5652-7739")
+           ),
+    person(given = "Jimmy",
+           family = "Fulp",
+           role = c("aut"),
+           email = "william.fulp@bms.com",
+           comment = c(ORCID = "0000-0001-6888-0794")
+    ),
+    person(given = "Alexandre",
+           family = "Alloy",
+           role = c("ctb"),
+           email = "alexandre.alloy@bms.com"
+    )
+  )
+Description: Iterative Correcting Weighted Gene Co-expression Network Analysis function for constructing a gene network from a gene expression matrix. The algorithm: 
+    1. Constructs a signed wgcna network.
+    2. Drops correlated modules based on kurtosis.
+    3. Regresses out the largest community from the expression data.
+    4. Repeats steps 1-3 until a maximum number of communities or iterations is reached.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
+URL: https://biogit.pri.bms.com/Systems-Immunology/icWGCNA
+BugReports: https://biogit.pri.bms.com/Systems-Immunology/icWGCNA/issues
+Imports: 
+    dynamicTreeCut,
+    RcppEigen,
+    plyr,
+    Rcpp,
+    Rfast
+Suggests:
+    data.table,
+    UCSCXenaTools
+LinkingTo: 
+    Rcpp,
+    RcppEigen
+    
