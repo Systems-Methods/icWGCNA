@@ -17,9 +17,9 @@ icwgcna(
 )
 }
 \arguments{
-\item{ex}{matrix of bulk RNA-seq or microarray gene expression data}
+\item{ex}{matrix of bulk RNA-seq or microarray gene expression data. This should be in log space and greater than 0.}
 
-\item{expo}{exponted to use for soft thresholding. If NULL will use angular distance}
+\item{expo}{exponent to use for soft thresholding. If NULL will use angular distance}
 
 \item{Method}{correlation to use for distance measure, "pearson" (default) or "spearman"}
 

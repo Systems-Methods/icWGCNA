@@ -2,8 +2,8 @@
 #'
 #' Iterative Correcting Weighted Gene Co-expression Network Analysis function constructing a network from an expression matrix.
 #'
-#' @param ex matrix of bulk RNA-seq or microarray gene expression data
-#' @param expo exponted to use for soft thresholding. If NULL will use angular distance
+#' @param ex matrix of bulk RNA-seq or microarray gene expression data. This should be in log space and greater than 0.
+#' @param expo exponent to use for soft thresholding. If NULL will use angular distance
 #' @param Method correlation to use for distance measure, "pearson" (default) or "spearman"
 #' @param q quantile (0-1) for first round filtering based on mean expression and standard deviation
 #' @param maxIt maximum number of iterations must be 25 or less
