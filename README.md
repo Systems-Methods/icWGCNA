@@ -39,12 +39,21 @@ Some differences from standard [WGNCA
 
 ## Installation
 
-You can currently install the development version of icWGCNA from the
-BMS BioGit repository:
+Install the released version of icWGCNA from BMS RStudio Package Manager
+(BRAN):
 
 ``` r
-remotes::install_github("masonm3/icWGCNA", 
-                        host = "https://biogit.pri.bms.com")
+install.packages("icWGCNA", 
+                 repos = "http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest")
+```
+
+Or install the development version from BMS BioGit with:
+
+``` r
+remotes::install_github(repo = "Systems-Immunology/icWGCNA", 
+                        host = "https://biogit.pri.bms.comapi/v3")
+#or use install_git
+remotes::install_git('https://biogit.pri.bms.com/Systems-Immunology/icWGCNA.git')
 ```
 
 ## Lifecycle
