@@ -51,7 +51,7 @@ Or install the development version from BMS BioGit with:
 
 ``` r
 remotes::install_github(repo = "Systems-Immunology/icWGCNA", 
-                        host = "https://biogit.pri.bms.comapi/api/v3")
+                        host = "https://biogit.pri.bms.com/api/v3")
 #or use install_git
 remotes::install_git('https://biogit.pri.bms.com/Systems-Immunology/icWGCNA.git')
 ```
