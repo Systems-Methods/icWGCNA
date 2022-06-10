@@ -18,7 +18,8 @@ Authors@R:
     person(given = "Alexandre",
            family = "Alloy",
            role = c("ctb"),
-           email = "alexandre.alloy@bms.com"
+           email = "alexandre.alloy@bms.com",
+           comment = c(ORCID = "0000-0001-8280-0543")
     )
   )
 Description: Iterative Correcting Weighted Gene Co-expression Network Analysis function for constructing a gene network from a gene expression matrix. The algorithm: 
