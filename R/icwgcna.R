@@ -13,7 +13,7 @@
 #' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see {details})
 #'
 #' @return Returns a list with the following items:
-#' * `community_membership` - community membership score (kME). Analogous to loadings in PCA. 
+#' * `community_membership` - community membership score (kME). Analogous to loadings in PCA.
 #' * `community_signature` - community eigengene, the first principal component the expression of genes in this community. This can be thought of as the average of the scaled expression of top community genes.
 #' * `full_community_membership` -  similar to community_membership but includes communities that were dropped in the iterative process.
 #' * `full_community_signature` - similar to community_signature but includes communities that were dropped in the iterative process.
@@ -78,11 +78,22 @@ icwgcna <- function(ex,
   Method <- match.arg(Method)
   mat_mult_method <- match.arg(mat_mult_method)
 
-  # average expression of each gene
-  M <- apply(ex, 1, mean)
+
   SD <- matrix(NA, nrow(ex), maxIt)
   # standard deviation of each gene
   SD[, 1] <- apply(ex, 1, stats::sd)
+
+  # need to remove any 0 SD genes
+  SD_zero_index <- SD[, 1] == 0
+  if (any(SD_zero_index)) {
+    message('Removing ', sum(SD_zero_index),
+            ' genes with a 0 standard deviation')
+    ex <- ex[!SD_zero_index, ]
+    SD <- SD[!SD_zero_index, ]
+  }
+
+  # average expression of each gene
+  M <- apply(ex, 1, mean)
   # identify genes that should simply not be part of the first round due to low signal
   CoV      <- matrix(NA,nrow(ex), maxIt); CoV[,1] <- abs(SD[,1]/M)
   leaveOut <- M < stats::quantile(M, q) | SD[, 1] < stats::quantile(SD[, 1], q)

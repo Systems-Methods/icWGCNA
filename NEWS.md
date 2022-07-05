@@ -1,3 +1,11 @@
-# icWGCNA 0.0.0.9000
+# icWGCNA 0.0.0.9002
 
-* First Version.
+### Bug Fixes
+
+Fixed error when genes have 0 standard deviation (#16)
+
+
+# icWGCNA 0.0.0.9001
+
+### First Version.
+
