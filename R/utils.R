@@ -134,7 +134,8 @@ cutreeHybridWrapper <- function(d,
                                           cutHeight = cutHeight,
                                           minClusterSize = 5,
                                           pamStage = TRUE,
-                                          pamRespectsDendro = FALSE)
+                                          pamRespectsDendro = FALSE,
+                                          verbose = 0)
   return(modules)
 }
 
