@@ -60,7 +60,7 @@ icwgcna <- function(ex,
                     maxComm = 100,
                     corCut = .8,
                     covCut = .33,
-                    mat_mult_method = c('Rfast', 'RcppEigen')) {
+                    mat_mult_method = c("Rfast", "RcppEigen")) {
   # param checking
   if (!all(unlist(lapply(ex, is.numeric)))) {
     stop("all 'ex' columns must be numeric")
@@ -69,13 +69,13 @@ icwgcna <- function(ex,
     stop("maxIt must be between 1 and 25")
   }
   if (q >= 1 | q <= 0) {
-    stop("q must be > 0 and <1 ")
+    stop("q must be >0 and <1 ")
   }
   if (corCut >= 1 | corCut <= 0) {
-    stop("corCut must be > 0 and < 1")
+    stop("corCut must be >0 and <1")
   }
   if (covCut >= 1 | covCut <= 0) {
-    stop("covCut must be > 0 and < 1")
+    stop("covCut must be >0 and <1")
   }
 
   Method <- match.arg(Method)
@@ -91,14 +91,15 @@ icwgcna <- function(ex,
   if (any(SD_zero_index)) {
     message('Removing ', sum(SD_zero_index),
             ' genes with a 0 standard deviation')
-    ex <- ex[!SD_zero_index, ]
-    SD <- SD[!SD_zero_index, ]
+    ex <- ex[!SD_zero_index, , drop = FALSE]
+    SD <- SD[!SD_zero_index, , drop = FALSE]
   }
 
   # average expression of each gene
   M <- apply(ex, 1, mean)
   # identify genes that should simply not be part of the first round due to low signal
-  CoV      <- matrix(NA,nrow(ex), maxIt); CoV[,1] <- abs(SD[,1]/M)
+  CoV <- matrix(NA,nrow(ex), maxIt)
+  CoV[,1] <- abs(SD[,1]/M)
   leaveOut <- M < stats::quantile(M, q) | SD[, 1] < stats::quantile(SD[, 1], q)
   tEx <- ex
   cont_for <- c()

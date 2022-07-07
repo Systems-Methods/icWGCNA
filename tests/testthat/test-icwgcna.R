@@ -1,8 +1,5 @@
 test_that("static test data", {
 
-  testing_data <- readRDS(test_path("fixtures", "testing_data.rds"))
-  testing_results <- readRDS(test_path("fixtures", "testing_results.rds"))
-
   results_plus <- purrr::quietly(
     ~ icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'RcppEigen')
   )()
@@ -10,7 +7,8 @@ test_that("static test data", {
   expect_equal(results_plus$result, testing_results)
   expect_equal(
     results_plus$messages,
-    c("Computing 1263 x 1263 TOM distance for subset of genes with higher variance\n",
+    c("Removing 2 genes with a 0 standard deviation\n",
+      "Computing 1263 x 1263 TOM distance for subset of genes with higher variance\n",
       "number of modules found is 11\n",
       "eigegenes trimmed to 11 due to correlation > 0.8 max eigenCor = 0.77\n",
       "0.201680.084970.06978\n",
@@ -33,6 +31,14 @@ test_that("static test data", {
   expect_equal(results_plus$output, '')
   expect_equal(results_plus$warnings, character(0))
 
+  #checking rfast mult method
+  results_plus_Rfast <- purrr::quietly(
+    ~ icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'Rfast')
+  )()
+  expect_equal(results_plus_Rfast, results_plus)
+
+
+
 })
 
 
@@ -43,5 +49,27 @@ test_that("input checking", {
     "all 'ex' columns must be numeric"
   )
 
+  expect_error(
+    icwgcna(testing_data, maxIt = 26),
+    "maxIt must be between 1 and 25"
+  )
+  expect_error(
+    icwgcna(testing_data, maxIt = 0),
+    "maxIt must be between 1 and 25"
+  )
+
+  expect_error(icwgcna(testing_data, q = 0), "q must be >0 and <1")
+  expect_error(icwgcna(testing_data, q = 1), "q must be >0 and <1")
+
+  expect_error(icwgcna(testing_data, corCut = 0), "corCut must be >0 and <1")
+  expect_error(icwgcna(testing_data, corCut = 1), "corCut must be >0 and <1")
+
+  expect_error(icwgcna(testing_data, covCut = 0), "covCut must be >0 and <1")
+  expect_error(icwgcna(testing_data, covCut = 1), "covCut must be >0 and <1")
+
+
 
 })
+
+
+

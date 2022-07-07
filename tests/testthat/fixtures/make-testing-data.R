@@ -14,6 +14,10 @@ testing_data <- withr::with_seed(
   seed = 148654315,
   code = ex[mu > 2.5 & SD > 1.5, sample.int(ncol(ex), n_picked)]
 )
+# Adding rows with 0 SD, witch should get removed
+testing_data <- rbind(rep(1,  ncol(testing_data)),
+                      testing_data,
+                      rep(1,  ncol(testing_data)))
 saveRDS(testing_data, file = testthat::test_path('fixtures','testing_data.rds'))
 
 # saving results file
