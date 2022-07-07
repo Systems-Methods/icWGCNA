@@ -49,7 +49,7 @@
 #' luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
 #'                   clinical = FALSE, download = TRUE)
 #' ex <- data.table::fread(luad$destfiles)
-#' results <- icwgcna(ex)}
+#' results <- icwgcna(ex[,-1])}
 #'
 #' @export
 icwgcna <- function(ex,
@@ -62,6 +62,9 @@ icwgcna <- function(ex,
                     covCut = .33,
                     mat_mult_method = c('Rfast', 'RcppEigen')) {
   # param checking
+  if (!all(unlist(lapply(ex, is.numeric)))) {
+    stop("all 'ex' columns must be numeric")
+  }
   if (maxIt > 25 | maxIt < 1) {
     stop("maxIt must be between 1 and 25")
   }

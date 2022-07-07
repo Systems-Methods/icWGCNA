@@ -4,7 +4,7 @@ test_that("static test data", {
   testing_results <- readRDS(test_path("fixtures", "testing_results.rds"))
 
   results_plus <- purrr::quietly(
-    ~ icWGCNA::icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'RcppEigen')
+    ~ icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'RcppEigen')
   )()
 
   expect_equal(results_plus$result, testing_results)
@@ -32,5 +32,16 @@ test_that("static test data", {
   )
   expect_equal(results_plus$output, '')
   expect_equal(results_plus$warnings, character(0))
+
+})
+
+
+test_that("input checking", {
+  # ex must be numeric
+  expect_error(
+    icwgcna(cbind(paste('a', testing_data[,1]), testing_data)),
+    "all 'ex' columns must be numeric"
+  )
+
 
 })
