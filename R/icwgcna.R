@@ -65,16 +65,19 @@ icwgcna <- function(ex,
   if (!all(unlist(lapply(ex, is.numeric)))) {
     stop("all 'ex' columns must be numeric")
   }
-  if (maxIt > 25 | maxIt < 1) {
+  if (!is.null(expo) && (expo > 10 || expo <= 0)) {
+    stop("expo must be >0 and <=10, or NULL")
+  }
+  if (maxIt > 25 || maxIt < 1) {
     stop("maxIt must be between 1 and 25")
   }
-  if (q >= 1 | q <= 0) {
+  if (q >= 1 || q <= 0) {
     stop("q must be >0 and <1 ")
   }
-  if (corCut >= 1 | corCut <= 0) {
+  if (corCut >= 1 || corCut <= 0) {
     stop("corCut must be >0 and <1")
   }
-  if (covCut >= 1 | covCut <= 0) {
+  if (covCut >= 1 || covCut <= 0) {
     stop("covCut must be >0 and <1")
   }
 

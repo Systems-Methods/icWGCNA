@@ -23,3 +23,4 @@ saveRDS(testing_data, file = testthat::test_path('fixtures','testing_data.rds'))
 # saving results file
 results <- icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'RcppEigen')
 saveRDS(results, file = testthat::test_path('fixtures','testing_results.rds'))
+
