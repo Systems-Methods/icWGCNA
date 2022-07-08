@@ -2,7 +2,7 @@
 % Please edit documentation in R/icwgcna.R
 \name{icwgcna}
 \alias{icwgcna}
-\title{icwgcna}
+\title{Iterative Correcting Weighted Gene Co-expression Network Analysis}
 \usage{
 icwgcna(
   ex,

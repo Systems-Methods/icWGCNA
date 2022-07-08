@@ -24,3 +24,11 @@ test_that("panglaoDB enrichment input checking", {
   )
 
 })
+
+test_that("panglaoDB enrichment status results", {
+  expect_equal(
+    compute_panglaoDB_enrichment(testing_results$community_membership,
+                                 pangDB = testing_pangDB),
+    testing_enrichment
+  )
+})

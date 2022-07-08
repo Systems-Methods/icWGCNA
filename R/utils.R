@@ -146,8 +146,7 @@ cutreeHybridWrapper <- function(d,
 # we use kurtosis
 dropModuels <- function(eigenGenes,
                         Kurts = NULL,
-                        corCut = .95,
-                        verbose = FALSE) {
+                        corCut = .95) {
   eigen_Cors <- stats::cor(t(eigenGenes))
   diag(eigen_Cors) <- 0
   while (any(eigen_Cors > corCut)) {
@@ -158,11 +157,6 @@ dropModuels <- function(eigenGenes,
       for (j in (i + 1):nrow(eigen_Cors))
       {
         if (eigen_Cors[i, j] > corCut) {
-          if (verbose) {
-            message(paste("threshold", corCut, "exceeded for mods",
-                        rownames(eigenGenes)[i], ",",
-                        rownames(eigenGenes)[j]))
-          }
           if (is.null(Kurts)) {
             removeInd <- j
           } else {
@@ -189,8 +183,8 @@ dropModuels <- function(eigenGenes,
   eigen_Cors <- stats::cor(t(eigenGenes))
   diag(eigen_Cors) <- 0
   message(paste("eigegenes trimmed to", nrow(eigenGenes),
-              "due to correlation >", corCut,
-              "max eigenCor =", max(signif(eigen_Cors, 2))))
+                "due to correlation >", corCut,
+                "max eigenCor =", max(signif(eigen_Cors, 2))))
   return(eigenGenes)
 }
 

@@ -1,4 +1,4 @@
-#' icwgcna
+#' Iterative Correcting Weighted Gene Co-expression Network Analysis
 #'
 #' Iterative Correcting Weighted Gene Co-expression Network Analysis function constructing a network from an expression matrix.
 #'
@@ -64,6 +64,12 @@ icwgcna <- function(ex,
   # param checking
   if (!all(unlist(lapply(ex, is.numeric)))) {
     stop("all 'ex' columns must be numeric")
+  }
+  if (min(ex) < 0) {
+    stop("all values of ex must be >=0")
+  }
+  if (max(ex) > 100) {
+    warning("some values of ex are >100, strongly indicating ex is not in log space")
   }
   if (!is.null(expo) && (expo > 10 || expo <= 0)) {
     stop("expo must be >0 and <=10, or NULL")
@@ -139,8 +145,7 @@ icwgcna <- function(ex,
       clust_kurt <- apply(metaGenes, 2, Rfast::kurt)
       eigenGenes <- dropModuels(eigenGenes = eigenGenes,
                                 Kurts = clust_kurt,
-                                corCut = corCut,
-                                verbose = FALSE)
+                                corCut = corCut)
       metaGenes <- metaGenes[, colnames(metaGenes) %in% rownames(eigenGenes)]
     }
 

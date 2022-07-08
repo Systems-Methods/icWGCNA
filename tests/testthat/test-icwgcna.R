@@ -6,6 +6,19 @@ test_that("input checking", {
     icwgcna(cbind(paste('a', testing_data[,1]), testing_data)),
     "all 'ex' columns must be numeric"
   )
+  expect_error(
+    icwgcna(cbind(testing_data[,1] - 1, testing_data)),
+    "all values of ex must be >=0"
+  )
+  expect_warning(
+    suppressMessages(
+      icwgcna(cbind(testing_data[,1] + c(rep(100, 10),
+                                       rep(0, nrow(testing_data) - 10)),
+                  testing_data),
+            maxIt = 1)
+      ),
+    "some values of ex are >100, strongly indicating ex is not in log space"
+  )
 
   expect_error(
     icwgcna(testing_data, maxIt = 26),
