@@ -3,6 +3,13 @@
 
 # icWGCNA
 
+<!-- badges: start -->
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![](https://img.shields.io/badge/codecov-96%25-green.svg)](https://covr.r-lib.org/)
+<!-- badges: end -->
+
 ## Overview
 
 Iterative Correcting Weighted Gene Co-expression Network Analysis
@@ -52,27 +59,69 @@ Or install the development version from BMS BioGit with:
 ``` r
 remotes::install_github(repo = "Systems-Immunology/icWGCNA", 
                         host = "https://biogit.pri.bms.com/api/v3")
-#or use install_git
+```
+
+Or:
+
+``` r
 remotes::install_git('https://biogit.pri.bms.com/Systems-Immunology/icWGCNA.git')
 ```
 
-## Lifecycle
-
-<!-- badges: start -->
-
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-<!-- badges: end -->
-
-icWGCNA is still in development.
-
 ## Example
 
-EXAMPLE CODE TBD
+### Example Data
+
+First we can use the
+[{UCSCXenaTools}](https://cran.r-project.org/web/packages/UCSCXenaTools/vignettes/USCSXenaTools.html)
+package to download an example mRNASeq dataset.
+
+``` r
+luad <- UCSCXenaTools::getTCGAdata(project = "LUAD", 
+                                   mRNASeq = TRUE, 
+                                   mRNASeqType = "normalized",
+                                   clinical = FALSE, 
+                                   download = TRUE)
+
+ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+```
+
+### Main Results
+
+Next we can run the main `icwgcna()` function
 
 ``` r
 library(icWGCNA)
-## basic example code
+
+results <- icwgcna(ex,   
+                   expo = 6,
+                   Method = "pearson",
+                   q = 0.3,
+                   maxIt = 10,
+                   maxComm = 100,
+                   corCut = 0.8,
+                   covCut = 0.33,
+                   mat_mult_method = "Rfast")
+```
+
+### Downstream Analysis
+
+Finally, downstream analysis can be run on the Iterative Correcting
+Weighted Gene Co-expression Network Analysis results.
+
+``` r
+compute_eigengene_matrix(ex, 
+                         membership_matrix = results$community_membership, 
+                         cutoff = 5,
+                         pc_flag = TRUE)
+
+
+
+pangDB <- data.table::fread(pangDB_link)
+compute_panglaoDB_enrichment(results$community_membership,
+                             K = 100,
+                             memb_cut = 0.65,
+                             pangDB = pangDB,
+                             prolif = prolif_names)
 ```
 
 ## Code of Conduct

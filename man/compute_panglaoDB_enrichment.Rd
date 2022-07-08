@@ -43,7 +43,13 @@ using Fisher test.
 \examples{
 
 \dontrun{
+library("UCSCXenaTools")
+luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+clinical = FALSE, download = TRUE)
+ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+results <- icwgcna(ex)
+
 pangDB <- data.table::fread(pangDB_link)
-compute_panglaoDB_enrichment(tcell_net$community_membership, pangDB = pangDB)}
+compute_panglaoDB_enrichment(results$community_membership, pangDB = pangDB)}
 
 }
