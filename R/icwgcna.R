@@ -41,6 +41,27 @@
 #' multiple cores. If running this on a cluster with access to many computer core
 #' there is a significant performance advantage to using [Rfast::mat.mult()]
 #'
+#' @references
+#'
+#' Langfelder P, Horvath S (2008).
+#' ``WGCNA: an R package for weighted correlation network analysis.''
+#' \emph{BMC Bioinformatics}, 559.
+#' \url{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559}.
+#'
+#' Langfelder P, Horvath S (2012).
+#' ``Fast R Functions for Robust Correlations and Hierarchical Clustering.''
+#' \emph{Journal of Statistical Software}, \bold{46}(11), 1--17.
+#' \url{https://www.jstatsoft.org/v46/i11/}.
+#'
+#' Zhang, Bin and Horvath, Steve. "A General Framework for Weighted Gene
+#' Co-Expression Network Analysis" \emph{Statistical Applications in Genetics
+#' and Molecular Biology}, vol. 4, no. 1, 2005.
+#' \url{https://doi.org/10.2202/1544-6115.1128}
+#'
+#' Mason, M.J., Fan, G., Plath, K. et al. Signed weighted gene co-expression
+#' network analysis of transcriptional regulation in murine embryonic stem cells.
+#' \emph{BMC Genomics 10}, 327 (2009).
+#' \url{https://doi.org/10.1186/1471-2164-10-327#'}
 #'
 #' @examples
 #'
