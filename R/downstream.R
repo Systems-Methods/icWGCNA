@@ -24,6 +24,18 @@
 #' interaction terms or use tree based
 #' methods since dependencies are not addressed in this output matrix.
 #'
+#' @examples
+#' \dontrun{
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#' clinical = FALSE, download = TRUE)
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+#'
+#' results <- icwgcna(ex)
+#'
+#' compute_eigengene_matrix(ex, results$community_membership)
+#' }
+#'
 #' @export
 compute_eigengene_matrix <- function(ex,
                                      membership_matrix,
@@ -39,9 +51,22 @@ compute_eigengene_matrix <- function(ex,
     warning("some values of ex are >100, strongly indicating ex is not in log space")
   }
 
-  SD[, 1] <- apply(as.matrix(ex), 1, stats::sd)
-  ex <- ex[apply(as.matrix(ex), 1, stats::sd) != 0, ]
-  membership_matrix <- membership_matrix[rownames(membership_matrix) %in% rownames(ex), ]
+  rows_to_use <- rownames(membership_matrix) %in% rownames(ex)
+  if (!any(rows_to_use)) {
+    stop('No matching rownames in ex and membership_matrix')
+  }
+
+
+  SD <- apply(as.matrix(ex), 1, stats::sd)
+  # need to remove any 0 SD genes
+  SD_zero_index <- SD == 0
+  if (any(SD_zero_index)) {
+    message('Removing ', sum(SD_zero_index),
+            ' genes with a 0 standard deviation')
+    ex <- ex[!SD_zero_index, , drop = FALSE]
+  }
+
+  membership_matrix <- membership_matrix[rows_to_use, ]
   m_genes <- rownames(membership_matrix)
   e_genes <- rownames(ex)
 
@@ -53,16 +78,17 @@ compute_eigengene_matrix <- function(ex,
     }
 
     scaled_ave <- apply(t(scale(t(tEx))), 2, mean)
-    if (pc_flag == FALSE) {
-      return(scaled_ave)
+    if (!pc_flag) {
+      scaled_ave
     } else {
       pc1 <- stats::prcomp(t(tEx))$x[, 1]
       if (stats::cor(scaled_ave, pc1) < 0) {
         pc1 <- -pc1
       }
-      return(pc1)
+      pc1
     }
   })
+  tEigen
 }
 
 

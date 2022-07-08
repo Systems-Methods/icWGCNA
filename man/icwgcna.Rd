@@ -79,7 +79,8 @@ there is a significant performance advantage to using \code{\link[Rfast:mat.mult
 library("UCSCXenaTools")
 luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
                   clinical = FALSE, download = TRUE)
-ex <- data.table::fread(luad$destfiles)
-results <- icwgcna(ex[,-1])}
+ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 
+results <- icwgcna(ex)
+}
 }

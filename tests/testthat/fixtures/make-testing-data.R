@@ -25,6 +25,11 @@ saveRDS(testing_data, file = testthat::test_path('fixtures','testing_data.rds'))
 testing_results <- icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'RcppEigen')
 saveRDS(testing_results, file = testthat::test_path('fixtures','testing_results.rds'))
 
+# saving compute eigengene matrix results
+testing_eigengene_matrix <- compute_eigengene_matrix(testing_data, testing_results$community_membership)
+saveRDS(testing_eigengene_matrix, file = testthat::test_path('fixtures','testing_eigengene_matrix.rds'))
+
+
 # saving pangDB results
 testing_enrichment <- compute_panglaoDB_enrichment(testing_results$community_membership,
                                         pangDB = testing_pangDB)

@@ -36,3 +36,16 @@ When using these community signatures for modeling it may be best to include
 interaction terms or use tree based
 methods since dependencies are not addressed in this output matrix.
 }
+\examples{
+\dontrun{
+library("UCSCXenaTools")
+luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+clinical = FALSE, download = TRUE)
+ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+
+results <- icwgcna(ex)
+
+compute_eigengene_matrix(ex, results$community_membership)
+}
+
+}
