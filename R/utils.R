@@ -5,7 +5,8 @@
 
 # simple function computing angular distance to use as a adjacency measure.
 angularDist <- function(x) {
-  aDist <- asin(x) / (pi / 2)
+  # suppress warnings for NaN values on the diagonal (set to 0 later regardless)
+  aDist <- suppressWarnings(asin(x)) / (pi / 2)
   return(aDist)
 }
 
@@ -134,7 +135,8 @@ cutreeHybridWrapper <- function(d,
                                           cutHeight = cutHeight,
                                           minClusterSize = 5,
                                           pamStage = TRUE,
-                                          pamRespectsDendro = FALSE)
+                                          pamRespectsDendro = FALSE,
+                                          verbose = 0)
   return(modules)
 }
 

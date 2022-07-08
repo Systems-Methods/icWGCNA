@@ -80,6 +80,6 @@ library("UCSCXenaTools")
 luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
                   clinical = FALSE, download = TRUE)
 ex <- data.table::fread(luad$destfiles)
-results <- icwgcna(ex)}
+results <- icwgcna(ex[,-1])}
 
 }
