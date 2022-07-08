@@ -126,36 +126,35 @@ compute_panglaoDB_enrichment <- function(t_memb,
     stop('expecting pangDB variables "cell.type" and "official.gene.symbol" (after making syntactically valid names using make.names() function)')
   }
 
-  if (!any(rownames(t_memb) %in% prolif)) {
-    stop('No rownames of "t_memb" are in the provided "prolif" list')
-  }
-
   c.types <- as.vector(stats::na.omit(unique(pangDB$cell.type)))
   enr <- plyr::adply(t_memb,2, function(x) {
     prolif_overlap <- table(
       rank(-x) <= K & x > memb_cut,
       rownames(t_memb) %in% prolif
     )
-    ret <- t(plyr::ldply(c.types,function(ct) {
-      if (ncol(prolif_overlap) > 1 &
-          (prolif_overlap[2,2] > floor(.33 * length(prolif)))) {
-        return(1)
-      }
+    if (nrow(prolif_overlap) < 2 ||
+        ncol(prolif_overlap) < 2 ||
+        prolif_overlap[2,2] > floor(.33 * length(prolif))) {
 
-      overlap <- table(
-        rank(-x) <= K & x > memb_cut,
-        rownames(t_memb) %in%
-          pangDB$official.gene.symbol[pangDB$cell.type == ct]
-      )
-      if (ncol(overlap) == 1) {
-        return(1)
-      }
-      ret2 <- stats::fisher.test(overlap,)$p.val
-      return(unlist(ret2))
-    }))
+      ret <- t(rep(1, length(c.types)))
 
+    } else {
+
+      ret <- t(plyr::ldply(c.types,function(ct) {
+        overlap <- table(
+          rank(-x) <= K & x > memb_cut,
+          rownames(t_memb) %in%
+            pangDB$official.gene.symbol[pangDB$cell.type == ct]
+        )
+        if (ncol(overlap) == 1 || nrow(overlap) == 1) {
+          return(1)
+        }
+        ret2 <- stats::fisher.test(overlap)$p.val
+        return(unlist(ret2))
+      }))
+    }
     colnames(ret) <- c.types
-    return(ret)
+    ret
   })
 
   rownames(enr) <- enr[,1]
@@ -163,7 +162,7 @@ compute_panglaoDB_enrichment <- function(t_memb,
 
   top_enr <- plyr::ldply(apply(enr,2,function(x){
     if (min(x) > 0.001) {
-      return(data.frame(cell_type = NA,p = NA))
+      return(data.frame(cell_type = NA, p = NA))
     }
 
     i <- which(x == min(x))

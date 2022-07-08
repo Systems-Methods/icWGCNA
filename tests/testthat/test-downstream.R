@@ -9,13 +9,6 @@ test_that("panglaoDB enrichment input checking", {
                                  pangDB = testing_pangDB),
     "t_memb values can't be <-1 or >1"
   )
-  bad_data <- testing_results$community_membership
-  rownames(bad_data) <- 1:nrow(bad_data)
-  expect_error(
-    compute_panglaoDB_enrichment(bad_data,
-                                 pangDB = testing_pangDB),
-    'No rownames of "t_memb" are in the provided "prolif" list'
-  )
 
   expect_error(
     compute_panglaoDB_enrichment(testing_results$community_membership,
