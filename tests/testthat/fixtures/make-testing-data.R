@@ -7,6 +7,7 @@ luad <- suppressMessages(
                              download = TRUE)
   )
 ex <- data.table::fread(luad$destfiles, data.table = FALSE)
+rownames(ex) <- ex[,1]
 mu <- apply(as.matrix(ex[,-1]),1,mean)
 SD <- apply(as.matrix(ex[,-1]),1,sd)
 n_picked <- 50
@@ -21,6 +22,10 @@ testing_data <- rbind(rep(1,  ncol(testing_data)),
 saveRDS(testing_data, file = testthat::test_path('fixtures','testing_data.rds'))
 
 # saving results file
-results <- icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'RcppEigen')
-saveRDS(results, file = testthat::test_path('fixtures','testing_results.rds'))
+testing_results <- icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'RcppEigen')
+saveRDS(testing_results, file = testthat::test_path('fixtures','testing_results.rds'))
 
+# saving pangDB results
+testing_enrichment <- compute_panglaoDB_enrichment(testing_results$community_membership,
+                                        pangDB = testing_pangDB)
+saveRDS(testing_enrichment, file = testthat::test_path('fixtures','testing_enrichment.rds'))
