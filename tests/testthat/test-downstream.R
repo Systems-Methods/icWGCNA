@@ -2,12 +2,12 @@ test_that("panglaoDB enrichment input checking", {
 
   expect_error(
     compute_panglaoDB_enrichment(testing_results, pangDB = testing_pangDB),
-    "t_memb must be a martix or data.frame"
+    "membership_matrix must be a martix or data.frame"
   )
   expect_error(
     compute_panglaoDB_enrichment(testing_results$community_signature,
                                  pangDB = testing_pangDB),
-    "t_memb values can't be <-1 or >1"
+    "membership_matrix values can't be <-1 or >1"
   )
 
   expect_error(

@@ -5,8 +5,9 @@
 #'
 #' @param ex matrix of bulk RNA-seq or microarray gene expression data.
 #' This should be in log space and greater than or equal to 0.
-#' @param membership_matrix, a community membership (kME) matrix with genes as
-#' rows and communities as columns.
+#' @param membership_matrix a community membership (kME) matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]
 #' @param cutoff number of top genes to use when computing community signatures
 #' @param pc_flag indicator. TRUE (default) means to use the 1st principal component
 #' (corrected for direction). FALSE uses the mean of scaled and centered top genes.
@@ -28,6 +29,17 @@ compute_eigengene_matrix <- function(ex,
                                      membership_matrix,
                                      cutoff = 5,
                                      pc_flag = TRUE) {
+  if (!all(unlist(lapply(ex, is.numeric)))) {
+    stop("all 'ex' columns must be numeric")
+  }
+  if (min(ex) < 0) {
+    stop("all values of ex must be >=0")
+  }
+  if (max(ex) > 100) {
+    warning("some values of ex are >100, strongly indicating ex is not in log space")
+  }
+
+  SD[, 1] <- apply(as.matrix(ex), 1, stats::sd)
   ex <- ex[apply(as.matrix(ex), 1, stats::sd) != 0, ]
   membership_matrix <- membership_matrix[rownames(membership_matrix) %in% rownames(ex), ]
   m_genes <- rownames(membership_matrix)
@@ -85,8 +97,9 @@ prolif_names <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20",
 #'
 #' compute cell type enrichments using [panglaoDB cell markers](https://academic.oup.com/database/article/doi/10.1093/database/baz046/5427041?login=true)
 #' using Fisher test.
-#' @param t_memb `community_membership` or `full_community_membership`
-#' values from [icwgcna()]
+#' @param membership_matrix a community membership (kME) matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]
 #' @param K cutoff for top community genes to include for computing enrichment.
 #' Used in an AND condition with memb_cut.
 #' @param memb_cut cutoff as a membership score threshold for determining top
@@ -109,16 +122,16 @@ prolif_names <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20",
 #' pangDB <- data.table::fread(pangDB_link)
 #' compute_panglaoDB_enrichment(tcell_net$community_membership, pangDB = pangDB)}
 #'
-compute_panglaoDB_enrichment <- function(t_memb,
+compute_panglaoDB_enrichment <- function(membership_matrix,
                                          K = 100,
                                          memb_cut = .65,
                                          pangDB = data.table::fread(pangDB_link),
                                          prolif = prolif_names) {
-  if (!any(class(t_memb) %in% c('matrix', 'data.frame'))) {
-    stop("t_memb must be a martix or data.frame")
+  if (!any(class(membership_matrix) %in% c('matrix', 'data.frame'))) {
+    stop("membership_matrix must be a martix or data.frame")
   }
-  if (min(t_memb) < -1 || max(t_memb) > 1) {
-    stop("t_memb values can't be <-1 or >1")
+  if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
+    stop("membership_matrix values can't be <-1 or >1")
   }
 
   colnames(pangDB) <- make.names(colnames(pangDB))
@@ -127,10 +140,10 @@ compute_panglaoDB_enrichment <- function(t_memb,
   }
 
   c.types <- as.vector(stats::na.omit(unique(pangDB$cell.type)))
-  enr <- plyr::adply(t_memb,2, function(x) {
+  enr <- plyr::adply(membership_matrix,2, function(x) {
     prolif_overlap <- table(
       rank(-x) <= K & x > memb_cut,
-      rownames(t_memb) %in% prolif
+      rownames(membership_matrix) %in% prolif
     )
     if (nrow(prolif_overlap) < 2 ||
         ncol(prolif_overlap) < 2 ||
@@ -143,7 +156,7 @@ compute_panglaoDB_enrichment <- function(t_memb,
       ret <- t(plyr::ldply(c.types,function(ct) {
         overlap <- table(
           rank(-x) <= K & x > memb_cut,
-          rownames(t_memb) %in%
+          rownames(membership_matrix) %in%
             pangDB$official.gene.symbol[pangDB$cell.type == ct]
         )
         if (ncol(overlap) == 1 || nrow(overlap) == 1) {

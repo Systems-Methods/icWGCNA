@@ -10,8 +10,9 @@ compute_eigengene_matrix(ex, membership_matrix, cutoff = 5, pc_flag = TRUE)
 \item{ex}{matrix of bulk RNA-seq or microarray gene expression data.
 This should be in log space and greater than or equal to 0.}
 
-\item{membership_matrix, }{a community membership (kME) matrix with genes as
-rows and communities as columns.}
+\item{membership_matrix}{a community membership (kME) matrix with genes as
+rows and communities as columns. Often \code{community_membership} or
+\code{full_community_membership} output from \code{\link[=icwgcna]{icwgcna()}}}
 
 \item{cutoff}{number of top genes to use when computing community signatures}
 

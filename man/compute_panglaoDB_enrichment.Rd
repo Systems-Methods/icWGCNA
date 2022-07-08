@@ -5,7 +5,7 @@
 \title{Compute Cell Type Enrichments Using panglaoDB Cell Markers}
 \usage{
 compute_panglaoDB_enrichment(
-  t_memb,
+  membership_matrix,
   K = 100,
   memb_cut = 0.65,
   pangDB = data.table::fread(pangDB_link),
@@ -13,8 +13,9 @@ compute_panglaoDB_enrichment(
 )
 }
 \arguments{
-\item{t_memb}{\code{community_membership} or \code{full_community_membership}
-values from \code{\link[=icwgcna]{icwgcna()}}}
+\item{membership_matrix}{a community membership (kME) matrix with genes as
+rows and communities as columns. Often \code{community_membership} or
+\code{full_community_membership} output from \code{\link[=icwgcna]{icwgcna()}}}
 
 \item{K}{cutoff for top community genes to include for computing enrichment.
 Used in an AND condition with memb_cut.}
