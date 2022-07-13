@@ -1,4 +1,4 @@
-#' icwgcna
+#' Iterative Correcting Weighted Gene Co-expression Network Analysis
 #'
 #' Iterative Correcting Weighted Gene Co-expression Network Analysis function constructing a network from an expression matrix.
 #'
@@ -41,6 +41,27 @@
 #' multiple cores. If running this on a cluster with access to many computer core
 #' there is a significant performance advantage to using [Rfast::mat.mult()]
 #'
+#' @references
+#'
+#' Langfelder P, Horvath S (2008).
+#' ``WGCNA: an R package for weighted correlation network analysis.''
+#' \emph{BMC Bioinformatics}, 559.
+#' \url{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559}.
+#'
+#' Langfelder P, Horvath S (2012).
+#' ``Fast R Functions for Robust Correlations and Hierarchical Clustering.''
+#' \emph{Journal of Statistical Software}, \bold{46}(11), 1--17.
+#' \url{https://www.jstatsoft.org/v46/i11/}.
+#'
+#' Zhang, Bin and Horvath, Steve. "A General Framework for Weighted Gene
+#' Co-Expression Network Analysis" \emph{Statistical Applications in Genetics
+#' and Molecular Biology}, vol. 4, no. 1, 2005.
+#' \url{https://doi.org/10.2202/1544-6115.1128}
+#'
+#' Mason, M.J., Fan, G., Plath, K. et al. Signed weighted gene co-expression
+#' network analysis of transcriptional regulation in murine embryonic stem cells.
+#' \emph{BMC Genomics 10}, 327 (2009).
+#' \url{https://doi.org/10.1186/1471-2164-10-327#'}
 #'
 #' @examples
 #'
@@ -48,9 +69,10 @@
 #' library("UCSCXenaTools")
 #' luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
 #'                   clinical = FALSE, download = TRUE)
-#' ex <- data.table::fread(luad$destfiles)
-#' results <- icwgcna(ex[,-1])}
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 #'
+#' results <- icwgcna(ex)
+#'}
 #' @export
 icwgcna <- function(ex,
                     expo = 6,
@@ -64,6 +86,12 @@ icwgcna <- function(ex,
   # param checking
   if (!all(unlist(lapply(ex, is.numeric)))) {
     stop("all 'ex' columns must be numeric")
+  }
+  if (min(ex) < 0) {
+    stop("all values of ex must be >=0")
+  }
+  if (max(ex) > 100) {
+    warning("some values of ex are >100, strongly indicating ex is not in log space")
   }
   if (!is.null(expo) && (expo > 10 || expo <= 0)) {
     stop("expo must be >0 and <=10, or NULL")
@@ -139,8 +167,7 @@ icwgcna <- function(ex,
       clust_kurt <- apply(metaGenes, 2, Rfast::kurt)
       eigenGenes <- dropModuels(eigenGenes = eigenGenes,
                                 Kurts = clust_kurt,
-                                corCut = corCut,
-                                verbose = FALSE)
+                                corCut = corCut)
       metaGenes <- metaGenes[, colnames(metaGenes) %in% rownames(eigenGenes)]
     }
 
