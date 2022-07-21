@@ -12,12 +12,16 @@ test_that("input checking", {
   )
   expect_warning(
     suppressMessages(
-      icwgcna(cbind(testing_data[,1] + c(rep(100, 10),
-                                       rep(0, nrow(testing_data) - 10)),
-                  testing_data),
-            maxIt = 1)
+      icwgcna(cbind(testing_data[1:1000,1] + c(rep(100, 10),
+                                       rep(0, nrow(testing_data[1:1000,]) - 10)),
+                  testing_data[1:1000,]),
+            maxIt = 2)
       ),
     "some values of ex are >100, strongly indicating ex is not in log space"
+  )
+  expect_warning(
+    suppressMessages(icwgcna(testing_data[1:1000,], maxIt = 1)),
+    "advisable to use WGCNA package when maxIt = 1"
   )
 
   expect_error(

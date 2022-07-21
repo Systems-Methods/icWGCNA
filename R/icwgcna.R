@@ -99,6 +99,9 @@ icwgcna <- function(ex,
   if (maxIt > 25 || maxIt < 1) {
     stop("maxIt must be between 1 and 25")
   }
+  if (maxIt == 1) {
+    warning("advisable to use WGCNA package when maxIt = 1")
+  }
   if (q >= 1 || q <= 0) {
     stop("q must be >0 and <1 ")
   }
