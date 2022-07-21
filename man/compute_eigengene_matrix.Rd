@@ -39,8 +39,10 @@ methods since dependencies are not addressed in this output matrix.
 \examples{
 \dontrun{
 library("UCSCXenaTools")
-luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
-clinical = FALSE, download = TRUE)
+luad <- getTCGAdata(
+  project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+  clinical = FALSE, download = TRUE
+)
 ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 
 results <- icwgcna(ex)

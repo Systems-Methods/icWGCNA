@@ -50,8 +50,10 @@ Install the released version of icWGCNA from BMS RStudio Package Manager
 (BRAN):
 
 ``` r
-install.packages("icWGCNA", 
-                 repos = "http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest")
+install.packages(
+  "icWGCNA", 
+  repos = "http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest"
+)
 ```
 
 Or install the development version from BMS BioGit with:
@@ -64,7 +66,9 @@ remotes::install_github(repo = "Systems-Immunology/icWGCNA",
 Or:
 
 ``` r
-remotes::install_git('https://biogit.pri.bms.com/Systems-Immunology/icWGCNA.git')
+remotes::install_git(
+  'https://biogit.pri.bms.com/Systems-Immunology/icWGCNA.git'
+)
 ```
 
 ## Example

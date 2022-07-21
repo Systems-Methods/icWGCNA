@@ -74,11 +74,12 @@ multiple cores. If running this on a cluster with access to many computer core
 there is a significant performance advantage to using \code{\link[Rfast:mat.mult]{Rfast::mat.mult()}}
 }
 \examples{
-
 \dontrun{
 library("UCSCXenaTools")
-luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
-                  clinical = FALSE, download = TRUE)
+luad <- getTCGAdata(
+  project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+  clinical = FALSE, download = TRUE
+)
 ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 
 results <- icwgcna(ex)

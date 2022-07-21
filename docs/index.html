@@ -34,7 +34,7 @@
     
     <a class="navbar-brand me-2" href="index.html">icWGCNA</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.0.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,8 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="icwgcna">icWGCNA<a class="anchor" aria-label="anchor" href="#icwgcna"></a>
 </h1></div>
+<!-- badges: start -->
+
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
@@ -86,29 +88,72 @@
 </h2>
 <p>Install the released version of icWGCNA from BMS RStudio Package Manager (BRAN):</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"icWGCNA"</span>, 
-                 repos <span class="op">=</span> <span class="st">"http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
+<span>  <span class="st">"icWGCNA"</span>, </span>
+<span>  repos <span class="op">=</span> <span class="st">"http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Or install the development version from BMS BioGit with:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span>repo <span class="op">=</span> <span class="st">"Systems-Immunology/icWGCNA"</span>, 
-                        host <span class="op">=</span> <span class="st">"https://biogit.pri.bms.com/api/v3"</span><span class="op">)</span>
-<span class="co">#or use install_git</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_git.html" class="external-link">install_git</a></span><span class="op">(</span><span class="st">'https://biogit.pri.bms.com/Systems-Immunology/icWGCNA.git'</span><span class="op">)</span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="lifecycle">Lifecycle<a class="anchor" aria-label="anchor" href="#lifecycle"></a>
-</h2>
-<!-- badges: start -->
-
-<p>icWGCNA is still in development.</p>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span>repo <span class="op">=</span> <span class="st">"Systems-Immunology/icWGCNA"</span>, </span>
+<span>                        host <span class="op">=</span> <span class="st">"https://biogit.pri.bms.com/api/v3"</span><span class="op">)</span></span></code></pre></div>
+<p>Or:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_git.html" class="external-link">install_git</a></span><span class="op">(</span></span>
+<span>  <span class="st">'https://biogit.pri.bms.com/Systems-Immunology/icWGCNA.git'</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p>EXAMPLE CODE TBD</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://biogit.pri.bms.com/Systems-Immunology/icWGCNA">icWGCNA</a></span><span class="op">)</span>
-<span class="co">## basic example code</span></code></pre></div>
+<div class="section level3">
+<h3 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
+</h3>
+<p>First we can use the <a href="https://cran.r-project.org/web/packages/UCSCXenaTools/vignettes/USCSXenaTools.html" class="external-link">{UCSCXenaTools}</a> package to download an example mRNASeq dataset.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">luad</span> <span class="op">&lt;-</span> <span class="fu">UCSCXenaTools</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/UCSCXenaTools/reference/getTCGAdata.html" class="external-link">getTCGAdata</a></span><span class="op">(</span>project <span class="op">=</span> <span class="st">"LUAD"</span>, </span>
+<span>                                   mRNASeq <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>                                   mRNASeqType <span class="op">=</span> <span class="st">"normalized"</span>,</span>
+<span>                                   clinical <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>                                   download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="va">luad</span><span class="op">$</span><span class="va">destfiles</span><span class="op">)</span>, rownames <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="main-results">Main Results<a class="anchor" aria-label="anchor" href="#main-results"></a>
+</h3>
+<p>Next we can run the main <code><a href="reference/icwgcna.html">icwgcna()</a></code> function</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://biogit.pri.bms.com/Systems-Immunology/icWGCNA">icWGCNA</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/icwgcna.html">icwgcna</a></span><span class="op">(</span><span class="va">ex</span>,   </span>
+<span>                   expo <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>                   Method <span class="op">=</span> <span class="st">"pearson"</span>,</span>
+<span>                   q <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>                   maxIt <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>                   maxComm <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>                   corCut <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>                   covCut <span class="op">=</span> <span class="fl">0.33</span>,</span>
+<span>                   mat_mult_method <span class="op">=</span> <span class="st">"Rfast"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="downstream-analysis">Downstream Analysis<a class="anchor" aria-label="anchor" href="#downstream-analysis"></a>
+</h3>
+<p>Finally, downstream analysis can be run on the Iterative Correcting Weighted Gene Co-expression Network Analysis results.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/compute_eigengene_matrix.html">compute_eigengene_matrix</a></span><span class="op">(</span><span class="va">ex</span>, </span>
+<span>                         membership_matrix <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">community_membership</span>, </span>
+<span>                         cutoff <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>                         pc_flag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="va">pangDB</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="va">pangDB_link</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/compute_panglaoDB_enrichment.html">compute_panglaoDB_enrichment</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">community_membership</span>,</span>
+<span>                             K <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>                             memb_cut <span class="op">=</span> <span class="fl">0.65</span>,</span>
+<span>                             pangDB <span class="op">=</span> <span class="va">pangDB</span>,</span>
+<span>                             prolif <span class="op">=</span> <span class="va">prolif_names</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
@@ -161,6 +206,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://covr.r-lib.org/" class="external-link"><img src="https://img.shields.io/badge/codecov-96%25-green.svg"></a></li>
 </ul>
 </div>
 
@@ -175,7 +221,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
     </footer>
