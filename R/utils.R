@@ -43,7 +43,7 @@ RfastCor_wrapper <- function(x,
 #'
 #' @examples
 RfastTOMdist <- function(A,
-                         mat_mult_method = c('Rfast', 'RcppEigen')) {
+                         mat_mult_method = c("Rfast", "RcppEigen")) {
   mat_mult_method <- match.arg(mat_mult_method)
 
   diag(A) <- 0
@@ -53,7 +53,7 @@ RfastTOMdist <- function(A,
   denomTOM <- Rfast::Pmin(denomHelp, Rfast::transpose(denomHelp)) + (1 - A)
   rm(denomHelp, kk)
 
-  if (mat_mult_method == 'Rfast') {
+  if (mat_mult_method == "Rfast") {
     numTOM <- Rfast::mat.mult(A, A) + A
   } else {
     numTOM <- eigenMapMatMult(A, A) + A
@@ -86,7 +86,7 @@ RfastTOMdist <- function(A,
 fastTOMwrapper <- function(X,
                            expo = 6,
                            Method = c("pearson", "spearman"),
-                           mat_mult_method = c('Rfast', 'RcppEigen')) {
+                           mat_mult_method = c("Rfast", "RcppEigen")) {
   Method <- match.arg(Method)
   mat_mult_method <- match.arg(mat_mult_method)
 
@@ -130,13 +130,15 @@ cutreeHybridWrapper <- function(d,
   dend <- stats::hclust(stats::as.dist(d), method = "average")
   refHeight <- stats::quantile(dend$height, .05, type = 1)
   cutHeight <- as.numeric(quantCut * (max(dend$height) - refHeight) + refHeight)
-  modules <- dynamicTreeCut::cutreeHybrid(dendro = dend,
-                                          distM = d,
-                                          cutHeight = cutHeight,
-                                          minClusterSize = 5,
-                                          pamStage = TRUE,
-                                          pamRespectsDendro = FALSE,
-                                          verbose = 0)
+  modules <- dynamicTreeCut::cutreeHybrid(
+    dendro = dend,
+    distM = d,
+    cutHeight = cutHeight,
+    minClusterSize = 5,
+    pamStage = TRUE,
+    pamRespectsDendro = FALSE,
+    verbose = 0
+  )
   return(modules)
 }
 
@@ -182,9 +184,11 @@ dropModuels <- function(eigenGenes,
   }
   eigen_Cors <- stats::cor(t(eigenGenes))
   diag(eigen_Cors) <- 0
-  message(paste("eigegenes trimmed to", nrow(eigenGenes),
-                "due to correlation >", corCut,
-                "max eigenCor =", max(signif(eigen_Cors, 2))))
+  message(paste(
+    "eigegenes trimmed to", nrow(eigenGenes),
+    "due to correlation >", corCut,
+    "max eigenCor =", max(signif(eigen_Cors, 2))
+  ))
   return(eigenGenes)
 }
 
@@ -197,18 +201,21 @@ simpWGCNAsubNet <- function(tEx,
                             n = 15,
                             minMods = 5,
                             corCut = .6,
-                            mat_mult_method = c('Rfast', 'RcppEigen')) {
+                            mat_mult_method = c("Rfast", "RcppEigen")) {
   Method <- match.arg(Method)
   mat_mult_method <- match.arg(mat_mult_method)
 
-  message(paste("Computing", nrow(tEx),
-              "x", nrow(tEx),
-              "TOM distance for subset of genes with higher variance"))
+  message(paste(
+    "Computing", nrow(tEx),
+    "x", nrow(tEx),
+    "TOM distance for subset of genes with higher variance"
+  ))
 
   TOMd <- fastTOMwrapper(tEx,
-                         expo = expo,
-                         Method = Method,
-                         mat_mult_method = mat_mult_method)
+    expo = expo,
+    Method = Method,
+    mat_mult_method = mat_mult_method
+  )
   mods <- cutreeHybridWrapper(TOMd)$labels
   modSz <- table(mods)
   if (sum(modSz >= n) < minMods) {
@@ -224,18 +231,22 @@ simpWGCNAsubNet <- function(tEx,
   if (length(retMods) == 0) {
     eigenGenes <- NULL
   } else {
-    eigenGenes <- as.matrix(plyr::ldply(.data = retMods,
-                                         .fun = function(m) {
-                                         eg <- calcEigenGene(tEx[mods == m, ])
-                                         return(eg)
-                                       }))
+    eigenGenes <- as.matrix(plyr::ldply(
+      .data = retMods,
+      .fun = function(m) {
+        eg <- calcEigenGene(tEx[mods == m, ])
+        return(eg)
+      }
+    ))
     rownames(eigenGenes) <- retMods
 
     # subsetting modSz to match eigenGenes
     # For dropping communities within an iteration we use size and keep the larger since we have dynamic tree cut which uses topology.
-    eigenGenes <- dropModuels(eigenGenes = eigenGenes,
-                             Kurts = modSz[names(modSz) %in% retMods],
-                              corCut = corCut)
+    eigenGenes <- dropModuels(
+      eigenGenes = eigenGenes,
+      Kurts = modSz[names(modSz) %in% retMods],
+      corCut = corCut
+    )
     # when we drop between rounds we use kurtosis since we don't have access to topology at that point.
     tPc <- stats::prcomp(t(tEx))
     message(summary(tPc)$importance[2, 1:3])
@@ -245,5 +256,3 @@ simpWGCNAsubNet <- function(tEx,
   }
   return(eigenGenes)
 }
-
-

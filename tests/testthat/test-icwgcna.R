@@ -3,24 +3,29 @@
 test_that("input checking", {
   # ex must be numeric
   expect_error(
-    icwgcna(cbind(paste('a', testing_data[,1]), testing_data)),
+    icwgcna(cbind(paste("a", testing_data[, 1]), testing_data)),
     "all 'ex' columns must be numeric"
   )
   expect_error(
-    icwgcna(cbind(testing_data[,1] - 1, testing_data)),
+    icwgcna(cbind(testing_data[, 1] - 1, testing_data)),
     "all values of ex must be >=0"
   )
   expect_warning(
     suppressMessages(
-      icwgcna(cbind(testing_data[1:1000,1] + c(rep(100, 10),
-                                       rep(0, nrow(testing_data[1:1000,]) - 10)),
-                  testing_data[1:1000,]),
-            maxIt = 2)
+      icwgcna(cbind(
+        testing_data[1:1000, 1] + c(
+          rep(100, 10),
+          rep(0, nrow(testing_data[1:1000, ]) - 10)
+        ),
+        testing_data[1:1000, ]
       ),
+      maxIt = 2
+      )
+    ),
     "some values of ex are >100, strongly indicating ex is not in log space"
   )
   expect_warning(
-    suppressMessages(icwgcna(testing_data[1:1000,], maxIt = 1)),
+    suppressMessages(icwgcna(testing_data[1:1000, ], maxIt = 1)),
     "advisable to use WGCNA package when maxIt = 1"
   )
 
@@ -44,22 +49,19 @@ test_that("input checking", {
 
   expect_error(icwgcna(testing_data, covCut = 0), "covCut must be >0 and <1")
   expect_error(icwgcna(testing_data, covCut = 1), "covCut must be >0 and <1")
-
-
-
 })
 
 
 test_that("static test data", {
-
   results_plus <- purrr::quietly(
-    ~ icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'RcppEigen')
+    ~ icwgcna(testing_data, maxIt = 3, covCut = .66, mat_mult_method = "RcppEigen")
   )()
 
   expect_equal(results_plus$result, testing_results)
   expect_equal(
     results_plus$messages,
-    c("Removing 2 genes with a 0 standard deviation\n",
+    c(
+      "Removing 2 genes with a 0 standard deviation\n",
       "Computing 1263 x 1263 TOM distance for subset of genes with higher variance\n",
       "number of modules found is 11\n",
       "eigegenes trimmed to 11 due to correlation > 0.8 max eigenCor = 0.77\n",
@@ -80,16 +82,14 @@ test_that("static test data", {
       "Reached maximimum number of iterations\n"
     )
   )
-  expect_equal(results_plus$output, '')
+  expect_equal(results_plus$output, "")
   expect_equal(results_plus$warnings, character(0))
 
-  #checking rfast mult method
+  # checking rfast mult method
   results_plus_Rfast <- purrr::quietly(
-    ~ icwgcna(testing_data, maxIt = 3,covCut = .66, mat_mult_method = 'Rfast')
+    ~ icwgcna(testing_data, maxIt = 3, covCut = .66, mat_mult_method = "Rfast")
   )()
   expect_equal(results_plus_Rfast, results_plus)
-
-
 })
 
 
@@ -98,8 +98,10 @@ test_that("expo = NULL (angular dist)", {
 
   # testing angular distance results (expo = NULL)
   results_plus_expoNULL <- purrr::quietly(
-    ~ icwgcna(testing_data, maxIt = 2, covCut = .66,
-              mat_mult_method = 'RcppEigen', expo = NULL)
+    ~ icwgcna(testing_data,
+      maxIt = 2, covCut = .66,
+      mat_mult_method = "RcppEigen", expo = NULL
+    )
   )()
   expect_equal(
     results_plus_expoNULL$messages,
@@ -119,14 +121,14 @@ test_that("expo = NULL (angular dist)", {
       "Reached maximimum number of iterations\n"
     )
   )
-
 })
 
 test_that("spearman test", {
-
   results_plus_spearman <- purrr::quietly(
-    ~ icwgcna(testing_data, maxIt = 2, covCut = .66,
-              mat_mult_method = 'RcppEigen', Method = 'spearman')
+    ~ icwgcna(testing_data,
+      maxIt = 2, covCut = .66,
+      mat_mult_method = "RcppEigen", Method = "spearman"
+    )
   )()
   expect_equal(
     results_plus_spearman$messages,
@@ -143,9 +145,7 @@ test_that("spearman test", {
       "0.115320.102510.06966\n",
       "eigegenes trimmed to 12 due to correlation > 0.8 max eigenCor = 0.75\n",
       "Done with iteration: 2 : current number of gene communities is 12 \n\n\n",
-      "Reached maximimum number of iterations\n")
+      "Reached maximimum number of iterations\n"
+    )
   )
-
 })
-
-

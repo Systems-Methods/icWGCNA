@@ -27,8 +27,10 @@
 #' @examples
 #' \dontrun{
 #' library("UCSCXenaTools")
-#' luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
-#' clinical = FALSE, download = TRUE)
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
 #' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 #'
 #' results <- icwgcna(ex)
@@ -53,7 +55,7 @@ compute_eigengene_matrix <- function(ex,
 
   rows_to_use <- rownames(membership_matrix) %in% rownames(ex)
   if (!any(rows_to_use)) {
-    stop('No matching rownames in ex and membership_matrix')
+    stop("No matching rownames in ex and membership_matrix")
   }
 
 
@@ -61,8 +63,10 @@ compute_eigengene_matrix <- function(ex,
   # need to remove any 0 SD genes
   SD_zero_index <- SD == 0
   if (any(SD_zero_index)) {
-    message('Removing ', sum(SD_zero_index),
-            ' genes with a 0 standard deviation')
+    message(
+      "Removing ", sum(SD_zero_index),
+      " genes with a 0 standard deviation"
+    )
     ex <- ex[!SD_zero_index, , drop = FALSE]
   }
 
@@ -113,10 +117,12 @@ pangDB_link <- "https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.g
 #'
 #' @export
 #'
-prolif_names <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20",
-                  "MCM10","HJURP","FOXM1","TOP2A","DLGAP5","KIF2C","KIF14",
-                  "ASPM","NEK2","CDCA8","CDKN3","NUF2","CDCA3",
-                  "CCNA2","CDCA5","CCNB1","ANLN","TTK","KIF20A","CCNB2")
+prolif_names <- c(
+  "TPX2", "PRC1", "BIRC5", "CEP55", "MELK", "KIF4A", "CDC20",
+  "MCM10", "HJURP", "FOXM1", "TOP2A", "DLGAP5", "KIF2C", "KIF14",
+  "ASPM", "NEK2", "CDCA8", "CDKN3", "NUF2", "CDCA3",
+  "CCNA2", "CDCA5", "CCNB1", "ANLN", "TTK", "KIF20A", "CCNB2"
+)
 
 
 #' Compute Cell Type Enrichments Using panglaoDB Cell Markers
@@ -143,23 +149,25 @@ prolif_names <- c("TPX2","PRC1","BIRC5","CEP55","MELK","KIF4A","CDC20",
 #' @export
 #'
 #' @examples
-#'
-#'\dontrun{
+#' \dontrun{
 #' library("UCSCXenaTools")
-#' luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
-#' clinical = FALSE, download = TRUE)
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
 #' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 #' results <- icwgcna(ex)
 #'
 #' pangDB <- data.table::fread(pangDB_link)
-#' compute_panglaoDB_enrichment(results$community_membership, pangDB = pangDB)}
+#' compute_panglaoDB_enrichment(results$community_membership, pangDB = pangDB)
+#' }
 #'
 compute_panglaoDB_enrichment <- function(membership_matrix,
                                          K = 100,
                                          memb_cut = .65,
                                          pangDB = data.table::fread(pangDB_link),
                                          prolif = prolif_names) {
-  if (!any(class(membership_matrix) %in% c('matrix', 'data.frame'))) {
+  if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
     stop("membership_matrix must be a martix or data.frame")
   }
   if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
@@ -167,25 +175,22 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
   }
 
   colnames(pangDB) <- make.names(colnames(pangDB))
-  if (!all(c('cell.type', 'official.gene.symbol') %in% colnames(pangDB))) {
+  if (!all(c("cell.type", "official.gene.symbol") %in% colnames(pangDB))) {
     stop('expecting pangDB variables "cell.type" and "official.gene.symbol" (after making syntactically valid names using make.names() function)')
   }
 
   c.types <- as.vector(stats::na.omit(unique(pangDB$cell.type)))
-  enr <- plyr::adply(membership_matrix,2, function(x) {
+  enr <- plyr::adply(membership_matrix, 2, function(x) {
     prolif_overlap <- table(
       rank(-x) <= K & x > memb_cut,
       rownames(membership_matrix) %in% prolif
     )
     if (nrow(prolif_overlap) < 2 ||
-        ncol(prolif_overlap) < 2 ||
-        prolif_overlap[2,2] > floor(.33 * length(prolif))) {
-
+      ncol(prolif_overlap) < 2 ||
+      prolif_overlap[2, 2] > floor(.33 * length(prolif))) {
       ret <- t(rep(1, length(c.types)))
-
     } else {
-
-      ret <- t(plyr::ldply(c.types,function(ct) {
+      ret <- t(plyr::ldply(c.types, function(ct) {
         overlap <- table(
           rank(-x) <= K & x > memb_cut,
           rownames(membership_matrix) %in%
@@ -202,10 +207,10 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
     ret
   })
 
-  rownames(enr) <- enr[,1]
-  enr           <- as.data.frame(t(enr[,-1]))
+  rownames(enr) <- enr[, 1]
+  enr <- as.data.frame(t(enr[, -1]))
 
-  top_enr <- plyr::ldply(apply(enr,2,function(x){
+  top_enr <- plyr::ldply(apply(enr, 2, function(x) {
     if (min(x) > 0.001) {
       return(data.frame(cell_type = NA, p = NA))
     }
@@ -217,8 +222,8 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
   }))
   names(top_enr)[1] <- "community"
 
-  return(list(top_enr = top_enr,
-              full_enr = enr))
+  return(list(
+    top_enr = top_enr,
+    full_enr = enr
+  ))
 }
-
-
