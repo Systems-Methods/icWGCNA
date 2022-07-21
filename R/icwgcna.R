@@ -1,4 +1,4 @@
-#' icwgcna
+#' Iterative Correcting Weighted Gene Co-expression Network Analysis
 #'
 #' Iterative Correcting Weighted Gene Co-expression Network Analysis function constructing a network from an expression matrix.
 #'
@@ -41,16 +41,39 @@
 #' multiple cores. If running this on a cluster with access to many computer core
 #' there is a significant performance advantage to using [Rfast::mat.mult()]
 #'
+#' @references
+#'
+#' Langfelder P, Horvath S (2008).
+#' ``WGCNA: an R package for weighted correlation network analysis.''
+#' \emph{BMC Bioinformatics}, 559.
+#' \url{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559}.
+#'
+#' Langfelder P, Horvath S (2012).
+#' ``Fast R Functions for Robust Correlations and Hierarchical Clustering.''
+#' \emph{Journal of Statistical Software}, \bold{46}(11), 1--17.
+#' \url{https://www.jstatsoft.org/v46/i11/}.
+#'
+#' Zhang, Bin and Horvath, Steve. "A General Framework for Weighted Gene
+#' Co-Expression Network Analysis" \emph{Statistical Applications in Genetics
+#' and Molecular Biology}, vol. 4, no. 1, 2005.
+#' \url{https://doi.org/10.2202/1544-6115.1128}
+#'
+#' Mason, M.J., Fan, G., Plath, K. et al. Signed weighted gene co-expression
+#' network analysis of transcriptional regulation in murine embryonic stem cells.
+#' \emph{BMC Genomics 10}, 327 (2009).
+#' \url{https://doi.org/10.1186/1471-2164-10-327#'}
 #'
 #' @examples
-#'
-#'\dontrun{
+#' \dontrun{
 #' library("UCSCXenaTools")
-#' luad <- getTCGAdata(project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
-#'                   clinical = FALSE, download = TRUE)
-#' ex <- data.table::fread(luad$destfiles)
-#' results <- icwgcna(ex)}
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 #'
+#' results <- icwgcna(ex)
+#' }
 #' @export
 icwgcna <- function(ex,
                     expo = 6,
@@ -60,19 +83,34 @@ icwgcna <- function(ex,
                     maxComm = 100,
                     corCut = .8,
                     covCut = .33,
-                    mat_mult_method = c('Rfast', 'RcppEigen')) {
+                    mat_mult_method = c("Rfast", "RcppEigen")) {
   # param checking
-  if (maxIt > 25 | maxIt < 1) {
+  if (!all(unlist(lapply(ex, is.numeric)))) {
+    stop("all 'ex' columns must be numeric")
+  }
+  if (min(ex) < 0) {
+    stop("all values of ex must be >=0")
+  }
+  if (max(ex) > 100) {
+    warning("some values of ex are >100, strongly indicating ex is not in log space")
+  }
+  if (!is.null(expo) && (expo > 10 || expo <= 0)) {
+    stop("expo must be >0 and <=10, or NULL")
+  }
+  if (maxIt > 25 || maxIt < 1) {
     stop("maxIt must be between 1 and 25")
   }
-  if (q >= 1 | q <= 0) {
-    stop("q must be > 0 and <1 ")
+  if (maxIt == 1) {
+    warning("advisable to use WGCNA package when maxIt = 1")
   }
-  if (corCut >= 1 | corCut <= 0) {
-    stop("corCut must be > 0 and < 1")
+  if (q >= 1 || q <= 0) {
+    stop("q must be >0 and <1 ")
   }
-  if (covCut >= 1 | covCut <= 0) {
-    stop("covCut must be > 0 and < 1")
+  if (corCut >= 1 || corCut <= 0) {
+    stop("corCut must be >0 and <1")
+  }
+  if (covCut >= 1 || covCut <= 0) {
+    stop("covCut must be >0 and <1")
   }
 
   Method <- match.arg(Method)
@@ -86,16 +124,19 @@ icwgcna <- function(ex,
   # need to remove any 0 SD genes
   SD_zero_index <- SD[, 1] == 0
   if (any(SD_zero_index)) {
-    message('Removing ', sum(SD_zero_index),
-            ' genes with a 0 standard deviation')
-    ex <- ex[!SD_zero_index, ]
-    SD <- SD[!SD_zero_index, ]
+    message(
+      "Removing ", sum(SD_zero_index),
+      " genes with a 0 standard deviation"
+    )
+    ex <- ex[!SD_zero_index, , drop = FALSE]
+    SD <- SD[!SD_zero_index, , drop = FALSE]
   }
 
   # average expression of each gene
   M <- apply(ex, 1, mean)
   # identify genes that should simply not be part of the first round due to low signal
-  CoV      <- matrix(NA,nrow(ex), maxIt); CoV[,1] <- abs(SD[,1]/M)
+  CoV <- matrix(NA, nrow(ex), maxIt)
+  CoV[, 1] <- abs(SD[, 1] / M)
   leaveOut <- M < stats::quantile(M, q) | SD[, 1] < stats::quantile(SD[, 1], q)
   tEx <- ex
   cont_for <- c()
@@ -103,11 +144,11 @@ icwgcna <- function(ex,
   for (i in 1:maxIt) {
     # returns eigengenes for modules, orderd by |correlation to first pc of subsetted expression|
     tEigenGenes <- simpWGCNAsubNet(tEx[!leaveOut, ],
-                                   expo = expo,
-                                   Method = Method,
-                                   n = 5,
-                                   corCut = corCut,
-                                   mat_mult_method = mat_mult_method
+      expo = expo,
+      Method = Method,
+      n = 5,
+      corCut = corCut,
+      mat_mult_method = mat_mult_method
     )
 
     if (is.null(tEigenGenes)) {
@@ -130,10 +171,11 @@ icwgcna <- function(ex,
       full_metaGenes <- cbind(full_metaGenes, tMetaGenes)
       # not really size of community but more a measure of tightness
       clust_kurt <- apply(metaGenes, 2, Rfast::kurt)
-      eigenGenes <- dropModuels(eigenGenes = eigenGenes,
-                                Kurts = clust_kurt,
-                                corCut = corCut,
-                                verbose = FALSE)
+      eigenGenes <- dropModuels(
+        eigenGenes = eigenGenes,
+        Kurts = clust_kurt,
+        corCut = corCut
+      )
       metaGenes <- metaGenes[, colnames(metaGenes) %in% rownames(eigenGenes)]
     }
 
@@ -142,11 +184,13 @@ icwgcna <- function(ex,
       cont_for <- c(cont_for, row.names(tEigenGenes)[1])
       # regress out 1st/largest eigen gene from this iteration
       x <- tEigenGenes[1, ]
-      tEx <- plyr::aaply(.data = as.matrix(tEx),
-                         .margins = 1,
-                         .fun = function(y) {
-                           stats::residuals.lm(stats::lm(y ~ x)) + mean(y)
-                         })
+      tEx <- plyr::aaply(
+        .data = as.matrix(tEx),
+        .margins = 1,
+        .fun = function(y) {
+          stats::residuals.lm(stats::lm(y ~ x)) + mean(y)
+        }
+      )
       # filter on top third of genes based on coefficient of variation
       CoV[, i + 1] <- apply(tEx, 1, function(x) {
         abs(stats::sd(x) / mean(x))
@@ -155,13 +199,17 @@ icwgcna <- function(ex,
       leaveOut <- CoV[, i] < stats::quantile(CoV[, i], covCut)
     }
 
-    message(paste("Done with iteration:", i,
-              ": current number of gene communities is",
-              nrow(eigenGenes), "\n\n"))
+    message(paste(
+      "Done with iteration:", i,
+      ": current number of gene communities is",
+      nrow(eigenGenes), "\n\n"
+    ))
     if (nrow(eigenGenes) >= maxComm) {
-      message(paste("Number of modules", nrow(eigenGenes),
-                  "is >=", maxComm,
-                  "the maximum number of modules. -- Stopping Iterations --"))
+      message(paste(
+        "Number of modules", nrow(eigenGenes),
+        "is >=", maxComm,
+        "the maximum number of modules. -- Stopping Iterations --"
+      ))
       break()
     }
     if (i == maxIt) {
@@ -172,10 +220,12 @@ icwgcna <- function(ex,
 
   colnames(metaGenes) <- paste0("m", colnames(metaGenes))
   return(
-    list(community_membership = metaGenes,
-         community_signature = eigenGenes,
-         full_community_membership = full_metaGenes,
-         full_community_signature = full_eigenGenes,
-         controlled_for = cont_for)
+    list(
+      community_membership = metaGenes,
+      community_signature = eigenGenes,
+      full_community_membership = full_metaGenes,
+      full_community_signature = full_eigenGenes,
+      controlled_for = cont_for
+    )
   )
 }

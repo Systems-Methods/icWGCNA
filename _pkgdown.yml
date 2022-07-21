@@ -3,9 +3,6 @@ url: https://biogit.pri.bms.com/Systems-Immunology/icWGCNA
 template:
   bootstrap: 5
 
-development:
-  mode: auto
-
 home:
   links:
   - text: Browse source code
