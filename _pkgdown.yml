@@ -3,11 +3,6 @@ url: https://github.com/Systems-Methods/icWGCNA
 template:
   bootstrap: 5
 
-home:
-  links:
-  - text: Browse source code
-    href: https://github.com/Systems-Methods/icWGCNA
-
 authors:
   Mike Mason:
     href: https://github.com/mjrmason
