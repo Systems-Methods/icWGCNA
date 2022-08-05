@@ -1,3 +1,7 @@
+# icWGCNA 0.1.1
+
+Released on public Github. 
+
 # icWGCNA 0.1.0
 
 Initial release to be shared publicly
