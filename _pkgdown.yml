@@ -1,17 +1,12 @@
-url: https://biogit.pri.bms.com/Systems-Immunology/icWGCNA
+url: https://github.com/Systems-Methods/icWGCNA
 
 template:
   bootstrap: 5
 
-home:
-  links:
-  - text: Browse source code
-    href: https://biogit.pri.bms.com/Systems-Immunology/icWGCNA
-
 authors:
   Mike Mason:
-    href: https://biogit.pri.bms.com/masonm3
+    href: https://github.com/mjrmason
   Jimmy Fulp:
-    href: https://biogit.pri.bms.com/fulpw
+    href: https://github.com/wfulp
   Alexandre Alloy:
-    href: https://biogit.pri.bms.com/alloya
+    href: https://github.com/alexandre-alloy
