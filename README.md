@@ -7,7 +7,8 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![](https://img.shields.io/badge/codecov-96%25-green.svg)](https://covr.r-lib.org/)
+[![Codecov test
+coverage](https://codecov.io/gh/Systems-Methods/icWGCNA/branch/main/graph/badge.svg)](https://app.codecov.io/gh/Systems-Methods/icWGCNA?branch=main)
 <!-- badges: end -->
 
 ## Overview
@@ -34,7 +35,7 @@ Some differences from standard [WGNCA
     in order to avoid possible distortions of community signatures
     (eigengenes).
 -   Iteratively regresses out strongest community in order to facilitate
-    discovery of communities possibly obscured larger module(s).
+    discovery of communities possibly obscured by larger module(s).
 -   Clustering does not focus on merging communities but dropping to
     identify strongest module(s), keeping communities with higher
     membership kurtosis.
@@ -46,28 +47,24 @@ Some differences from standard [WGNCA
 
 ## Installation
 
-Install the released version of icWGCNA from BMS RStudio Package Manager
-(BRAN):
+Install the released version of icWGCNA from Github:
 
 ``` r
-install.packages(
-  "icWGCNA", 
-  repos = "http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest"
-)
+remotes::install_github(repo = "Systems-Methods/icWGCNA")
 ```
 
 Or install the development version from BMS BioGit with:
 
 ``` r
-remotes::install_github(repo = "Systems-Immunology/icWGCNA", 
-                        host = "https://biogit.pri.bms.com/api/v3")
+remotes::install_github(repo = "Systems-Methods/icWGCNA", 
+                        ref = "develop")
 ```
 
 Or:
 
 ``` r
 remotes::install_git(
-  'https://biogit.pri.bms.com/Systems-Immunology/icWGCNA.git'
+  'https://github.com/Systems-Methods/icWGCNA.git'
 )
 ```
 
@@ -113,6 +110,7 @@ Finally, downstream analysis can be run on the Iterative Correcting
 Weighted Gene Co-expression Network Analysis results.
 
 ``` r
+
 compute_eigengene_matrix(ex, 
                          membership_matrix = results$community_membership, 
                          cutoff = 5,
