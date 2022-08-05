@@ -1,6 +1,6 @@
 Package: icWGCNA
 Title: Iterative Correcting Weighted Gene Co-expression Network Analysis
-Version: 0.1.0.9000
+Version: 0.1.1
 Authors@R: 
   c(
     person(given = "Mike",
