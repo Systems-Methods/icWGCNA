@@ -264,7 +264,7 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
 #' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 #' results <- icwgcna(ex)
 #'
-#' compute_MSigDB_enrichment(tcell_net$community_membership, para_flag = T) 
+#' compute_MSigDB_enrichment(tcell_net$community_membership, para_flag = T)
 #' }
 #'
 
@@ -273,16 +273,16 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
 compute_MSigDB_enrichment <- function(membership_matrix,
                                          K = 100,
                                          memb_cut = .65,
-                                         cats = c("H", "C3", "C6", "C7", "C8"), 
+                                         cats = c("H", "C3", "C6", "C7", "C8"),
                                          para_flag = F) {
-  
+
   library(dplyr,quietly = T)
   m_df_simp    <- msigdbr::msigdbr(species = "Homo sapiens")
   m_df_simp    <- m_df_simp %>% dplyr::filter(gs_cat %in% cats)
   sig_list     <- list()
-  
+
   for(i in 1:length(cats)){
-    sig_list[[cats[i]]] <- m_df_simp %>% dplyr::filter(gs_cat == cats[i]) %>% split(x = .$gene_symbol, f = .$gs_name)  
+    sig_list[[cats[i]]] <- m_df_simp %>% dplyr::filter(gs_cat == cats[i]) %>% split(x = .$gene_symbol, f = .$gs_name)
   }
   rm(m_df_simp)
 
@@ -291,34 +291,34 @@ compute_MSigDB_enrichment <- function(membership_matrix,
   t_meta    <- membership_matrix
   top_genes <- apply(t_meta, 2, function(meta){rank(-meta) <= K & meta > memb_cut})
   all_genes <- rownames(top_genes)
-  
+
   overlap_enrichment <- plyr::ldply(names(sig_list), .fun = function(cat)
   {
     sig <- sig_list[[cat]]
     print(paste("working on", cat))
-    
+
     goGenes <- as.data.frame(lapply(sig, function(go){all_genes %in% go}))
-    
+
     enr <- plyr::adply(top_genes,2,function(topGenes)
     {
       if(F){ fish_p <- apply(goGenes,2,function(go){ if(!any(go & topGenes)){return(1)}else{fisher.test(go,topGenes,alternative = "greater")$p.value}}) }
-      
+
       q_h     <- t(as.matrix(goGenes)) %*% topGenes
       m_h     <- colSums(goGenes)
       n_h     <- nrow(goGenes) - m_h
       k_h     <- rep(sum(topGenes), length(q_h))
       hyper_p <- phyper(q_h-1,m_h,n_h, k_h, lower.tail = F) # matches fish_p but much faster to compute
-      
+
       return(data.frame(go = colnames(goGenes), top_comm_gene_n = k_h, go_n = m_h, overlap = q_h,p = hyper_p))
-      
+
     },.parallel = para_flag)
     gc()
     enr$cat <- cat
     return(enr)
   })
-  
+
   names(overlap_enrichment)[1] <- "community"
-  
+
   # for some reason if we use more cpu we get warnings about cores not returning results so we have to use less cores and error check here
   cat_cnts <- table(overlap_enrichment$community, overlap_enrichment$cat)
   correct  <- all(apply(cat_cnts,2,function(x){length(unique(x)) == 1}))
@@ -329,10 +329,10 @@ compute_MSigDB_enrichment <- function(membership_matrix,
     print(cat_cnts)
   }
   gc();
-  
+
   best_of_cat <- plyr::ddply(overlap_enrichment, .variables = c("community","cat"), function(x)
   {
-    ind <- which(x$p == min(x$p,na.rm=T)); 
+    ind <- which(x$p == min(x$p,na.rm=T));
     if(length(ind) > 1)
     {
       best            <- "";
@@ -349,21 +349,76 @@ compute_MSigDB_enrichment <- function(membership_matrix,
       overlap         <- NA
     }else
     {
-      best <- x$go[ind]; 
+      best <- x$go[ind];
       p_val <- x$p[ind]
       top_comm_gene_n <- x$top_comm_gene_n[ind]
       go_n            <- x$go_n[ind]
       overlap         <- x$overlap[ind]
     }
-    return(data.frame("best" = best,top_comm_gene_n,go_n,overlap,"p"=p_val))      
+    return(data.frame("best" = best,top_comm_gene_n,go_n,overlap,"p"=p_val))
   })
   gc()
 
   best <- plyr::dlply(best_of_cat, .variables = "cat",)
-  
+
   return(list(top_enr = best, full_enr = overlap_enrichment))
 }
 
 
 
 
+########################################################################################################################################################
+#' Display UMAP of Community Membership with text overlays
+#'
+#' @param membership_matrix a community membership (kME) matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]
+#' @param K cutoff for top community genes to include for computing enrichment.
+#' Used in an AND condition with memb_cut.
+#' @param memb_cut cutoff as a membership score threshold for determining top
+#' community genes for computing enrichment.  Used in an AND condition with K.
+#' @param labels the text to display over gene communities
+#'
+#' @return Returns a list with the following items:
+#' * `plot` - a UMAP plot of genes in labeled clusters
+#' * `layout` - the UMAP layout with additional information
+#'
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+#' results <- icwgcna(ex)
+#'
+#' compute_MSigDB_enrichment(tcell_net$community_membership, para_flag = T)
+#' }
+#'
+
+# community function from MSigDB H, C3, C6, C7, C8
+# GSEA Enrichment testing assumes differential analysis so we are using simple fisher test instead (actually hypergeometric for speed)
+make_network_umap <- function(membership_matrix,
+                                      K = 100,
+                                      memb_cut = .65,
+                                      cats = c("H", "C3", "C6", "C7", "C8"),
+                                      para_flag = F) {
+
+  t_ad_meta  <- ad_meta
+  t_ad_meta <- t_ad_meta[,(apply(abs(t_ad_meta) > .7,2,sum) >= 20) | apply(abs(t_ad_meta) > .8,2,sum) >= 5]
+  keep_inds1 <- apply(t_ad_meta > .75, 1, any)
+  keep_inds2 <- apply(t_ad_meta > .65, 1, sum) > 1
+  keep_inds <- keep_inds1 | keep_inds2
+  eigen_u                <- umap(t_ad_meta[keep_inds,])
+  uc_layout              <- as.data.frame(eigen_u$layout); names(uc_layout) <- c("UMAP1","UMAP2")
+  Community              <- colnames(t_ad_meta)[apply(t_ad_meta[keep_inds,],1,function(x){which(x == max(x))})]
+  Community              <- paste(Community,ad_clin_ass$cell_type[match(Community,ad_clin_ass$Community)])
+  uc_layout              <- cbind(uc_layout, Community = Community)
+
+  ad_metagene_u_plot <- ggplot(uc_layout, aes(x= UMAP1, y=UMAP2, color = Community)) + geom_point(size=.75) +
+    theme_classic() + theme(legend.text=element_text(size=5))#, legend.key.height= unit(6, 'cm'), legend.key.width= unit(2, 'cm')) #
+}
