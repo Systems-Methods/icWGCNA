@@ -1,6 +1,6 @@
 Package: icWGCNA
 Title: Iterative Correcting Weighted Gene Co-expression Network Analysis
-Version: 0.1.1
+Version: 0.1.1.9000
 Authors@R: 
   c(
     person(given = "Mike",
@@ -30,7 +30,7 @@ Description: Iterative Correcting Weighted Gene Co-expression Network Analysis f
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 URL: https://github.com/Systems-Methods/icWGCNA
 BugReports: https://github.com/Systems-Methods/icWGCNA/issues
 Depends: 
@@ -44,6 +44,9 @@ Imports:
 Suggests:
     covr,
     data.table,
+    doMC,
+    foreach,
+    msigdbr,
     purrr,
     R.utils,
     testthat (>= 3.0.0),

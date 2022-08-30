@@ -231,10 +231,9 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
 
 
 
-########################################################################################################################################################
 #' Compute MSigDB Collection Enrichments for each community
 #'
-#' compute MSigDB Collection enrichments using msigdbr
+#' Compute MSigDB Collection enrichments using msigdbr
 #' using Fisher test.
 #' @param membership_matrix a community membership (kME) matrix with genes as
 #' rows and communities as columns. Often `community_membership` or
@@ -243,14 +242,21 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
 #' Used in an AND condition with memb_cut.
 #' @param memb_cut cutoff as a membership score threshold for determining top
 #' community genes for computing enrichment.  Used in an AND condition with K.
-#' @param cats MSigDB collections to use. We recommend only using H, C3, C6, C7, C8 and avoiding C1, C2, C4, C5 for speed
-#' @param para_flag indicator for using multiple cores
-#' Default is to use [cats]
+#' @param cats MSigDB collections to use. We recommend only using
+#' H, C3, C6, C7, C8 and avoiding C1, C2, C4, C5 for speed
 #'
 #' @return Returns a list with the following items:
-#' * `top_enr` - a list with a data.frame of the most significant enrichment for each MSigDB collection.
-#' * `full_enr` - all MSigDB enrichment scores for all communities for the selected collections.
+#' * `top_enr` - a data.frame of the most significant enrichment for each
+#' MSigDB collection.
+#' * `full_enr` - all MSigDB enrichment scores for all communities for the
+#' selected collections.
 #'
+#' @details
+#' The function can use parallel and distributed processing in R, via the
+#' [foreach][foreach::foreach()] package.
+#'
+#' GSEA Enrichment testing assumes differential analysis so we are using simple
+#' fisher tests instead (actually hypergeometric for speed)
 #'
 #' @export
 #'
@@ -264,104 +270,132 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
 #' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 #' results <- icwgcna(ex)
 #'
-#' compute_MSigDB_enrichment(tcell_net$community_membership, para_flag = T)
+#' # Running with whatever parallel processing is already set up
+#' compute_MSigDB_enrichment(results$community_membership)
+#'
+#' # Using doMC package to set up parallel processing
+#' doMC::registerDoMC()
+#' compute_MSigDB_enrichment(results$community_membership)
 #' }
 #'
 
 # community function from MSigDB H, C3, C6, C7, C8
 # GSEA Enrichment testing assumes differential analysis so we are using simple fisher test instead (actually hypergeometric for speed)
 compute_MSigDB_enrichment <- function(membership_matrix,
-                                         K = 100,
-                                         memb_cut = .65,
-                                         cats = c("H", "C3", "C6", "C7", "C8"),
-                                         para_flag = F) {
+                                      K = 100,
+                                      memb_cut = .65,
+                                      cats = c("H", "C3", "C6", "C7", "C8")) {
 
-  library(dplyr,quietly = T)
-  m_df_simp    <- msigdbr::msigdbr(species = "Homo sapiens")
-  m_df_simp    <- m_df_simp %>% dplyr::filter(gs_cat %in% cats)
-  sig_list     <- list()
+  m_df_simp <- msigdbr::msigdbr(species = "Homo sapiens")
+  gs_cat_levels <- unique(m_df_simp$gs_cat)
 
-  for(i in 1:length(cats)){
-    sig_list[[cats[i]]] <- m_df_simp %>% dplyr::filter(gs_cat == cats[i]) %>% split(x = .$gene_symbol, f = .$gs_name)
+  if (all(!cats %in% gs_cat_levels)) {
+    stop('No "cats" found in MSigDB. Must use at least one of: ',
+         paste0(gs_cat_levels, collapse = ', '))
   }
-  rm(m_df_simp)
+  if (any(!cats %in% gs_cat_levels)) {
+    warning('The following "cats" are not in MSigDB: ',
+            paste0(cats[!cats %in% gs_cat_levels], collapse = ', '))
+    cats <- cats[cats %in% gs_cat_levels]
+  }
 
-  if(para_flag){doMC::registerDoMC(floor(parallel::detectCores()/4))}
+  sig_list <- lapply(cats, function(xx) {
+    tmp_data <- m_df_simp[m_df_simp$gs_cat == xx, ]
+    split(x = tmp_data$gene_symbol, f = tmp_data$gs_name)
+  })
+  names(sig_list) <- cats
 
-  t_meta    <- membership_matrix
-  top_genes <- apply(t_meta, 2, function(meta){rank(-meta) <= K & meta > memb_cut})
+  if (is.null(foreach::getDoParName())) {
+    message('No parallel processing has been detected')
+     `%d%` <- foreach::`%do%`
+  } else {
+    message('Using ', foreach::getDoParName(), ' with ',
+            foreach::getDoParWorkers(), ' workers')
+    `%d%` <- foreach::`%dopar%`
+  }
+
+  top_genes <- apply(membership_matrix, 2,
+                     function(meta) {
+                       rank(-meta) <= K & meta > memb_cut
+                     })
   all_genes <- rownames(top_genes)
 
-  overlap_enrichment <- plyr::ldply(names(sig_list), .fun = function(cat)
-  {
-    sig <- sig_list[[cat]]
-    print(paste("working on", cat))
+  overlap_enrichment <- plyr::ldply(
+    names(sig_list),
+    .fun = function(xx) {
+      sig <- sig_list[[xx]]
+      message("working on ", xx)
 
-    goGenes <- as.data.frame(lapply(sig, function(go){all_genes %in% go}))
+      goGenes <- as.data.frame(lapply(
+        sig,
+        function(go) {
+          all_genes %in% go
+        }))
 
-    enr <- plyr::adply(top_genes,2,function(topGenes)
-    {
-      if(F){ fish_p <- apply(goGenes,2,function(go){ if(!any(go & topGenes)){return(1)}else{fisher.test(go,topGenes,alternative = "greater")$p.value}}) }
+      top_genes <- top_genes
 
-      q_h     <- t(as.matrix(goGenes)) %*% topGenes
-      m_h     <- colSums(goGenes)
-      n_h     <- nrow(goGenes) - m_h
-      k_h     <- rep(sum(topGenes), length(q_h))
-      hyper_p <- phyper(q_h-1,m_h,n_h, k_h, lower.tail = F) # matches fish_p but much faster to compute
+      enr <- foreach::foreach(
+        i = 1:ncol(top_genes),
+        .combine = 'rbind') %d% {
+          q_h     <- t(as.matrix(goGenes)) %*% top_genes[, i]
+          m_h     <- colSums(goGenes)
+          n_h     <- nrow(goGenes) - m_h
+          k_h     <- rep(sum(top_genes[, i]), length(q_h))
+          hyper_p <- stats::phyper(q_h - 1, m_h, n_h, k_h, lower.tail = FALSE)
 
-      return(data.frame(go = colnames(goGenes), top_comm_gene_n = k_h, go_n = m_h, overlap = q_h,p = hyper_p))
-
-    },.parallel = para_flag)
-    gc()
-    enr$cat <- cat
-    return(enr)
-  })
-
-  names(overlap_enrichment)[1] <- "community"
+          data.frame(
+            community = colnames(top_genes)[i],
+            go = colnames(goGenes),
+            top_comm_gene_n = k_h,
+            go_n = m_h,
+            overlap = q_h,
+            p = hyper_p
+          )
+        }
+      enr$cat <- xx
+      enr
+    })
 
   # for some reason if we use more cpu we get warnings about cores not returning results so we have to use less cores and error check here
-  cat_cnts <- table(overlap_enrichment$community, overlap_enrichment$cat)
-  correct  <- all(apply(cat_cnts,2,function(x){length(unique(x)) == 1}))
-  if(!correct)
-  {
-    print("problem computing enrichments")
-    print(warnings())
-    print(cat_cnts)
+  cat_cnts <- table(overlap_enrichment$community,
+                    overlap_enrichment$cat)
+  correct  <- all(apply(cat_cnts,2,function(x) {length(unique(x)) == 1}))
+  if (!correct) {
+    stop("problem computing enrichments")
+    # warning(warnings())
+    # stop(cat_cnts)
   }
-  gc();
 
-  best_of_cat <- plyr::ddply(overlap_enrichment, .variables = c("community","cat"), function(x)
-  {
-    ind <- which(x$p == min(x$p,na.rm=T));
-    if(length(ind) > 1)
-    {
-      best            <- "";
-      p_val           <- min(x$p,na.rm=T)
-      top_comm_gene_n <- NA
-      go_n            <- NA
-      overlap         <- NA
-    }else if(min(x$p,na.rm=T) == 1)
-    {
-      best            <- "";
-      p_val           <- 1
-      top_comm_gene_n <- NA
-      go_n            <- NA
-      overlap         <- NA
-    }else
-    {
-      best <- x$go[ind];
-      p_val <- x$p[ind]
-      top_comm_gene_n <- x$top_comm_gene_n[ind]
-      go_n            <- x$go_n[ind]
-      overlap         <- x$overlap[ind]
-    }
-    return(data.frame("best" = best,top_comm_gene_n,go_n,overlap,"p"=p_val))
-  })
-  gc()
+  best_of_cat <- plyr::ddply(
+    overlap_enrichment,
+    .variables = c("community","cat"),
+    function(x) {
+      ind <- which(x$p == min(x$p,na.rm = TRUE));
+      if (length(ind) > 1 || min(x$p, na.rm = TRUE) == 1) {
+        best            <- "";
+        p_val           <- min(x$p, na.rm = TRUE)
+        top_comm_gene_n <- NA
+        go_n            <- NA
+        overlap         <- NA
+      } else {
+        best <- x$go[ind];
+        p_val <- x$p[ind]
+        top_comm_gene_n <- x$top_comm_gene_n[ind]
+        go_n            <- x$go_n[ind]
+        overlap         <- x$overlap[ind]
+      }
+      data.frame(
+        best = best,
+        top_comm_gene_n,
+        go_n,
+        overlap,
+        p = p_val
+      )
+    })
 
-  best <- plyr::dlply(best_of_cat, .variables = "cat",)
+  best <- plyr::dlply(best_of_cat, .variables = "cat")
 
-  return(list(top_enr = best, full_enr = overlap_enrichment))
+  list(top_enr = best, full_enr = overlap_enrichment)
 }
 
 
