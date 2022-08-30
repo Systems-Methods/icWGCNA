@@ -46,11 +46,13 @@ Suggests:
     data.table,
     doMC,
     foreach,
+    ggplot2,
     msigdbr,
     purrr,
     R.utils,
     testthat (>= 3.0.0),
     UCSCXenaTools,
+    umap,
     withr
 LinkingTo: 
     Rcpp,

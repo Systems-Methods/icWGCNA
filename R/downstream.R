@@ -278,9 +278,6 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
 #' compute_MSigDB_enrichment(results$community_membership)
 #' }
 #'
-
-# community function from MSigDB H, C3, C6, C7, C8
-# GSEA Enrichment testing assumes differential analysis so we are using simple fisher test instead (actually hypergeometric for speed)
 compute_MSigDB_enrichment <- function(membership_matrix,
                                       K = 100,
                                       memb_cut = .65,
@@ -334,6 +331,7 @@ compute_MSigDB_enrichment <- function(membership_matrix,
 
       top_genes <- top_genes
 
+      i <- NA
       enr <- foreach::foreach(
         i = 1:ncol(top_genes),
         .combine = 'rbind') %d% {
@@ -356,14 +354,11 @@ compute_MSigDB_enrichment <- function(membership_matrix,
       enr
     })
 
-  # for some reason if we use more cpu we get warnings about cores not returning results so we have to use less cores and error check here
   cat_cnts <- table(overlap_enrichment$community,
                     overlap_enrichment$cat)
   correct  <- all(apply(cat_cnts,2,function(x) {length(unique(x)) == 1}))
   if (!correct) {
-    stop("problem computing enrichments")
-    # warning(warnings())
-    # stop(cat_cnts)
+    stop("problem computing enrichments, try a different parallel computing setup")
   }
 
   best_of_cat <- plyr::ddply(
@@ -401,32 +396,64 @@ compute_MSigDB_enrichment <- function(membership_matrix,
 
 
 
-########################################################################################################################################################
 #' Display UMAP of Community Membership with text overlays
 #'
 #' @param membership_matrix a community membership (kME) matrix with genes as
 #' rows and communities as columns. Often `community_membership` or
 #' `full_community_membership` output from [icwgcna()]
-#' @param gene_memb_cut_main main cutoff of a membership score threshold for filtering genes to include in the plot. Any genes with an absolute membership
-#' score greater than gene_memb_cut_main in any community is included
-#' @param gene_memb_cut_secondary secondary cutoff of a membership score threshold for filtering genes to include in the plot. Any genes with an absolute membership
-#' score greater than gene_memb_cut_main in more than 1 community is included
-#' @param community_memb_cut_main main cutoff of a membership score threshold for filtering out communities to include in the plot. Any communities with
-#' less than community_n_main number of genes greater than community_memb_cut_main are filtered out.
-#' @param community_memb_cut_secondary cutoff of a membership score threshold for filtering genes to include in the plot. Any communities with
-#' less than community_n_secondary number of genes greater than community_memb_cut_secondary are filtered out.
-#' @param community_n_main the number of genes that must have membership scores great than community_memb_cut_main in order for a community to be
+#' @param community_memb_cut_main main cutoff of a membership score threshold
+#' for filtering out communities to include in the plot. Any communities with
+#' less than `community_n_main` number of genes greater than
+#' `community_memb_cut_main` are filtered out.
+#' @param community_n_main the number of genes that must have membership scores
+#'  great than `community_memb_cut_main` in order for a community to be
 #' kept in the plot.
-#' @param community_n_secondary the number of genes that must have membership scores great than community_memb_cut_secondary in order for a community
+#' @param community_memb_cut_secondary cutoff of a membership score threshold
+#' for filtering genes to include in the plot. Any communities with
+#' less than `community_n_secondary` number of genes greater than
+#' `community_memb_cut_secondary` are filtered out.
+#' @param community_n_secondary the number of genes that must have membership
+#' scores great than `community_memb_cut_secondary` in order for a community
 #' to be kept in the plot.
-#' @param community_labels a data.frame with the text to display over gene communities. Expects first column to match column names of membership_matrix and
-#' second column to contain text of labels associated with each community
+#' @param gene_memb_cut_main main cutoff of a membership score threshold for
+#' filtering genes to include in the plot. Any genes with an absolute membership
+#' score greater than `gene_memb_cut_main` in any community is included
+#' @param gene_memb_cut_secondary secondary cutoff of a membership score
+#' threshold for filtering genes to include in the plot. Any genes with an
+#' absolute membership score greater than `gene_memb_cut_main` in more than 1
+#' community is included
+#' @param community_labels a data.frame with the text to display over gene
+#' communities. Expects first column to match column names of `membership_matrix`
+#' and second column to contain text of labels associated with each community
 #'
 #' @return Returns a list with the following items:
-#' * `labeled_u_plot` - a UMAP plot of genes with labeled clusters overlaid
-#' * `u_plot` - a UMAP plot of genes with a legend and no overlaid labels
-#' * `layout_df` - the UMAP layout to enable customized user plotting
+#' * `umap_w_annotation` - a UMAP plot of genes with labeled clusters overlaid
+#' * `umap_w_legend` - a UMAP plot of genes with a legend and no overlaid labels
+#' * `layout` - the UMAP layout to enable customized user plotting
 #'
+#' @details
+#'
+#' # Filtering
+#'
+#' In order to facilitate viewing, communities and genes are filtered prior to
+#' plotting. Gene filtering is performed after community filtering.
+#'
+#' For inclusion either the main or secondary parameters can be satisfied. For
+#' example, using the defaults here a community must have either 20 genes over
+#' 0.7 kME or 5 genes over 0.8 kME to be included. After community filtering,
+#' gene filtering is performed. Again using the defaults here, a gene must
+#' have at least one community over 0.75 kME or two communities over 0.65 kME
+#' to be included.
+#'
+#' Setting `community_memb_cut_main`, `community_memb_cut_secondary`,
+#' `gene_memb_cut_main`, and `gene_memb_cut_secondary` all to 0 will force
+#' all communities and genes to be included in the UMAP
+#'
+#' # Output
+#'
+#' Both `umap_w_annotation` and `umap_w_legend` outputs are
+#' [ggplot][ggplot2::ggplot()] objects, so plot details can easily be added or
+#' modified (i.e. `umap_results$umap_w_legend + theme_classic()`).
 #'
 #' @export
 #'
@@ -440,51 +467,84 @@ compute_MSigDB_enrichment <- function(membership_matrix,
 #' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 #' results <- icwgcna(ex)
 #'
-#' compute_MSigDB_enrichment(tcell_net$community_membership, para_flag = T)
+#' umap_results <- make_network_umap(results$community_membership)
+#' umap_results$umap_w_annotation
+#' umap_results$umap_w_legend + theme(legend.position = 'top')
 #' }
 #'
 make_network_umap <- function(membership_matrix,
+                              community_memb_cut_main = 0.7,
+                              community_n_main = 20,
+                              community_memb_cut_secondary = 0.8,
+                              community_n_secondary = 5,
                               gene_memb_cut_main = 0.75,
                               gene_memb_cut_secondary = 0.65,
-                              community_memb_cut_main = 0.7,
-                              community_memb_cut_secondary = 0.8,
-                              community_n_main = 20,
-                              community_n_secondary = 5,
                               community_labels = NULL) {
 
-  library(ggplot2,quietly = T)
-  kME_mat    <- membership_matrix
-  col_inds   <- (apply(abs(kME_mat) > community_memb_cut_main,2,sum) >= community_n_main) |
-                (apply(abs(kME_mat) > community_memb_cut_secondary,2,sum) >= community_n_secondary)
-  kME_mat    <- kME_mat[,col_inds]
-  row_inds   <- apply(kME_mat > gene_memb_cut_main, 1, any) | (apply(kME_mat > gene_memb_cut_secondary, 1, sum) > 1)
+  col_inds <- (apply(abs(membership_matrix) > community_memb_cut_main, 2, sum) >=
+                   community_n_main) |
+    (apply(abs(membership_matrix) > community_memb_cut_secondary, 2, sum) >=
+       community_n_secondary)
+  kME_mat    <- membership_matrix[,col_inds]
+
+  row_inds   <- apply(kME_mat > gene_memb_cut_main, 1, any) |
+    (apply(kME_mat > gene_memb_cut_secondary, 1, sum) > 1)
   kME_mat    <- kME_mat[row_inds,]
 
-  print(paste("Filtering from",ncol(membership_matrix),"communites to",ncol(kME_mat), "communities for plotting."))
-  print(paste("And filtering from",nrow(membership_matrix),"genes to",nrow(kME_mat), "genes for plotting."))
+  print(paste("Filtering from", ncol(membership_matrix),
+              "communites to", ncol(kME_mat), "communities for plotting."))
+  print(paste("And filtering from", nrow(membership_matrix),
+              "genes to", nrow(kME_mat), "genes for plotting."))
 
   memb_u     <- umap::umap(kME_mat)
-  layout_df  <- as.data.frame(memb_u$layout); names(layout_df) <- c("UMAP1","UMAP2")
-  Community  <- colnames(kME_mat)[apply(kME_mat,1,function(x){which(x == max(x))})]
-  if(!is.null(community_labels)){
-    add_lab    <- community_labels[match(Community, community_labels$community),2]
-    Community[!is.na(add_lab)]  <- paste(Community[!is.na(add_lab)],add_lab[!is.na(add_lab)])
+  layout_df  <- as.data.frame(memb_u$layout)
+  names(layout_df) <- c("UMAP1","UMAP2")
+  Community  <- colnames(kME_mat)[apply(kME_mat,1,
+                                        function(x) {which(x == max(x))})]
+  if (!is.null(community_labels)) {
+    add_lab <- community_labels[match(Community, community_labels$community), 2]
+    Community[!is.na(add_lab)]  <- paste(Community[!is.na(add_lab)],
+                                         add_lab[!is.na(add_lab)])
   }
 
   layout_df  <- cbind(layout_df, Community = Community)
 
-  u_plot <- ggplot(layout_df, aes(x= UMAP1, y=UMAP2, color = Community)) + geom_point(size=.75) +
-    theme_classic() + theme(legend.text=element_text(size=5))
+  u_plot <- ggplot2::ggplot(layout_df,
+                            ggplot2::aes_string(x = 'UMAP1',
+                                                y = 'UMAP2',
+                                                color = 'Community')) +
+    ggplot2::geom_point(size = .75) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(legend.text = ggplot2::element_text(size = 5))
 
-  cell_type_locs <- plyr::ddply(layout_df,"Community",function(x){return(data.frame(UMAP1 = median(x$UMAP1),UMAP2 = median(x$UMAP2)))})
-  cell_type_locs <- cell_type_locs[order(cell_type_locs$UMAP1,cell_type_locs$UMAP2,decreasing = T),]
-  labeled_u_plot <- ggplot(layout_df, aes(x= UMAP1, y=UMAP2, color = Community)) + geom_point(size=.75) + theme_classic() + theme(legend.text=element_text(size=5), legend.position = "none") +
-    guides(colour = guide_legend(override.aes = list(size=5))) +
-    annotate("label",x=cell_type_locs$UMAP1, y = cell_type_locs$UMAP2, label= cell_type_locs$Community, size=2, fill="white")
+  cell_type_locs <- plyr::ddply(layout_df, "Community",
+                                function(x) {
+                                  data.frame(UMAP1 = stats::median(x$UMAP1),
+                                             UMAP2 = stats::median(x$UMAP2))
+                                })
+  cell_type_locs <- cell_type_locs[order(cell_type_locs$UMAP1,
+                                         cell_type_locs$UMAP2,
+                                         decreasing = T),]
+  labeled_u_plot <- ggplot2::ggplot(layout_df,
+                                    ggplot2::aes_string(x = 'UMAP1',
+                                                        y = 'UMAP2',
+                                                        color = 'Community')) +
+    ggplot2::geom_point(size = .75) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(legend.text = ggplot2::element_text(size = 5),
+                   legend.position = "none") +
+    ggplot2::guides(colour = ggplot2::guide_legend(
+      override.aes = list(size = 5)
+    )) +
+    ggplot2::annotate("label",x = cell_type_locs$UMAP1,
+                      y = cell_type_locs$UMAP2,
+                      label = cell_type_locs$Community,
+                      size = 2,
+                      fill = "white")
 
-  ret <- list(umap_w_annotation = labeled_u_plot, umap_w_legend = u_plot, layout = layout_df)
-  return(ret)
-
+  list(umap_w_annotation = labeled_u_plot,
+       umap_w_legend = u_plot,
+       layout = layout_df)
 }
 
 
