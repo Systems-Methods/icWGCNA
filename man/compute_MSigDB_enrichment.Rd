@@ -58,7 +58,12 @@ results <- icwgcna(ex)
 # Running with whatever parallel processing is already set up
 compute_MSigDB_enrichment(results$community_membership)
 
-# Using doMC package to set up parallel processing
+# Using doParallel package to set up parallel processing
+cl <- parallel::makePSOCKcluster(2)
+doParallel::registerDoParallel(cl)
+compute_MSigDB_enrichment(results$community_membership)
+
+# Using doMC package to set up parallel processing (not available in Windows)
 doMC::registerDoMC()
 compute_MSigDB_enrichment(results$community_membership)
 }
