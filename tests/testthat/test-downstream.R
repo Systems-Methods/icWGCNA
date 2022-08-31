@@ -112,7 +112,9 @@ test_that("MSigDB enrichment input checking", {
 
 test_that("MSigDB enrichment status results", {
   results_plus <- purrr::quietly(
-    ~ compute_MSigDB_enrichment(testing_results$community_membership)
+    ~ compute_MSigDB_enrichment(testing_results$community_membership,
+                                cats = c("H", "AAAAAAA","C3", "C6", "C7", "C8",
+                                         "BAD_CAT"))
   )()
 
   expect_equal(results_plus$result$top_enr, testing_MSigDB_enrichment$top_enr)
@@ -127,7 +129,8 @@ test_that("MSigDB enrichment status results", {
       "working on C8\n"
     ))
   expect_equal(results_plus$output, "")
-  expect_equal(results_plus$warnings, character(0))
+  expect_equal(results_plus$warnings,
+               "The following \"cats\" are not in MSigDB: AAAAAAA, BAD_CAT")
 })
 
 
