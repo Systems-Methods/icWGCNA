@@ -86,6 +86,82 @@ test_that("panglaoDB enrichment status results", {
     compute_panglaoDB_enrichment(testing_results$community_membership,
       pangDB = testing_pangDB
     ),
-    testing_enrichment
+    testing_panglaoDB_enrichment
   )
+})
+
+
+
+
+
+
+test_that("MSigDB enrichment input checking", {
+  expect_error(
+    compute_MSigDB_enrichment(testing_results),
+    "membership_matrix must be a martix or data.frame"
+  )
+  expect_error(
+    compute_MSigDB_enrichment(testing_results$community_signature),
+    "membership_matrix values can't be <-1 or >1"
+  )
+  expect_error(
+    compute_MSigDB_enrichment(testing_results$community_membership, cats = 'M'),
+    'No "cats" found in MSigDB. Must use at least one of: C1, C2, C3, C4, C5, C6, C7, C8, H'
+  )
+})
+
+test_that("MSigDB enrichment status results", {
+  results_plus <- withr::with_collate(
+    "fr_FR",
+    purrr::quietly(
+      ~ compute_MSigDB_enrichment(testing_results$community_membership)
+    )()
+  )
+  expect_equal(results_plus$result$top_enr, testing_MSigDB_enrichment$top_enr)
+  expect_equal(results_plus$result$full_enr, testing_MSigDB_enrichment$full_enr)
+  expect_equal(
+    results_plus$messages,
+    c("No parallel processing has been detected\n",
+      "working on H\n",
+      "working on C3\n",
+      "working on C6\n",
+      "working on C7\n",
+      "working on C8\n"
+    ))
+  expect_equal(results_plus$output, "")
+  expect_equal(results_plus$warnings, character(0))
+})
+
+
+test_that("MSigDB enrichment parallel", {
+  cl <- parallel::makePSOCKcluster(2)
+  doParallel::registerDoParallel(cl)
+
+  results_plus <- withr::with_collate(
+    "fr_FR",
+    purrr::quietly(
+      ~ compute_MSigDB_enrichment(testing_results$community_membership)
+    )()
+  )
+
+  expect_equal(results_plus$result$top_enr, testing_MSigDB_enrichment$top_enr)
+  expect_equal(results_plus$result$full_enr, testing_MSigDB_enrichment$full_enr)
+  expect_equal(
+    results_plus$messages,
+    c("Using doParallelSNOW with 2 workers\n",
+      "working on H\n",
+      "working on C3\n",
+      "working on C6\n",
+      "working on C7\n",
+      "working on C8\n"
+    ))
+  expect_equal(results_plus$output, "")
+  expect_equal(results_plus$warnings, character(0))
+
+  on.exit({
+    try({
+      doParallel::stopImplicitCluster()
+      parallel::stopCluster(cl)
+    })
+  })
 })

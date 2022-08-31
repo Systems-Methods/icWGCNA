@@ -17,10 +17,10 @@ rows and communities as columns. Often \code{community_membership} or
 \code{full_community_membership} output from \code{\link[=icwgcna]{icwgcna()}}}
 
 \item{K}{cutoff for top community genes to include for computing enrichment.
-Used in an AND condition with memb_cut.}
+Used in an AND condition with \code{memb_cut.}}
 
 \item{memb_cut}{cutoff as a membership score threshold for determining top
-community genes for computing enrichment.  Used in an AND condition with K.}
+community genes for computing enrichment.  Used in an AND condition with \code{K}.}
 
 \item{cats}{MSigDB collections to use. We recommend only using
 H, C3, C6, C7, C8 and avoiding C1, C2, C4, C5 for speed}

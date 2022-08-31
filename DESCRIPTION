@@ -29,12 +29,15 @@ Imports:
 Suggests:
     covr,
     data.table,
+    doParallel,
     foreach,
     ggplot2,
     msigdbr,
+    parallel,
     purrr,
     R.utils,
     testthat (>= 3.0.0),
+    tidyr,
     UCSCXenaTools,
     umap,
     withr

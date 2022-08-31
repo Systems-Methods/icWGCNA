@@ -239,9 +239,9 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
 #' rows and communities as columns. Often `community_membership` or
 #' `full_community_membership` output from [icwgcna()]
 #' @param K cutoff for top community genes to include for computing enrichment.
-#' Used in an AND condition with memb_cut.
+#' Used in an AND condition with `memb_cut.`
 #' @param memb_cut cutoff as a membership score threshold for determining top
-#' community genes for computing enrichment.  Used in an AND condition with K.
+#' community genes for computing enrichment.  Used in an AND condition with `K`.
 #' @param cats MSigDB collections to use. We recommend only using
 #' H, C3, C6, C7, C8 and avoiding C1, C2, C4, C5 for speed
 #'
@@ -287,9 +287,24 @@ compute_MSigDB_enrichment <- function(membership_matrix,
                                       K = 100,
                                       memb_cut = .65,
                                       cats = c("H", "C3", "C6", "C7", "C8")) {
+  needed_packages <- c('msigdbr', 'foreach', 'tidyr')
+  missing_packages <- !vapply(needed_packages,
+                          FUN = requireNamespace, quietly = TRUE,
+                          FUN.VALUE = logical(1))
+  if (any(missing_packages)) {
+    stop('Must have the following R packages installed for this function: ',
+         paste0(names(missing_packages[missing_packages]), collapse = ', '))
+  }
+
+  if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
+    stop("membership_matrix must be a martix or data.frame")
+  }
+  if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
+    stop("membership_matrix values can't be <-1 or >1")
+  }
 
   m_df_simp <- msigdbr::msigdbr(species = "Homo sapiens")
-  gs_cat_levels <- unique(m_df_simp$gs_cat)
+  gs_cat_levels <- sort(unique(m_df_simp$gs_cat))
 
   if (all(!cats %in% gs_cat_levels)) {
     stop('No "cats" found in MSigDB. Must use at least one of: ',
@@ -393,7 +408,17 @@ compute_MSigDB_enrichment <- function(membership_matrix,
       )
     })
 
-  best <- plyr::dlply(best_of_cat, .variables = "cat")
+  best <- tidyr::pivot_wider(best_of_cat,
+                             id_cols = 'community',
+                             names_from = 'cat',
+                             values_from = c('best', 'top_comm_gene_n',
+                                             'go_n', 'overlap'))
+  # reorder col
+  best <- best[, c(1, unlist(lapply(cats,
+                             function(xx) {
+                               grep(paste0('_', xx), colnames(best))
+                             }))
+                   )]
 
   list(top_enr = best, full_enr = overlap_enrichment)
 }
@@ -485,6 +510,15 @@ make_network_umap <- function(membership_matrix,
                               gene_memb_cut_main = 0.75,
                               gene_memb_cut_secondary = 0.65,
                               community_labels = NULL) {
+
+  needed_packages <- c('ggplot2', 'umap')
+  missing_packages <- !vapply(needed_packages,
+                              FUN = requireNamespace, quietly = TRUE,
+                              FUN.VALUE = logical(1))
+  if (any(missing_packages)) {
+    stop('Must have the following R packages installed for this function: ',
+         paste0(names(missing_packages[missing_packages]), collapse = ', '))
+  }
 
   col_inds <- (apply(abs(membership_matrix) > community_memb_cut_main, 2, sum) >=
                    community_n_main) |

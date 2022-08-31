@@ -35,7 +35,16 @@ saveRDS(testing_eigengene_matrix, file = testthat::test_path("fixtures", "testin
 
 
 # saving pangDB results
-testing_enrichment <- compute_panglaoDB_enrichment(testing_results$community_membership,
+testing_panglaoDB_enrichment <- compute_panglaoDB_enrichment(testing_results$community_membership,
   pangDB = testing_pangDB
 )
-saveRDS(testing_enrichment, file = testthat::test_path("fixtures", "testing_enrichment.rds"))
+saveRDS(testing_panglaoDB_enrichment,
+        file = testthat::test_path("fixtures",
+                                   "testing_panglaoDB_enrichment.rds"))
+
+# saving MSigDB results
+testing_MSigDB_enrichment <-
+  compute_MSigDB_enrichment(testing_results$community_membership)
+saveRDS(testing_MSigDB_enrichment,
+        file = testthat::test_path("fixtures",
+                                   "testing_MSigDB_enrichment.rds"))
