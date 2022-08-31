@@ -43,8 +43,10 @@ saveRDS(testing_panglaoDB_enrichment,
                                    "testing_panglaoDB_enrichment.rds"))
 
 # saving MSigDB results
-testing_MSigDB_enrichment <-
+testing_MSigDB_enrichment <- withr::with_collate(
+  "C",
   compute_MSigDB_enrichment(testing_results$community_membership)
+)
 saveRDS(testing_MSigDB_enrichment,
         file = testthat::test_path("fixtures",
                                    "testing_MSigDB_enrichment.rds"))

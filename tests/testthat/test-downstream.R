@@ -111,12 +111,10 @@ test_that("MSigDB enrichment input checking", {
 })
 
 test_that("MSigDB enrichment status results", {
-  results_plus <- withr::with_collate(
-    "fr_FR",
-    purrr::quietly(
-      ~ compute_MSigDB_enrichment(testing_results$community_membership)
-    )()
-  )
+  results_plus <- purrr::quietly(
+    ~ compute_MSigDB_enrichment(testing_results$community_membership)
+  )()
+
   expect_equal(results_plus$result$top_enr, testing_MSigDB_enrichment$top_enr)
   expect_equal(results_plus$result$full_enr, testing_MSigDB_enrichment$full_enr)
   expect_equal(
@@ -137,12 +135,10 @@ test_that("MSigDB enrichment parallel", {
   cl <- parallel::makePSOCKcluster(2)
   doParallel::registerDoParallel(cl)
 
-  results_plus <- withr::with_collate(
-    "fr_FR",
-    purrr::quietly(
-      ~ compute_MSigDB_enrichment(testing_results$community_membership)
-    )()
-  )
+  results_plus <- purrr::quietly(
+    ~ compute_MSigDB_enrichment(testing_results$community_membership)
+  )()
+
 
   expect_equal(results_plus$result$top_enr, testing_MSigDB_enrichment$top_enr)
   expect_equal(results_plus$result$full_enr, testing_MSigDB_enrichment$full_enr)
