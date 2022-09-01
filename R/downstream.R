@@ -566,7 +566,7 @@ make_network_umap <- function(membership_matrix,
   message("Then filtering from ", nrow(membership_matrix),
           " genes to ", nrow(kME_mat), " genes for plotting.")
 
-  memb_u     <- umap::umap(kME_mat, config = umap_specs)
+  memb_u     <- umap::umap(kME_mat, config = umap_specs, preserve.seed = FALSE)
   layout_df  <- as.data.frame(memb_u$layout)
   names(layout_df) <- c("UMAP1","UMAP2")
   Community  <- colnames(kME_mat)[apply(kME_mat,1,
