@@ -40,7 +40,7 @@ Suggests:
     testthat (>= 3.0.0),
     tidyr,
     UCSCXenaTools,
-    umap,
+    umap (>= 0.2.9.0),
     withr
 LinkingTo: 
     Rcpp,

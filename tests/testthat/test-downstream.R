@@ -202,6 +202,13 @@ test_that("UMAP plotting input checking", {
                       gene_memb_cut_secondary = 1),
     "Must have at least 2 genes after filtering. Try less restrictive cutoffs."
   )
+
+  expect_error(
+    make_network_umap(testing_results$community_membership, community_labels = 1),
+    "community_labels must be a data.frame with 2 columns and a column named \"community\""
+  )
+
+
 })
 
 
@@ -219,11 +226,17 @@ test_that("UMAP Success", {
   custom_umap_specs$random_state <- 94124456
   results_plus <- purrr::quietly(
     ~ make_network_umap(testing_results$community_membership,
-                        umap_specs = custom_umap_specs)
+                        umap_specs = custom_umap_specs,
+                        community_labels = data.frame(community = 'mA1',
+                                                      lab = 'Extra'))
   )()
 
-
-  expect_equal(results_plus$result, testing_UMAP_results)
+  expect_equal(results_plus$result$layout,
+               testing_UMAP_results$layout)
+  expect_equal(results_plus$result$umap_w_legend,
+               testing_UMAP_results$umap_w_legend)
+  expect_equal(results_plus$result$umap_w_annotation,
+               testing_UMAP_results$umap_w_annotation)
   expect_equal(
     results_plus$messages,
     c("Filtering from 18 communites to 15 communities for plotting.\n",

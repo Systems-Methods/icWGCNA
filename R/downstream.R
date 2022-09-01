@@ -537,6 +537,13 @@ make_network_umap <- function(membership_matrix,
     stop("membership_matrix values can't be <-1 or >1")
   }
 
+  if (!is.null(community_labels)) {
+    if (!any(class(community_labels) == 'data.frame') ||
+        ncol(community_labels) != 2 ||
+        !any(colnames(community_labels) == 'community')) {
+      stop('community_labels must be a data.frame with 2 columns and a column named "community"')
+    }
+  }
 
   col_inds <- (apply(abs(membership_matrix) > community_memb_cut_main, 2, sum) >=
                    community_n_main) |
