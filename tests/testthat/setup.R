@@ -14,4 +14,6 @@ testing_eigengene_matrix <-
 
 testing_UMAP_results <-
   readRDS(test_path("fixtures", "testing_UMAP_results.rds"))
+UMAP_testing_layout <-
+  readRDS(test_path("fixtures", "UMAP_testing_layout.rds"))
 

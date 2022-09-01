@@ -222,15 +222,11 @@ test_that('requireNamespace stubbing (UMAP)', {
 })
 
 test_that("UMAP Success", {
-  custom_umap_specs <- structure(list(
-    n_neighbors = 15, n_components = 2, metric = "euclidean",
-    n_epochs = 200, input = "data", init = "spectral", min_dist = 0.1,
-    set_op_mix_ratio = 1, local_connectivity = 1, bandwidth = 1,
-    alpha = 1, gamma = 1, negative_sample_rate = 5, a = NA, b = NA,
-    spread = 1, random_state = 94124456, transform_state = NA, knn = NA,
-    knn_repeats = 1, verbose = FALSE, umap_learn_args = NA),
-    class = "umap.config")
-    results_plus <- purrr::quietly(
+  mockery::stub(make_network_umap, 'umap::umap', UMAP_testing_layout)
+
+  custom_umap_specs <- umap::umap.defaults
+  custom_umap_specs$random_state <- 94124456
+  results_plus <- purrr::quietly(
     ~ make_network_umap(testing_results$community_membership,
                         umap_specs = custom_umap_specs,
                         community_labels = data.frame(community = 'mA1',
@@ -239,10 +235,12 @@ test_that("UMAP Success", {
 
   expect_equal(results_plus$result$layout,
                testing_UMAP_results$layout)
-  expect_equal(results_plus$result$umap_w_legend,
-               testing_UMAP_results$umap_w_legend)
-  expect_equal(results_plus$result$umap_w_annotation,
-               testing_UMAP_results$umap_w_annotation)
+  expect_equal(results_plus$result$umap_w_legend[-8],
+               testing_UMAP_results$umap_w_legend[-8],
+               ignore_attr = TRUE)
+  expect_equal(results_plus$result$umap_w_annotation[-8],
+               testing_UMAP_results$umap_w_annotation[-8],
+               ignore_attr = TRUE)
   expect_equal(
     results_plus$messages,
     c("Filtering from 18 communites to 15 communities for plotting.\n",
