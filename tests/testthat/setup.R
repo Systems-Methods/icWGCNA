@@ -1,13 +1,17 @@
 # grabbing large file for testing
 testing_data <- readRDS(test_path("fixtures", "testing_data.rds"))
 testing_results <- readRDS(test_path("fixtures", "testing_results.rds"))
+
+testing_pangDB <- data.table::fread(pangDB_link, showProgress = FALSE)
 testing_panglaoDB_enrichment <-
   readRDS(test_path("fixtures", "testing_panglaoDB_enrichment.rds"))
+
 testing_MSigDB_enrichment <-
   readRDS(test_path("fixtures", "testing_MSigDB_enrichment.rds"))
 
-testing_eigengene_matrix <- readRDS(
-  test_path("fixtures", "testing_eigengene_matrix.rds")
-)
+testing_eigengene_matrix <-
+  readRDS(test_path("fixtures", "testing_eigengene_matrix.rds"))
 
-testing_pangDB <- data.table::fread(pangDB_link, showProgress = FALSE)
+testing_UMAP_results <-
+  readRDS(test_path("fixtures", "testing_UMAP_results.rds"))
+

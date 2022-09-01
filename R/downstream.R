@@ -455,6 +455,9 @@ compute_MSigDB_enrichment <- function(membership_matrix,
 #' @param community_labels a data.frame with the text to display over gene
 #' communities. Expects first column to match column names of `membership_matrix`
 #' and second column to contain text of labels associated with each community
+#' @param umap_specs configuration for UMAP (default is [umap::umap.defaults]).
+#' To use custom specs copy [umap::umap.defaults] and make specific changes
+#' (see {Examples})
 #'
 #' @return Returns a list with the following items:
 #' * `umap_w_annotation` - a UMAP plot of genes with labeled clusters overlaid
@@ -475,8 +478,7 @@ compute_MSigDB_enrichment <- function(membership_matrix,
 #' have at least one community over 0.75 kME or two communities over 0.65 kME
 #' to be included.
 #'
-#' Setting `community_memb_cut_main`, `community_memb_cut_secondary`,
-#' `gene_memb_cut_main`, and `gene_memb_cut_secondary` all to 0 will force
+#' Setting `community_memb_cut_main` and `gene_memb_cut_main` to 0 will force
 #' all communities and genes to be included in the UMAP
 #'
 #' # Output
@@ -500,6 +502,13 @@ compute_MSigDB_enrichment <- function(membership_matrix,
 #' umap_results <- make_network_umap(results$community_membership)
 #' umap_results$umap_w_annotation
 #' umap_results$umap_w_legend + theme(legend.position = 'top')
+#'
+#' # can adjust umap specifications
+#' custom_umap_specs <- umap::umap.defaults
+#' custom_umap_specs$n_neighbors <- 20
+#'
+#' umap_results <- make_network_umap(results$community_membership,
+#'                                   umap_specs = custom_umap_specs)
 #' }
 #'
 make_network_umap <- function(membership_matrix,
@@ -509,7 +518,8 @@ make_network_umap <- function(membership_matrix,
                               community_n_secondary = 5,
                               gene_memb_cut_main = 0.75,
                               gene_memb_cut_secondary = 0.65,
-                              community_labels = NULL) {
+                              community_labels = NULL,
+                              umap_specs = umap::umap.defaults) {
 
   needed_packages <- c('ggplot2', 'umap')
   missing_packages <- !vapply(needed_packages,
@@ -520,22 +530,36 @@ make_network_umap <- function(membership_matrix,
          paste0(names(missing_packages[missing_packages]), collapse = ', '))
   }
 
+  if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
+    stop("membership_matrix must be a martix or data.frame")
+  }
+  if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
+    stop("membership_matrix values can't be <-1 or >1")
+  }
+
+
   col_inds <- (apply(abs(membership_matrix) > community_memb_cut_main, 2, sum) >=
                    community_n_main) |
     (apply(abs(membership_matrix) > community_memb_cut_secondary, 2, sum) >=
        community_n_secondary)
-  kME_mat    <- membership_matrix[,col_inds]
+  if (sum(col_inds) < 2) {
+    stop('Must have at least 2 communities after filtering. Try less restrictive cutoffs.')
+  }
+  kME_mat    <- membership_matrix[, col_inds]
 
   row_inds   <- apply(kME_mat > gene_memb_cut_main, 1, any) |
     (apply(kME_mat > gene_memb_cut_secondary, 1, sum) > 1)
-  kME_mat    <- kME_mat[row_inds,]
+  if (sum(row_inds) < 2) {
+    stop('Must have at least 2 genes after filtering. Try less restrictive cutoffs.')
+  }
+  kME_mat    <- kME_mat[row_inds, ]
 
-  print(paste("Filtering from", ncol(membership_matrix),
-              "communites to", ncol(kME_mat), "communities for plotting."))
-  print(paste("And filtering from", nrow(membership_matrix),
-              "genes to", nrow(kME_mat), "genes for plotting."))
+  message("Filtering from ", ncol(membership_matrix),
+          " communites to ", ncol(kME_mat), " communities for plotting.")
+  message("Then filtering from ", nrow(membership_matrix),
+          " genes to ", nrow(kME_mat), " genes for plotting.")
 
-  memb_u     <- umap::umap(kME_mat)
+  memb_u     <- umap::umap(kME_mat, config = umap_specs)
   layout_df  <- as.data.frame(memb_u$layout)
   names(layout_df) <- c("UMAP1","UMAP2")
   Community  <- colnames(kME_mat)[apply(kME_mat,1,

@@ -50,3 +50,12 @@ testing_MSigDB_enrichment <- withr::with_collate(
 saveRDS(testing_MSigDB_enrichment,
         file = testthat::test_path("fixtures",
                                    "testing_MSigDB_enrichment.rds"))
+
+# saving UMAP ggplots results
+custom_umap_specs <- umap::umap.defaults
+custom_umap_specs$random_state <- 94124456
+testing_UMAP_results <- make_network_umap(testing_results$community_membership,
+                                          umap_specs = custom_umap_specs)
+saveRDS(testing_UMAP_results,
+        file = testthat::test_path("fixtures",
+                                   "testing_UMAP_results.rds"))

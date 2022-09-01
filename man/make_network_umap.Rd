@@ -12,7 +12,8 @@ make_network_umap(
   community_n_secondary = 5,
   gene_memb_cut_main = 0.75,
   gene_memb_cut_secondary = 0.65,
-  community_labels = NULL
+  community_labels = NULL,
+  umap_specs = umap::umap.defaults
 )
 }
 \arguments{
@@ -50,6 +51,10 @@ community is included}
 \item{community_labels}{a data.frame with the text to display over gene
 communities. Expects first column to match column names of \code{membership_matrix}
 and second column to contain text of labels associated with each community}
+
+\item{umap_specs}{configuration for UMAP (default is \link[umap:umap.defaults]{umap::umap.defaults}).
+To use custom specs copy \link[umap:umap.defaults]{umap::umap.defaults} and make specific changes
+(see {Examples})}
 }
 \value{
 Returns a list with the following items:
@@ -73,8 +78,7 @@ gene filtering is performed. Again using the defaults here, a gene must
 have at least one community over 0.75 kME or two communities over 0.65 kME
 to be included.
 
-Setting \code{community_memb_cut_main}, \code{community_memb_cut_secondary},
-\code{gene_memb_cut_main}, and \code{gene_memb_cut_secondary} all to 0 will force
+Setting \code{community_memb_cut_main} and \code{gene_memb_cut_main} to 0 will force
 all communities and genes to be included in the UMAP
 }
 
@@ -97,6 +101,13 @@ results <- icwgcna(ex)
 umap_results <- make_network_umap(results$community_membership)
 umap_results$umap_w_annotation
 umap_results$umap_w_legend + theme(legend.position = 'top')
+
+# can adjust umap specifications
+custom_umap_specs <- umap::umap.defaults
+custom_umap_specs$n_neighbors <- 20
+
+umap_results <- make_network_umap(results$community_membership,
+                                  umap_specs = custom_umap_specs)
 }
 
 }

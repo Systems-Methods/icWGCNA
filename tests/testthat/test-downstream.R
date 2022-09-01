@@ -110,6 +110,15 @@ test_that("MSigDB enrichment input checking", {
   )
 })
 
+test_that('requireNamespace stubbing (MSigDB)', {
+  mockery::stub(compute_MSigDB_enrichment, 'requireNamespace', FALSE)
+
+  expect_error(
+    compute_MSigDB_enrichment(testing_results$community_membership),
+    "Must have the following R packages installed for this function: msigdbr, foreach, tidyr")
+
+})
+
 test_that("MSigDB enrichment status results", {
   results_plus <- purrr::quietly(
     ~ compute_MSigDB_enrichment(testing_results$community_membership,
@@ -163,4 +172,63 @@ test_that("MSigDB enrichment parallel", {
       parallel::stopCluster(cl)
     })
   })
+})
+
+
+
+
+
+
+test_that("UMAP plotting input checking", {
+  expect_error(
+    make_network_umap(testing_results),
+    "membership_matrix must be a martix or data.frame"
+  )
+  expect_error(
+    make_network_umap(testing_results$community_signature),
+    "membership_matrix values can't be <-1 or >1"
+  )
+
+  expect_error(
+    make_network_umap(testing_results$community_membership,
+                      community_memb_cut_main = 1,
+                      community_memb_cut_secondary = 1),
+    "Must have at least 2 communities after filtering. Try less restrictive cutoffs."
+  )
+
+  expect_error(
+    make_network_umap(testing_results$community_membership,
+                      gene_memb_cut_main = 1,
+                      gene_memb_cut_secondary = 1),
+    "Must have at least 2 genes after filtering. Try less restrictive cutoffs."
+  )
+})
+
+
+test_that('requireNamespace stubbing (UMAP)', {
+  mockery::stub(make_network_umap, 'requireNamespace', FALSE)
+
+  expect_error(
+    make_network_umap(testing_results$community_membership),
+    "Must have the following R packages installed for this function: ggplot2, umap")
+
+})
+
+test_that("UMAP Success", {
+  custom_umap_specs <- umap::umap.defaults
+  custom_umap_specs$random_state <- 94124456
+  results_plus <- purrr::quietly(
+    ~ make_network_umap(testing_results$community_membership,
+                        umap_specs = custom_umap_specs)
+  )()
+
+
+  expect_equal(results_plus$result, testing_UMAP_results)
+  expect_equal(
+    results_plus$messages,
+    c("Filtering from 18 communites to 15 communities for plotting.\n",
+      "Then filtering from 2685 genes to 513 genes for plotting.\n"
+    ))
+  expect_equal(results_plus$output, "")
+  expect_equal(results_plus$warnings, character(0))
 })
