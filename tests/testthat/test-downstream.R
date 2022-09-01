@@ -235,14 +235,12 @@ test_that("UMAP Success", {
 
   expect_equal(results_plus$result$layout,
                testing_UMAP_results$layout)
-  expect_equal(results_plus$result$umap_w_legend[-8],
-               testing_UMAP_results$umap_w_legend[-8],
-               ignore_attr = TRUE, ignore_function_env = TRUE,
-               ignore_formula_env = TRUE, ignore_srcref = TRUE)
-  expect_equal(results_plus$result$umap_w_annotation[-8],
-               testing_UMAP_results$umap_w_annotation[-8],
-               ignore_attr = TRUE, ignore_function_env = TRUE,
-               ignore_formula_env = TRUE, ignore_srcref = TRUE)
+  expect_equal(results_plus$result$umap_w_legend,
+               testing_UMAP_results$umap_w_legend,
+               ignore_attr = TRUE, ignore_function_env = TRUE)
+  expect_equal(results_plus$result$umap_w_annotation[-2],
+               testing_UMAP_results$umap_w_annotation[-2],
+               ignore_attr = TRUE, ignore_function_env = TRUE)
   expect_equal(
     results_plus$messages,
     c("Filtering from 18 communites to 15 communities for plotting.\n",
