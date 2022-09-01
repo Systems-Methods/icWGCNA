@@ -32,6 +32,7 @@ Suggests:
     doParallel,
     foreach,
     ggplot2,
+    mockery,
     msigdbr,
     parallel,
     purrr,

@@ -109,21 +109,58 @@ results <- icwgcna(ex,
 Finally, downstream analysis can be run on the Iterative Correcting
 Weighted Gene Co-expression Network Analysis results.
 
+#### Compute community signatures (eigengenes)
+
 ``` r
 
-compute_eigengene_matrix(ex, 
-                         membership_matrix = results$community_membership, 
-                         cutoff = 5,
-                         pc_flag = TRUE)
+eigengene_mat <- compute_eigengene_matrix(
+  ex, 
+  membership_matrix = results$community_membership, 
+  cutoff = 5,
+  pc_flag = TRUE
+)
+```
 
+#### Compute Cell Type Enrichments Using panglaoDB Cell Markers
 
-
+``` r
 pangDB <- data.table::fread(pangDB_link)
-compute_panglaoDB_enrichment(results$community_membership,
-                             K = 100,
-                             memb_cut = 0.65,
-                             pangDB = pangDB,
-                             prolif = prolif_names)
+panglaoDB_enrichment <- compute_panglaoDB_enrichment(
+  results$community_membership,
+  K = 100,
+  memb_cut = 0.65,
+  pangDB = pangDB,
+  prolif = prolif_names
+)
+```
+
+#### Compute MSigDB Collection Enrichments for each community
+
+``` r
+MSigDB_enrichment <- compute_MSigDB_enrichment(
+  results$community_membership,
+  K = 100,
+  memb_cut = .65,
+  cats = c("H", "C3", "C6", "C7", "C8")
+)
+```
+
+#### Display UMAP of Community Membership with text overlays
+
+``` r
+network_umap <- make_network_umap(
+  results$community_membership,
+  community_memb_cut_main = 0.7,
+  community_n_main = 20,
+  community_memb_cut_secondary = 0.8,
+  community_n_secondary = 5,
+  gene_memb_cut_main = 0.75,
+  gene_memb_cut_secondary = 0.65,
+  community_labels = NULL,
+  umap_specs = umap::umap.defaults
+)
+
+network_umap$umap_w_annotation
 ```
 
 ## Code of Conduct
