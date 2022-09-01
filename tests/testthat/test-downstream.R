@@ -222,9 +222,15 @@ test_that('requireNamespace stubbing (UMAP)', {
 })
 
 test_that("UMAP Success", {
-  custom_umap_specs <- umap::umap.defaults
-  custom_umap_specs$random_state <- 94124456
-  results_plus <- purrr::quietly(
+  custom_umap_specs <- structure(list(
+    n_neighbors = 15, n_components = 2, metric = "euclidean",
+    n_epochs = 200, input = "data", init = "spectral", min_dist = 0.1,
+    set_op_mix_ratio = 1, local_connectivity = 1, bandwidth = 1,
+    alpha = 1, gamma = 1, negative_sample_rate = 5, a = NA, b = NA,
+    spread = 1, random_state = 94124456, transform_state = NA, knn = NA,
+    knn_repeats = 1, verbose = FALSE, umap_learn_args = NA),
+    class = "umap.config")
+    results_plus <- purrr::quietly(
     ~ make_network_umap(testing_results$community_membership,
                         umap_specs = custom_umap_specs,
                         community_labels = data.frame(community = 'mA1',
