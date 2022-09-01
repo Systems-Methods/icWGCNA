@@ -25,7 +25,8 @@ Imports:
     plyr,
     Rcpp,
     RcppEigen,
-    Rfast
+    Rfast,
+    umap (>= 0.2.9.0)
 Suggests:
     covr,
     data.table,
@@ -40,7 +41,6 @@ Suggests:
     testthat (>= 3.0.0),
     tidyr,
     UCSCXenaTools,
-    umap,
     withr
 LinkingTo: 
     Rcpp,
