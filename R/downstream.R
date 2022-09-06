@@ -230,7 +230,6 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
 
 
 
-
 #' Compute MSigDB Collection Enrichments for each community
 #'
 #' Compute MSigDB Collection enrichments using msigdbr
@@ -616,5 +615,4 @@ make_network_umap <- function(membership_matrix,
        umap_w_legend = u_plot,
        layout = layout_df)
 }
-
 
