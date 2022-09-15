@@ -423,6 +423,96 @@ compute_MSigDB_enrichment <- function(membership_matrix,
 }
 
 
+#' Compute Cell Type Enrichments Using xCell Cell Markers
+#'
+#' compute cell type enrichments using [xCell cell markers](https://github.com/dviraran/xCell)
+#' using Fisher test.
+#' @param membership_matrix a community membership (kME) matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]
+#' @param K cutoff for top community genes to include for computing enrichment.
+#' Used in an AND condition with memb_cut.
+#' @param memb_cut cutoff as a membership score threshold for determining top
+#' community genes for computing enrichment.  Used in an AND condition with K.
+#'
+#' @return Returns a list with the following items:
+#' * `top_enr` - the most significant cell type from the enrichment scores.
+#' * `full_enr` - all panglaoDB cell type enrichment scores for all communities.
+#'
+#' @details note that this is disctinct from running xCell which is run on expression data. This
+#' is an enrichment using their cell markers.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+#' results <- icwgcna(ex)
+#'
+#' pangDB <- data.table::fread(pangDB_link)
+#' compute_xCell_enrichment(results$community_membership, pangDB = pangDB)
+#' }
+#'
+compute_xCell_enrichment <- function(membership_matrix,
+                                     K = 100,
+                                     memb_cut = .65) {
+  if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
+    stop("membership_matrix must be a martix or data.frame")
+  }
+  if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
+    stop("membership_matrix values can't be <-1 or >1")
+  }
+
+  markers <- xCell::xCell.data$signatures
+  tNames  <- names(markers)
+  markers <- plyr::llply(names(markers),function(n){markers[[n]]@geneIds})
+  names(markers) <- tNames
+
+  c.types <- unique(gsub("%.*$","",names(markers))); ctNames <- c.types
+  c.types <- plyr::llply(c.types,function(x){as.vector(unlist(markers[grep(paste0("^",x),names(markers))]))})
+  names(c.types) <- ctNames
+
+  enr <- plyr::adply(membership_matrix, 2, function(x) {
+    ret <- t(plyr::ldply(names(c.types), function(ct) {
+      overlap <- table(
+        rank(-x) <= K & x > memb_cut,
+        rownames(membership_matrix) %in%
+          c.types[[ct]]
+      )
+      if (ncol(overlap) == 1 || nrow(overlap) == 1) {
+        return(1)
+      }
+      ret2 <- stats::fisher.test(overlap)$p.val
+      return(unlist(ret2))
+    }))
+    colnames(ret) <- names(c.types)
+    ret
+  })
+
+  rownames(enr) <- enr[, 1]
+  enr <- as.data.frame(t(enr[, -1]))
+
+  top_enr <- plyr::ldply(apply(enr, 2, function(x) {
+    if (min(x) > 0.001) {
+      return(data.frame(cell_type = NA, p = NA))
+    }
+
+    i <- which(x == min(x))
+
+    ret <- data.frame(cell_type = rownames(enr)[i], p = x[i])
+    return(ret)
+  }))
+  names(top_enr)[1] <- "community"
+
+  return(list(
+    top_enr = top_enr,
+    full_enr = enr
+  ))
+}
 
 
 #' Display UMAP of Community Membership with text overlays
