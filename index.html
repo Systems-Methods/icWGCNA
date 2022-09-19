@@ -79,13 +79,13 @@
 </h2>
 <p>Iterative Correcting Weighted Gene Co-expression Network Analysis function for constructing a gene network from a gene expression matrix. The algorithm:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> Constructs a signed wgcna network</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> Drops correlated modules based on kurtosis</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> Regresses out the largest community from the expression data</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> Drops correlated modules based on membership kurtosis</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> Regresses out the strongest community from the expression data</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fl">4.</span> Repeats steps <span class="dv">1-3</span> until a maximum number of communities or iterations is reached</span></code></pre></div>
 <p>Some differences from standard <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559" class="external-link">WGNCA (Horvath/Langfelder)</a>:</p>
 <ul>
 <li>Makes heavy use of <a href="https://cran.r-project.org/web/packages/Rfast/" class="external-link">Rfast</a> to compute adjacencies and <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559" class="external-link">topological overlap measure (TOM)</a>, which enables iterative network creation on &gt; 20K features.</li>
-<li>Uses <a href="https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-10-327" class="external-link">signed adjacency</a> in order to avoid possible distortions of community signatures (eigengenes).</li>
+<li>Always uses <a href="https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-10-327" class="external-link">signed adjacency</a> in order to avoid possible distortions of community signatures (eigengenes).</li>
 <li>Iteratively regresses out strongest community in order to facilitate discovery of communities possibly obscured by larger module(s).</li>
 <li>Clustering does not focus on merging communities but dropping to identify strongest module(s), keeping communities with higher membership kurtosis.</li>
 <li>In addition to Pearson correlation, there is an option for Spearman correlation as the base constructing adjacency matrix measure in order to enable robust application in RNA-seq and micro-array data. Future updates may include mutual information and other measures of similarity.</li>
