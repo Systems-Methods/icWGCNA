@@ -18,8 +18,8 @@ function for constructing a gene network from a gene expression matrix.
 The algorithm:
 
     1. Constructs a signed wgcna network
-    2. Drops correlated modules based on kurtosis
-    3. Regresses out the largest community from the expression data
+    2. Drops correlated modules based on membership kurtosis
+    3. Regresses out the strongest community from the expression data
     4. Repeats steps 1-3 until a maximum number of communities or iterations is reached
 
 Some differences from standard [WGNCA
@@ -30,7 +30,7 @@ Some differences from standard [WGNCA
     adjacencies and [topological overlap measure
     (TOM)](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559),
     which enables iterative network creation on \> 20K features.
--   Uses [signed
+-   Always uses [signed
     adjacency](https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-10-327)
     in order to avoid possible distortions of community signatures
     (eigengenes).
