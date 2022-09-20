@@ -214,7 +214,7 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
   enr <- as.data.frame(t(enr[, -1]))
 
   top_enr <- plyr::ldply(apply(enr, 2, function(x) {
-    if (min(x) > 0.001) {
+    if (min(x) > p_cut) {
       return(data.frame(cell_type = NA, p = NA))
     }
 
@@ -391,7 +391,7 @@ compute_MSigDB_enrichment <- function(membership_matrix,
     .variables = c("community","cat"),
     function(x) {
       ind <- which(x$p == min(x$p,na.rm = TRUE));
-      if (length(ind) > 1 || min(x$p, na.rm = TRUE) == p_cut) {
+      if (length(ind) > 1 || min(x$p, na.rm = TRUE) > p_cut) {
         best            <- "";
         p_val           <- NA
         top_comm_gene_n <- NA
