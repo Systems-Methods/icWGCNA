@@ -8,7 +8,8 @@ compute_MSigDB_enrichment(
   membership_matrix,
   K = 100,
   memb_cut = 0.65,
-  cats = c("H", "C3", "C6", "C7", "C8")
+  cats = c("H", "C3", "C6", "C7", "C8"),
+  p_cut = 0.001
 )
 }
 \arguments{
@@ -17,13 +18,16 @@ rows and communities as columns. Often \code{community_membership} or
 \code{full_community_membership} output from \code{\link[=icwgcna]{icwgcna()}}}
 
 \item{K}{cutoff for top community genes to include for computing enrichment.
-Used in an AND condition with \code{memb_cut.}}
+Used in an AND condition with \code{memb_cut}.}
 
 \item{memb_cut}{cutoff as a membership score threshold for determining top
 community genes for computing enrichment.  Used in an AND condition with \code{K}.}
 
 \item{cats}{MSigDB collections to use. We recommend only using
 H, C3, C6, C7, C8 and avoiding C1, C2, C4, C5 for speed}
+
+\item{p_cut}{p value cutoff for determining importance. If all p values are
+below \code{p_cut} for a community, no cell type is selected}
 }
 \value{
 Returns a list with the following items:

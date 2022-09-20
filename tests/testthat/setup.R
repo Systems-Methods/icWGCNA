@@ -9,6 +9,9 @@ testing_panglaoDB_enrichment <-
 testing_MSigDB_enrichment <-
   readRDS(test_path("fixtures", "testing_MSigDB_enrichment.rds"))
 
+testing_xCell_enrichment <-
+  readRDS(test_path("fixtures", "testing_xCell_enrichment.rds"))
+
 testing_eigengene_matrix <-
   readRDS(test_path("fixtures", "testing_eigengene_matrix.rds"))
 

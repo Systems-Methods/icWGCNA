@@ -51,6 +51,15 @@ saveRDS(testing_MSigDB_enrichment,
         file = testthat::test_path("fixtures",
                                    "testing_MSigDB_enrichment.rds"))
 
+
+# saving xCell results
+testing_xCell_enrichment <- compute_xCell_enrichment(
+  testing_results$community_membership
+)
+saveRDS(testing_xCell_enrichment,
+        file = testthat::test_path("fixtures",
+                                   "testing_xCell_enrichment.rds"))
+
 # saving UMAP ggplots results
 custom_umap_specs <- umap::umap.defaults
 custom_umap_specs$random_state <- 94124456

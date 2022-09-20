@@ -177,6 +177,38 @@ test_that("MSigDB enrichment parallel", {
 
 
 
+test_that("xCell enrichment input checking", {
+  expect_error(
+    compute_xCell_enrichment(testing_results),
+    "membership_matrix must be a martix or data.frame"
+  )
+  expect_error(
+    compute_xCell_enrichment(testing_results$community_signature),
+    "membership_matrix values can't be <-1 or >1"
+  )
+})
+
+
+test_that('requireNamespace stubbing (xCell)', {
+  mockery::stub(compute_xCell_enrichment, 'requireNamespace', FALSE)
+
+  expect_error(
+    compute_xCell_enrichment(testing_results$community_membership),
+    "Must have the following R packages installed for this function: xCell")
+
+})
+
+
+test_that("xCell enrichment status results", {
+  expect_equal(
+    compute_xCell_enrichment(testing_results$community_membership),
+    testing_xCell_enrichment
+  )
+})
+
+
+
+
 
 
 test_that("UMAP plotting input checking", {

@@ -4,7 +4,12 @@
 \alias{compute_xCell_enrichment}
 \title{Compute Cell Type Enrichments Using xCell Cell Markers}
 \usage{
-compute_xCell_enrichment(membership_matrix, K = 100, memb_cut = 0.65)
+compute_xCell_enrichment(
+  membership_matrix,
+  K = 100,
+  memb_cut = 0.65,
+  p_cut = 0.001
+)
 }
 \arguments{
 \item{membership_matrix}{a community membership (kME) matrix with genes as
@@ -12,10 +17,13 @@ rows and communities as columns. Often \code{community_membership} or
 \code{full_community_membership} output from \code{\link[=icwgcna]{icwgcna()}}}
 
 \item{K}{cutoff for top community genes to include for computing enrichment.
-Used in an AND condition with memb_cut.}
+Used in an AND condition with \code{memb_cut}.}
 
 \item{memb_cut}{cutoff as a membership score threshold for determining top
-community genes for computing enrichment.  Used in an AND condition with K.}
+community genes for computing enrichment. Used in an AND condition with \code{K}.}
+
+\item{p_cut}{p value cutoff for determining importance. If all p values are
+below \code{p_cut} for a community, no cell type is selected}
 }
 \value{
 Returns a list with the following items:
@@ -25,11 +33,11 @@ Returns a list with the following items:
 }
 }
 \description{
-compute cell type enrichments using \href{https://github.com/dviraran/xCell}{xCell cell markers}
-using Fisher test.
+Compute cell type enrichments using
+\href{https://github.com/dviraran/xCell}{xCell cell markers} with Fisher test.
 }
 \details{
-note that this is disctinct from running xCell which is run on expression data. This
+note that this is distinct from running xCell which is run on expression data. This
 is an enrichment using their cell markers.
 }
 \examples{
@@ -42,8 +50,7 @@ luad <- getTCGAdata(
 ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 results <- icwgcna(ex)
 
-pangDB <- data.table::fread(pangDB_link)
-compute_xCell_enrichment(results$community_membership, pangDB = pangDB)
+compute_xCell_enrichment(results$community_membership)
 }
 
 }

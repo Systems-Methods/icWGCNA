@@ -9,7 +9,8 @@ compute_panglaoDB_enrichment(
   K = 100,
   memb_cut = 0.65,
   pangDB = data.table::fread(pangDB_link),
-  prolif = prolif_names
+  prolif = prolif_names,
+  p_cut = 0.001
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ he url \link{pangDB_link}}
 
 \item{prolif}{list of proliferation genes to check.
 Default is to use \link{prolif_names}}
+
+\item{p_cut}{p value cutoff for determining importance. If all p values are
+below \code{p_cut} for a community, no cell type is selected}
 }
 \value{
 Returns a list with the following items:
