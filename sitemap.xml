@@ -25,10 +25,16 @@
     <loc>https://github.com/Systems-Methods/icWGCNA/reference/RfastTOMdist.html</loc>
   </url>
   <url>
+    <loc>https://github.com/Systems-Methods/icWGCNA/reference/compute_MSigDB_enrichment.html</loc>
+  </url>
+  <url>
     <loc>https://github.com/Systems-Methods/icWGCNA/reference/compute_eigengene_matrix.html</loc>
   </url>
   <url>
     <loc>https://github.com/Systems-Methods/icWGCNA/reference/compute_panglaoDB_enrichment.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/Systems-Methods/icWGCNA/reference/compute_xCell_enrichment.html</loc>
   </url>
   <url>
     <loc>https://github.com/Systems-Methods/icWGCNA/reference/eigenMapMatMult.html</loc>
@@ -41,6 +47,9 @@
   </url>
   <url>
     <loc>https://github.com/Systems-Methods/icWGCNA/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/Systems-Methods/icWGCNA/reference/make_network_umap.html</loc>
   </url>
   <url>
     <loc>https://github.com/Systems-Methods/icWGCNA/reference/pangDB_link.html</loc>
