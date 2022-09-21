@@ -15,7 +15,7 @@ coverage](https://codecov.io/gh/Systems-Methods/icWGCNA/branch/main/graph/badge.
 
 Iterative Correcting Weighted Gene Co-expression Network Analysis
 function for constructing a gene network from a gene expression matrix.
-The algorithm:
+The algorithm: 
 
     1. Constructs a signed wgcna network
     2. Drops correlated modules based on kurtosis
