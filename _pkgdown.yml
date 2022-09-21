@@ -2,6 +2,19 @@ url: https://github.com/Systems-Methods/icWGCNA
 
 template:
   bootstrap: 5
+  params:
+    google_site_verification: c6SqDiAmpGFE36T4lAZGMohVYW_YgNoycH-2dvmL_-0
+  includes:
+    in_header: |
+       <!-- Google tag (gtag.js) -->
+       <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JQQPWDW4Y"></script>
+       <script>
+         window.dataLayer = window.dataLayer || [];
+         function gtag(){dataLayer.push(arguments);}
+         gtag('js', new Date());
+
+         gtag('config', 'G-4JQQPWDW4Y');
+       </script>
 
 authors:
   Mike Mason:
@@ -10,3 +23,26 @@ authors:
     href: https://github.com/wfulp
   Alexandre Alloy:
     href: https://github.com/alexandre-alloy
+
+reference:
+  - title: Main icWGCNA Function
+    contents:
+    - icwgcna
+  - title: Downstream/Enrichment Functions
+    desc: >
+      Functions to run on icWGCNA results
+    contents:
+    - compute_panglaoDB_enrichment
+    - compute_MSigDB_enrichment
+    - compute_xCell_enrichment
+    - compute_eigengene_matrix
+    - make_network_umap
+  - title: Utility Functions
+    desc: >
+      These functions are rarely used directly
+    contents:
+    - eigenMapMatMult
+    - RfastTOMdist
+    - fastTOMwrapper
+    - pangDB_link
+    - prolif_names

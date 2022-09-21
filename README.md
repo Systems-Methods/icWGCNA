@@ -15,11 +15,11 @@ coverage](https://codecov.io/gh/Systems-Methods/icWGCNA/branch/main/graph/badge.
 
 Iterative Correcting Weighted Gene Co-expression Network Analysis
 function for constructing a gene network from a gene expression matrix.
-The algorithm:
+The algorithm: 
 
     1. Constructs a signed wgcna network
-    2. Drops correlated modules based on kurtosis
-    3. Regresses out the largest community from the expression data
+    2. Drops correlated modules based on membership kurtosis
+    3. Regresses out the strongest community from the expression data
     4. Repeats steps 1-3 until a maximum number of communities or iterations is reached
 
 Some differences from standard [WGNCA
@@ -30,7 +30,7 @@ Some differences from standard [WGNCA
     adjacencies and [topological overlap measure
     (TOM)](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559),
     which enables iterative network creation on \> 20K features.
--   Uses [signed
+-   Always uses [signed
     adjacency](https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-10-327)
     in order to avoid possible distortions of community signatures
     (eigengenes).
@@ -109,21 +109,71 @@ results <- icwgcna(ex,
 Finally, downstream analysis can be run on the Iterative Correcting
 Weighted Gene Co-expression Network Analysis results.
 
+#### Compute community signatures (eigengenes)
+
 ``` r
 
-compute_eigengene_matrix(ex, 
-                         membership_matrix = results$community_membership, 
-                         cutoff = 5,
-                         pc_flag = TRUE)
+eigengene_mat <- compute_eigengene_matrix(
+  ex, 
+  membership_matrix = results$community_membership, 
+  cutoff = 5,
+  pc_flag = TRUE
+)
+```
 
+#### Compute panglaoDB collection enrichments for each community
 
-
+``` r
 pangDB <- data.table::fread(pangDB_link)
-compute_panglaoDB_enrichment(results$community_membership,
-                             K = 100,
-                             memb_cut = 0.65,
-                             pangDB = pangDB,
-                             prolif = prolif_names)
+panglaoDB_enrichment <- compute_panglaoDB_enrichment(
+  results$community_membership,
+  K = 100,
+  memb_cut = 0.65,
+  pangDB = pangDB,
+  prolif = prolif_names, 
+  p_cut = 0.001
+)
+```
+
+#### Compute MSigDB collection enrichments for each community
+
+``` r
+MSigDB_enrichment <- compute_MSigDB_enrichment(
+  results$community_membership,
+  K = 100,
+  memb_cut = .65,
+  cats = c("H", "C3", "C6", "C7", "C8"), 
+  p_cut = 0.001
+)
+```
+
+#### Compute xCell collection enrichments for each community
+
+``` r
+xCell_enrichment <- compute_xCell_enrichment(
+  results$community_membership,
+  K = 100,
+  memb_cut = .65, 
+  p_cut = 0.001
+)
+```
+
+#### Display UMAP of Community Membership with text overlays
+
+``` r
+network_umap <- make_network_umap(
+  results$community_membership,
+  community_memb_cut_main = 0.7,
+  community_n_main = 20,
+  community_memb_cut_secondary = 0.8,
+  community_n_secondary = 5,
+  gene_memb_cut_main = 0.75,
+  gene_memb_cut_secondary = 0.65,
+  community_labels = NULL,
+  umap_specs = umap::umap.defaults
+)
+
+network_umap$umap_w_annotation
 ```
 
 ## Code of Conduct

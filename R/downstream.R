@@ -140,6 +140,8 @@ prolif_names <- c(
 #' he url [pangDB_link]
 #' @param prolif list of proliferation genes to check.
 #' Default is to use [prolif_names]
+#' @param p_cut p value cutoff for determining importance. If all p values are
+#' below `p_cut` for a community, no cell type is selected
 #'
 #' @return Returns a list with the following items:
 #' * `top_enr` - the most significant cell type from the enrichment scores.
@@ -166,7 +168,8 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
                                          K = 100,
                                          memb_cut = .65,
                                          pangDB = data.table::fread(pangDB_link),
-                                         prolif = prolif_names) {
+                                         prolif = prolif_names,
+                                         p_cut = 0.001) {
   if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
     stop("membership_matrix must be a martix or data.frame")
   }
@@ -211,7 +214,7 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
   enr <- as.data.frame(t(enr[, -1]))
 
   top_enr <- plyr::ldply(apply(enr, 2, function(x) {
-    if (min(x) > 0.001) {
+    if (min(x) > p_cut) {
       return(data.frame(cell_type = NA, p = NA))
     }
 
@@ -227,3 +230,502 @@ compute_panglaoDB_enrichment <- function(membership_matrix,
     full_enr = enr
   ))
 }
+
+
+
+#' Compute MSigDB Collection Enrichments for each community
+#'
+#' Compute MSigDB Collection enrichments using msigdbr
+#' using Fisher test.
+#' @param membership_matrix a community membership (kME) matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]
+#' @param K cutoff for top community genes to include for computing enrichment.
+#' Used in an AND condition with `memb_cut`.
+#' @param memb_cut cutoff as a membership score threshold for determining top
+#' community genes for computing enrichment.  Used in an AND condition with `K`.
+#' @param cats MSigDB collections to use. We recommend only using
+#' H, C3, C6, C7, C8 and avoiding C1, C2, C4, C5 for speed
+#' @param p_cut p value cutoff for determining importance. If all p values are
+#' below `p_cut` for a community, no cell type is selected
+#'
+#' @return Returns a list with the following items:
+#' * `top_enr` - a data.frame of the most significant enrichment for each
+#' MSigDB collection.
+#' * `full_enr` - all MSigDB enrichment scores for all communities for the
+#' selected collections.
+#'
+#' @details
+#' The function can use parallel and distributed processing in R, via the
+#' [foreach][foreach::foreach()] package.
+#'
+#' GSEA Enrichment testing assumes differential analysis so we are using simple
+#' fisher tests instead (actually hypergeometric for speed)
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+#' results <- icwgcna(ex)
+#'
+#' # Running with whatever parallel processing is already set up
+#' compute_MSigDB_enrichment(results$community_membership)
+#'
+#' # Using doParallel package to set up parallel processing
+#' cl <- parallel::makePSOCKcluster(2)
+#' doParallel::registerDoParallel(cl)
+#' compute_MSigDB_enrichment(results$community_membership)
+#'
+#' # Using doMC package to set up parallel processing (not available in Windows)
+#' doMC::registerDoMC()
+#' compute_MSigDB_enrichment(results$community_membership)
+#' }
+#'
+compute_MSigDB_enrichment <- function(membership_matrix,
+                                      K = 100,
+                                      memb_cut = .65,
+                                      cats = c("H", "C3", "C6", "C7", "C8"),
+                                      p_cut = 0.001) {
+  needed_packages <- c('msigdbr', 'foreach', 'tidyr')
+  missing_packages <- !vapply(needed_packages,
+                          FUN = requireNamespace, quietly = TRUE,
+                          FUN.VALUE = logical(1))
+  if (any(missing_packages)) {
+    stop('Must have the following R packages installed for this function: ',
+         paste0(names(missing_packages[missing_packages]), collapse = ', '))
+  }
+
+  if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
+    stop("membership_matrix must be a martix or data.frame")
+  }
+  if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
+    stop("membership_matrix values can't be <-1 or >1")
+  }
+
+  m_df_simp <- msigdbr::msigdbr(species = "Homo sapiens")
+  gs_cat_levels <- sort(unique(m_df_simp$gs_cat))
+
+  if (all(!cats %in% gs_cat_levels)) {
+    stop('No "cats" found in MSigDB. Must use at least one of: ',
+         paste0(gs_cat_levels, collapse = ', '))
+  }
+  if (any(!cats %in% gs_cat_levels)) {
+    warning('The following "cats" are not in MSigDB: ',
+            paste0(cats[!cats %in% gs_cat_levels], collapse = ', '))
+    cats <- cats[cats %in% gs_cat_levels]
+  }
+
+  sig_list <- lapply(cats, function(xx) {
+    tmp_data <- m_df_simp[m_df_simp$gs_cat == xx, ]
+    split(x = tmp_data$gene_symbol, f = tmp_data$gs_name)
+  })
+  names(sig_list) <- cats
+
+  if (is.null(foreach::getDoParName())) {
+    message('No parallel processing has been detected')
+     `%d%` <- foreach::`%do%`
+  } else {
+    message('Using ', foreach::getDoParName(), ' with ',
+            foreach::getDoParWorkers(), ' workers')
+    `%d%` <- foreach::`%dopar%`
+  }
+
+  top_genes <- apply(membership_matrix, 2,
+                     function(meta) {
+                       rank(-meta) <= K & meta > memb_cut
+                     })
+  all_genes <- rownames(top_genes)
+
+  overlap_enrichment <- plyr::ldply(
+    names(sig_list),
+    .fun = function(xx) {
+      sig <- sig_list[[xx]]
+      message("working on ", xx)
+
+      goGenes <- as.data.frame(lapply(
+        sig,
+        function(go) {
+          all_genes %in% go
+        }))
+
+      top_genes <- top_genes
+
+      i <- NA
+      enr <- foreach::foreach(
+        i = 1:ncol(top_genes),
+        .combine = 'rbind') %d% {
+          q_h     <- t(as.matrix(goGenes)) %*% top_genes[, i]
+          m_h     <- colSums(goGenes)
+          n_h     <- nrow(goGenes) - m_h
+          k_h     <- rep(sum(top_genes[, i]), length(q_h))
+          hyper_p <- stats::phyper(q_h - 1, m_h, n_h, k_h, lower.tail = FALSE)
+
+          data.frame(
+            community = colnames(top_genes)[i],
+            go = colnames(goGenes),
+            top_comm_gene_n = k_h,
+            go_n = m_h,
+            overlap = q_h,
+            p = hyper_p
+          )
+        }
+      enr$cat <- xx
+      enr
+    })
+
+  cat_cnts <- table(overlap_enrichment$community,
+                    overlap_enrichment$cat)
+  correct  <- all(apply(cat_cnts,2,function(x) {length(unique(x)) == 1}))
+  if (!correct) {
+    stop("problem computing enrichments, try a different parallel computing setup")
+  }
+
+  best_of_cat <- plyr::ddply(
+    overlap_enrichment,
+    .variables = c("community","cat"),
+    function(x) {
+      ind <- which(x$p == min(x$p,na.rm = TRUE));
+      if (length(ind) > 1 || min(x$p, na.rm = TRUE) > p_cut) {
+        best            <- "";
+        p_val           <- NA
+        top_comm_gene_n <- NA
+        go_n            <- NA
+        overlap         <- NA
+      } else {
+        best <- x$go[ind];
+        p_val <- x$p[ind]
+        top_comm_gene_n <- x$top_comm_gene_n[ind]
+        go_n            <- x$go_n[ind]
+        overlap         <- x$overlap[ind]
+      }
+      data.frame(
+        best = best,
+        top_comm_gene_n,
+        go_n,
+        overlap,
+        p = p_val
+      )
+    })
+
+  best <- tidyr::pivot_wider(best_of_cat,
+                             id_cols = 'community',
+                             names_from = 'cat',
+                             values_from = c('best', 'top_comm_gene_n',
+                                             'go_n', 'overlap'))
+  # reorder col
+  best <- best[, c(1, unlist(lapply(cats,
+                             function(xx) {
+                               grep(paste0('_', xx), colnames(best))
+                             }))
+                   )]
+
+  list(top_enr = best, full_enr = overlap_enrichment)
+}
+
+
+#' Compute Cell Type Enrichments Using xCell Cell Markers
+#'
+#' Compute cell type enrichments using
+#' [xCell cell markers](https://github.com/dviraran/xCell) with Fisher test.
+#' @param membership_matrix a community membership (kME) matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]
+#' @param K cutoff for top community genes to include for computing enrichment.
+#' Used in an AND condition with `memb_cut`.
+#' @param memb_cut cutoff as a membership score threshold for determining top
+#' community genes for computing enrichment. Used in an AND condition with `K`.
+#' @param p_cut p value cutoff for determining importance. If all p values are
+#' below `p_cut` for a community, no cell type is selected
+#'
+#' @return Returns a list with the following items:
+#' * `top_enr` - the most significant cell type from the enrichment scores.
+#' * `full_enr` - all panglaoDB cell type enrichment scores for all communities.
+#'
+#' @details note that this is distinct from running xCell which is run on expression data. This
+#' is an enrichment using their cell markers.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+#' results <- icwgcna(ex)
+#'
+#' compute_xCell_enrichment(results$community_membership)
+#' }
+#'
+compute_xCell_enrichment <- function(membership_matrix,
+                                     K = 100,
+                                     memb_cut = .65,
+                                     p_cut = 0.001) {
+  needed_packages <- c('xCell')
+  missing_packages <- !vapply(needed_packages,
+                              FUN = requireNamespace, quietly = TRUE,
+                              FUN.VALUE = logical(1))
+  if (any(missing_packages)) {
+    stop('Must have the following R packages installed for this function: ',
+         paste0(names(missing_packages[missing_packages]), collapse = ', '))
+  }
+
+
+  if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
+    stop("membership_matrix must be a martix or data.frame")
+  }
+  if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
+    stop("membership_matrix values can't be <-1 or >1")
+  }
+
+  markers <- xCell::xCell.data$signatures
+  tNames  <- names(markers)
+  markers <- plyr::llply(names(markers),function(n){markers[[n]]@geneIds})
+  names(markers) <- tNames
+
+  c_names_long <- gsub("%.*$","",names(markers))
+  c_names <- unique(c_names_long)
+  c_types <- plyr::llply(c_names,
+                         function(x) {
+                           tmp_index <- which(x == c_names_long)
+                           unique(as.vector(unlist(markers[tmp_index])))
+                         })
+  names(c_types) <- c_names
+
+  enr <- plyr::adply(membership_matrix, 2, function(x) {
+    ret <- t(plyr::ldply(names(c_types), function(ct) {
+      overlap <- table(
+        rank(-x) <= K & x > memb_cut,
+        rownames(membership_matrix) %in%
+          c_types[[ct]]
+      )
+      if (ncol(overlap) == 1 || nrow(overlap) == 1) {
+        return(1)
+      }
+      ret2 <- stats::fisher.test(overlap)$p.val
+      return(unlist(ret2))
+    }))
+    colnames(ret) <- names(c_types)
+    ret
+  })
+
+  rownames(enr) <- enr[, 1]
+  enr <- as.data.frame(t(enr[, -1]))
+
+  top_enr <- plyr::ldply(apply(enr, 2, function(x) {
+    if (min(x) > p_cut) {
+      return(data.frame(cell_type = NA, p = NA))
+    }
+
+    i <- which(x == min(x))
+
+    ret <- data.frame(cell_type = rownames(enr)[i], p = x[i])
+    return(ret)
+  }))
+  names(top_enr)[1] <- "community"
+
+  return(list(
+    top_enr = top_enr,
+    full_enr = enr
+  ))
+}
+
+
+#' Display UMAP of Community Membership with text overlays
+#'
+#' @param membership_matrix a community membership (kME) matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]
+#' @param community_memb_cut_main main cutoff of a membership score threshold
+#' for filtering out communities to include in the plot. Any communities with
+#' less than `community_n_main` number of genes greater than
+#' `community_memb_cut_main` are filtered out.
+#' @param community_n_main the number of genes that must have membership scores
+#'  great than `community_memb_cut_main` in order for a community to be
+#' kept in the plot.
+#' @param community_memb_cut_secondary cutoff of a membership score threshold
+#' for filtering genes to include in the plot. Any communities with
+#' less than `community_n_secondary` number of genes greater than
+#' `community_memb_cut_secondary` are filtered out.
+#' @param community_n_secondary the number of genes that must have membership
+#' scores great than `community_memb_cut_secondary` in order for a community
+#' to be kept in the plot.
+#' @param gene_memb_cut_main main cutoff of a membership score threshold for
+#' filtering genes to include in the plot. Any genes with an absolute membership
+#' score greater than `gene_memb_cut_main` in any community is included
+#' @param gene_memb_cut_secondary secondary cutoff of a membership score
+#' threshold for filtering genes to include in the plot. Any genes with an
+#' absolute membership score greater than `gene_memb_cut_main` in more than 1
+#' community is included
+#' @param community_labels a data.frame with the text to display over gene
+#' communities. Expects first column to match column names of `membership_matrix`
+#' and second column to contain text of labels associated with each community
+#' @param umap_specs configuration for UMAP (default is [umap::umap.defaults]).
+#' To use custom specs copy [umap::umap.defaults] and make specific changes
+#' (see {Examples})
+#'
+#' @return Returns a list with the following items:
+#' * `umap_w_annotation` - a UMAP plot of genes with labeled clusters overlaid
+#' * `umap_w_legend` - a UMAP plot of genes with a legend and no overlaid labels
+#' * `layout` - the UMAP layout to enable customized user plotting
+#'
+#' @details
+#'
+#' # Filtering
+#'
+#' In order to facilitate viewing, communities and genes are filtered prior to
+#' plotting. Gene filtering is performed after community filtering.
+#'
+#' For inclusion either the main or secondary parameters can be satisfied. For
+#' example, using the defaults here a community must have either 20 genes over
+#' 0.7 kME or 5 genes over 0.8 kME to be included. After community filtering,
+#' gene filtering is performed. Again using the defaults here, a gene must
+#' have at least one community over 0.75 kME or two communities over 0.65 kME
+#' to be included.
+#'
+#' Setting `community_memb_cut_main` and `gene_memb_cut_main` to 0 will force
+#' all communities and genes to be included in the UMAP
+#'
+#' # Output
+#'
+#' Both `umap_w_annotation` and `umap_w_legend` outputs are
+#' [ggplot][ggplot2::ggplot()] objects, so plot details can easily be added or
+#' modified (i.e. `umap_results$umap_w_legend + theme_classic()`).
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+#' results <- icwgcna(ex)
+#'
+#' umap_results <- make_network_umap(results$community_membership)
+#' umap_results$umap_w_annotation
+#' umap_results$umap_w_legend + theme(legend.position = 'top')
+#'
+#' # can adjust umap specifications
+#' custom_umap_specs <- umap::umap.defaults
+#' custom_umap_specs$n_neighbors <- 20
+#'
+#' umap_results <- make_network_umap(results$community_membership,
+#'                                   umap_specs = custom_umap_specs)
+#' }
+#'
+make_network_umap <- function(membership_matrix,
+                              community_memb_cut_main = 0.7,
+                              community_n_main = 20,
+                              community_memb_cut_secondary = 0.8,
+                              community_n_secondary = 5,
+                              gene_memb_cut_main = 0.75,
+                              gene_memb_cut_secondary = 0.65,
+                              community_labels = NULL,
+                              umap_specs = umap::umap.defaults) {
+
+  needed_packages <- c('ggplot2', 'umap')
+  missing_packages <- !vapply(needed_packages,
+                              FUN = requireNamespace, quietly = TRUE,
+                              FUN.VALUE = logical(1))
+  if (any(missing_packages)) {
+    stop('Must have the following R packages installed for this function: ',
+         paste0(names(missing_packages[missing_packages]), collapse = ', '))
+  }
+
+  if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
+    stop("membership_matrix must be a martix or data.frame")
+  }
+  if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
+    stop("membership_matrix values can't be <-1 or >1")
+  }
+
+  if (!is.null(community_labels)) {
+    if (!any(class(community_labels) == 'data.frame') ||
+        ncol(community_labels) != 2 ||
+        !any(colnames(community_labels) == 'community')) {
+      stop('community_labels must be a data.frame with 2 columns and a column named "community"')
+    }
+  }
+
+  col_inds <- (apply(abs(membership_matrix) > community_memb_cut_main, 2, sum) >=
+                   community_n_main) |
+    (apply(abs(membership_matrix) > community_memb_cut_secondary, 2, sum) >=
+       community_n_secondary)
+  if (sum(col_inds) < 2) {
+    stop('Must have at least 2 communities after filtering. Try less restrictive cutoffs.')
+  }
+  kME_mat    <- membership_matrix[, col_inds]
+
+  row_inds   <- apply(kME_mat > gene_memb_cut_main, 1, any) |
+    (apply(kME_mat > gene_memb_cut_secondary, 1, sum) > 1)
+  if (sum(row_inds) < 2) {
+    stop('Must have at least 2 genes after filtering. Try less restrictive cutoffs.')
+  }
+  kME_mat    <- kME_mat[row_inds, ]
+
+  message("Filtering from ", ncol(membership_matrix),
+          " communites to ", ncol(kME_mat), " communities for plotting.")
+  message("Then filtering from ", nrow(membership_matrix),
+          " genes to ", nrow(kME_mat), " genes for plotting.")
+
+  memb_u     <- umap::umap(kME_mat, config = umap_specs)
+  layout_df  <- as.data.frame(memb_u$layout)
+  names(layout_df) <- c("UMAP1","UMAP2")
+  Community  <- colnames(kME_mat)[apply(kME_mat,1,
+                                        function(x) {which(x == max(x))})]
+  if (!is.null(community_labels)) {
+    add_lab <- community_labels[match(Community, community_labels$community), 2]
+    Community[!is.na(add_lab)]  <- paste(Community[!is.na(add_lab)],
+                                         add_lab[!is.na(add_lab)])
+  }
+
+  layout_df  <- cbind(layout_df, Community = Community)
+
+  u_plot <- ggplot2::ggplot(layout_df,
+                            ggplot2::aes_string(x = 'UMAP1',
+                                                y = 'UMAP2',
+                                                color = 'Community')) +
+    ggplot2::geom_point(size = .75) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(legend.text = ggplot2::element_text(size = 5))
+
+  cell_type_locs <- plyr::ddply(layout_df, "Community",
+                                function(x) {
+                                  data.frame(UMAP1 = stats::median(x$UMAP1),
+                                             UMAP2 = stats::median(x$UMAP2))
+                                })
+  cell_type_locs <- cell_type_locs[order(cell_type_locs$UMAP1,
+                                         cell_type_locs$UMAP2,
+                                         decreasing = T),]
+  labeled_u_plot <- ggplot2::ggplot(layout_df,
+                                    ggplot2::aes_string(x = 'UMAP1',
+                                                        y = 'UMAP2',
+                                                        color = 'Community')) +
+    ggplot2::geom_point(size = .75) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(legend.text = ggplot2::element_text(size = 5),
+                   legend.position = "none") +
+    ggplot2::guides(colour = ggplot2::guide_legend(
+      override.aes = list(size = 5)
+    )) +
+    ggplot2::annotate("label",x = cell_type_locs$UMAP1,
+                      y = cell_type_locs$UMAP2,
+                      label = cell_type_locs$Community,
+                      size = 2,
+                      fill = "white")
+
+  list(umap_w_annotation = labeled_u_plot,
+       umap_w_legend = u_plot,
+       layout = layout_df)
+}
+

@@ -35,7 +35,44 @@ saveRDS(testing_eigengene_matrix, file = testthat::test_path("fixtures", "testin
 
 
 # saving pangDB results
-testing_enrichment <- compute_panglaoDB_enrichment(testing_results$community_membership,
+testing_panglaoDB_enrichment <- compute_panglaoDB_enrichment(testing_results$community_membership,
   pangDB = testing_pangDB
 )
-saveRDS(testing_enrichment, file = testthat::test_path("fixtures", "testing_enrichment.rds"))
+saveRDS(testing_panglaoDB_enrichment,
+        file = testthat::test_path("fixtures",
+                                   "testing_panglaoDB_enrichment.rds"))
+
+# saving MSigDB results
+testing_MSigDB_enrichment <- withr::with_collate(
+  "C",
+  compute_MSigDB_enrichment(testing_results$community_membership)
+)
+saveRDS(testing_MSigDB_enrichment,
+        file = testthat::test_path("fixtures",
+                                   "testing_MSigDB_enrichment.rds"))
+
+
+# saving xCell results
+testing_xCell_enrichment <- compute_xCell_enrichment(
+  testing_results$community_membership
+)
+saveRDS(testing_xCell_enrichment,
+        file = testthat::test_path("fixtures",
+                                   "testing_xCell_enrichment.rds"))
+
+# saving UMAP ggplots results
+custom_umap_specs <- umap::umap.defaults
+custom_umap_specs$random_state <- 94124456
+testing_UMAP_results <- make_network_umap(
+    testing_results$community_membership,
+    umap_specs = custom_umap_specs,
+    community_labels = data.frame(community = 'mA1', lab = 'Extra')
+  )
+
+saveRDS(testing_UMAP_results,
+        file = testthat::test_path("fixtures",
+                                   "testing_UMAP_results.rds"))
+saveRDS(list(layout = testing_UMAP_results$layout[,1:2]),
+        file = testthat::test_path("fixtures",
+                                   "UMAP_testing_layout.rds"))
+

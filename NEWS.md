@@ -1,3 +1,14 @@
+# icWGCNA 0.2.0
+
+### New Features
+
+#### Enrichments Functions
+- `compute_MSigDB_enrichment()` (with parallel and distributed processing)
+- `compute_xCell_enrichment()`
+
+#### UMAP Plotting
+- `make_network_umap()`
+
 # icWGCNA 0.1.1
 
 Released on public Github. 
@@ -6,7 +17,7 @@ Released on public Github.
 
 Initial release to be shared publicly
 
-### Bug Fixes
+#### Bug Fixes
 
 Better panglaoDB variable name matches and error catching (#18)
 
@@ -14,12 +25,12 @@ Downstream functions improvement and error catching
 
 # icWGCNA 0.0.0.9002
 
-### Bug Fixes
+#### Bug Fixes
 
 Fixed error when genes have 0 standard deviation (#16)
 
 
 # icWGCNA 0.0.0.9001
 
-### First Version.
+First Version
 

@@ -41,7 +41,6 @@ RfastCor_wrapper <- function(x,
 #' @description distance based on the topological overlap map from [Ravasz, E., Somera, A., Mongru, D., Oltvai, Z. and Barab´asi, A. (2002). Science](https://pubmed.ncbi.nlm.nih.gov/12202830/)
 #' Implemented to using the [Rfast][Rfast::Rfast-package] functions to  speed things up since we will be computing this up to 25 times
 #'
-#' @examples
 RfastTOMdist <- function(A,
                          mat_mult_method = c("Rfast", "RcppEigen")) {
   mat_mult_method <- match.arg(mat_mult_method)
@@ -82,7 +81,6 @@ RfastTOMdist <- function(A,
 #' with a community they should check community memberships (kME) output from the main function icwgcna().
 #'
 #'
-#' @examples
 fastTOMwrapper <- function(X,
                            expo = 6,
                            Method = c("pearson", "spearman"),
