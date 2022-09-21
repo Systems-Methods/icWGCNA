@@ -23,3 +23,25 @@ authors:
     href: https://github.com/wfulp
   Alexandre Alloy:
     href: https://github.com/alexandre-alloy
+
+reference:
+  - title: Main icWGCNA Function
+    contents:
+    - icwgcna
+  - title: Downstream/Enrichment Functions
+    desc: >
+      Functions to run on icWGCNA results
+    contents:
+    - compute_panglaoDB_enrichment
+    - compute_MSigDB_enrichment
+    - compute_xCell_enrichment
+    - compute_eigengene_matrix
+    - make_network_umap
+  - title: Utility Functions
+    desc: >
+      These functions are rarely used directly
+    - eigenMapMatMult
+    - RfastTOMdist
+    - fastTOMwrapper
+    - pangDB_link
+    - prolif_names
