@@ -2,6 +2,8 @@ url: https://github.com/Systems-Methods/icWGCNA
 
 template:
   bootstrap: 5
+  params:
+    google_site_verification: c6SqDiAmpGFE36T4lAZGMohVYW_YgNoycH-2dvmL_-0
 
 authors:
   Mike Mason:
