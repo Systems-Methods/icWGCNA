@@ -16,7 +16,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">icWGCNA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,7 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="main-icwgcna-function">Main icWGCNA Function<a class="anchor" aria-label="anchor" href="#main-icwgcna-function"></a></h2>
       
       
 
@@ -62,9 +62,25 @@
 
       <dl><dt>
           
-          <code><a href="RfastTOMdist.html">RfastTOMdist()</a></code> 
+          <code><a href="icwgcna.html">icwgcna()</a></code> 
         </dt>
-        <dd>RfastTOMdist</dd>
+        <dd>Iterative Correcting Weighted Gene Co-expression Network Analysis</dd>
+      </dl></div><div class="section level2">
+      <h2 id="downstream-enrichment-functions">Downstream/Enrichment Functions<a class="anchor" aria-label="anchor" href="#downstream-enrichment-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions to run on icWGCNA results</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="compute_panglaoDB_enrichment.html">compute_panglaoDB_enrichment()</a></code> 
+        </dt>
+        <dd>Compute Cell Type Enrichments Using panglaoDB Cell Markers</dd>
       </dl><dl><dt>
           
           <code><a href="compute_MSigDB_enrichment.html">compute_MSigDB_enrichment()</a></code> 
@@ -72,39 +88,45 @@
         <dd>Compute MSigDB Collection Enrichments for each community</dd>
       </dl><dl><dt>
           
+          <code><a href="compute_xCell_enrichment.html">compute_xCell_enrichment()</a></code> 
+        </dt>
+        <dd>Compute Cell Type Enrichments Using xCell Cell Markers</dd>
+      </dl><dl><dt>
+          
           <code><a href="compute_eigengene_matrix.html">compute_eigengene_matrix()</a></code> 
         </dt>
         <dd>Compute community signatures (eigengenes)</dd>
       </dl><dl><dt>
           
-          <code><a href="compute_panglaoDB_enrichment.html">compute_panglaoDB_enrichment()</a></code> 
+          <code><a href="make_network_umap.html">make_network_umap()</a></code> 
         </dt>
-        <dd>Compute Cell Type Enrichments Using panglaoDB Cell Markers</dd>
-      </dl><dl><dt>
-          
-          <code><a href="compute_xCell_enrichment.html">compute_xCell_enrichment()</a></code> 
-        </dt>
-        <dd>Compute Cell Type Enrichments Using xCell Cell Markers</dd>
-      </dl><dl><dt>
+        <dd>Display UMAP of Community Membership with text overlays</dd>
+      </dl></div><div class="section level2">
+      <h2 id="utility-functions">Utility Functions<a class="anchor" aria-label="anchor" href="#utility-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>These functions are rarely used directly</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="eigenMapMatMult.html">eigenMapMatMult()</a></code> 
         </dt>
         <dd>Faster Matrix Multiplication</dd>
       </dl><dl><dt>
           
+          <code><a href="RfastTOMdist.html">RfastTOMdist()</a></code> 
+        </dt>
+        <dd>RfastTOMdist</dd>
+      </dl><dl><dt>
+          
           <code><a href="fastTOMwrapper.html">fastTOMwrapper()</a></code> 
         </dt>
         <dd>fastTOMwrapper</dd>
-      </dl><dl><dt>
-          
-          <code><a href="icwgcna.html">icwgcna()</a></code> 
-        </dt>
-        <dd>Iterative Correcting Weighted Gene Co-expression Network Analysis</dd>
-      </dl><dl><dt>
-          
-          <code><a href="make_network_umap.html">make_network_umap()</a></code> 
-        </dt>
-        <dd>Display UMAP of Community Membership with text overlays</dd>
       </dl><dl><dt>
           
           <code><a href="pangDB_link.html">pangDB_link</a></code> 
@@ -116,7 +138,8 @@
         </dt>
         <dd>Current list of proliferation genes to check</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
