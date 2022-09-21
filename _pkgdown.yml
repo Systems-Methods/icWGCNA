@@ -4,6 +4,17 @@ template:
   bootstrap: 5
   params:
     google_site_verification: c6SqDiAmpGFE36T4lAZGMohVYW_YgNoycH-2dvmL_-0
+  includes:
+    in_header: |
+       <!-- Google tag (gtag.js) -->
+       <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JQQPWDW4Y"></script>
+       <script>
+         window.dataLayer = window.dataLayer || [];
+         function gtag(){dataLayer.push(arguments);}
+         gtag('js', new Date());
+
+         gtag('config', 'G-4JQQPWDW4Y');
+       </script>
 
 authors:
   Mike Mason:
