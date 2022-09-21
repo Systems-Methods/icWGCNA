@@ -15,7 +15,7 @@ coverage](https://codecov.io/gh/Systems-Methods/icWGCNA/branch/main/graph/badge.
 
 Iterative Correcting Weighted Gene Co-expression Network Analysis
 function for constructing a gene network from a gene expression matrix.
-The algorithm:
+The algorithm: 
 
     1. Constructs a signed wgcna network
     2. Drops correlated modules based on membership kurtosis
@@ -121,7 +121,7 @@ eigengene_mat <- compute_eigengene_matrix(
 )
 ```
 
-#### Compute Cell Type Enrichments Using panglaoDB Cell Markers
+#### Compute panglaoDB collection enrichments for each community
 
 ``` r
 pangDB <- data.table::fread(pangDB_link)
@@ -130,18 +130,31 @@ panglaoDB_enrichment <- compute_panglaoDB_enrichment(
   K = 100,
   memb_cut = 0.65,
   pangDB = pangDB,
-  prolif = prolif_names
+  prolif = prolif_names, 
+  p_cut = 0.001
 )
 ```
 
-#### Compute MSigDB Collection Enrichments for each community
+#### Compute MSigDB collection enrichments for each community
 
 ``` r
 MSigDB_enrichment <- compute_MSigDB_enrichment(
   results$community_membership,
   K = 100,
   memb_cut = .65,
-  cats = c("H", "C3", "C6", "C7", "C8")
+  cats = c("H", "C3", "C6", "C7", "C8"), 
+  p_cut = 0.001
+)
+```
+
+#### Compute xCell collection enrichments for each community
+
+``` r
+xCell_enrichment <- compute_xCell_enrichment(
+  results$community_membership,
+  K = 100,
+  memb_cut = .65, 
+  p_cut = 0.001
 )
 ```
 
