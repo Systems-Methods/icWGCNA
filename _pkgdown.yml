@@ -3,17 +3,17 @@ url: https://github.com/Systems-Methods/icWGCNA
 template:
   bootstrap: 5
   params:
-    google_site_verification: c6SqDiAmpGFE36T4lAZGMohVYW_YgNoycH-2dvmL_-0
+    google_site_verification: iibkm1sdjFL0gSzOkeENIdmk9u5Jkc6ZFQc4q-vTSpQ
   includes:
     in_header: |
        <!-- Google tag (gtag.js) -->
-       <script async src="https://www.googletagmanager.com/gtag/js?id=G-4JQQPWDW4Y"></script>
+       <script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZQ1CR751E"></script>
        <script>
          window.dataLayer = window.dataLayer || [];
          function gtag(){dataLayer.push(arguments);}
          gtag('js', new Date());
 
-         gtag('config', 'G-4JQQPWDW4Y');
+         gtag('config', 'G-1ZQ1CR751E');
        </script>
 
 authors:
