@@ -10,9 +10,8 @@ test_that("input checking", {
     icwgcna(cbind(testing_data[, 1] - 1, testing_data)),
     "all values of ex must be >=0"
   )
-  expect_warning(
-    suppressMessages(
-      icwgcna(cbind(
+  tmp_results_plus <- purrr::quietly(
+    ~ icwgcna(cbind(
         testing_data[1:1000, 1] + c(
           rep(100, 10),
           rep(0, nrow(testing_data[1:1000, ]) - 10)
@@ -20,9 +19,11 @@ test_that("input checking", {
         testing_data[1:1000, ]
       ),
       maxIt = 2
-      )
-    ),
-    "some values of ex are >100, strongly indicating ex is not in log space"
+    )
+  )()
+  expect_equal(
+    tmp_results_plus$warnings,
+    rep("some values of ex are >100, strongly indicating ex is not in log space", 2)
   )
   expect_warning(
     suppressMessages(icwgcna(testing_data[1:1000, ], maxIt = 1)),
