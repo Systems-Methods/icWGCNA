@@ -14,9 +14,8 @@
 #'
 #' @return Returns a list with the following items:
 #' * `community_membership` - community membership score (kME). Analogous to loadings in PCA.
-#' * `community_signature` - community eigengene, the first principal component the expression of genes in this community. This can be thought of as the average of the scaled expression of top community genes.
-#' * `full_community_membership` -  similar to community_membership but includes communities that were dropped in the iterative process.
-#' * `full_community_signature` - similar to community_signature but includes communities that were dropped in the iterative process.
+#' * `community_signature` - community eigengene, the first principal component of the expression of genes in this community (with proper direction). This can be thought of as the average of the scaled expression of top community genes.
+#' * `uncorrected_community_signature` - similar to community_signature, but based on expression data that has not been corrected at each iteration. 
 #' * `controlled_for` - The communities whose signatures were regressed out at each iteration.
 #'
 #' @details Iterative Correcting Weighted Gene Co-expression Network Analysis function for constructing a gene network from a gene expression matrix. The algorithm:
@@ -41,6 +40,11 @@
 #' multiple cores. If running this on a cluster with access to many computer core
 #' there is a significant performance advantage to using [Rfast::mat.mult()]
 #'
+#' Note, the uncorrected_community_signature matrix is useful when comparing to signature 
+#' matrices from new datasets that were computed with compute compute_eigengene_matrix(). The 
+#' community signatures in the uncorrected_community_signature matrix may show a high level 
+#' of colinearity and we strong recommend the use of tree based learners for any analysis based on them. 
+#' 
 #' @references
 #'
 #' Langfelder P, Horvath S (2008).
@@ -219,12 +223,13 @@ icwgcna <- function(ex,
   }
 
   colnames(metaGenes) <- paste0("m", colnames(metaGenes))
+  row.names(eigenGenes) <- colnames(metaGenes)
+  uncor_eigenGenes <- compute_eigengene_matrix(ex = ex, membership_matrix = metaGenes)
   return(
     list(
       community_membership = metaGenes,
       community_signature = eigenGenes,
-      full_community_membership = full_metaGenes,
-      full_community_signature = full_eigenGenes,
+      uncorrected_community_signature = uncor_eigenGenes,
       controlled_for = cont_for
     )
   )
