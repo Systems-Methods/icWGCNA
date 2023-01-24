@@ -692,9 +692,9 @@ make_network_umap <- function(membership_matrix,
   layout_df  <- cbind(layout_df, Community = Community)
 
   u_plot <- ggplot2::ggplot(layout_df,
-                            ggplot2::aes_string(x = 'UMAP1',
-                                                y = 'UMAP2',
-                                                color = 'Community')) +
+                            ggplot2::aes(x = !!rlang::sym('UMAP1'),
+                                         y = !!rlang::sym('UMAP2'),
+                                         color = !!rlang::sym('Community'))) +
     ggplot2::geom_point(size = .75) +
     ggplot2::theme_classic() +
     ggplot2::theme(legend.text = ggplot2::element_text(size = 5))
@@ -707,10 +707,12 @@ make_network_umap <- function(membership_matrix,
   cell_type_locs <- cell_type_locs[order(cell_type_locs$UMAP1,
                                          cell_type_locs$UMAP2,
                                          decreasing = T),]
-  labeled_u_plot <- ggplot2::ggplot(layout_df,
-                                    ggplot2::aes_string(x = 'UMAP1',
-                                                        y = 'UMAP2',
-                                                        color = 'Community')) +
+  labeled_u_plot <- ggplot2::ggplot(
+    layout_df,
+    ggplot2::aes(x = !!rlang::sym('UMAP1'),
+                 y = !!rlang::sym('UMAP2'),
+                 color = !!rlang::sym('Community'))
+    ) +
     ggplot2::geom_point(size = .75) +
     ggplot2::theme_classic() +
     ggplot2::theme(legend.text = ggplot2::element_text(size = 5),
