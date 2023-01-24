@@ -633,7 +633,7 @@ make_network_umap <- function(membership_matrix,
                               community_labels = NULL,
                               umap_specs = umap::umap.defaults) {
 
-  needed_packages <- c('ggplot2', 'umap')
+  needed_packages <- c('ggplot2', 'rlang', 'umap')
   missing_packages <- !vapply(needed_packages,
                               FUN = requireNamespace, quietly = TRUE,
                               FUN.VALUE = logical(1))
