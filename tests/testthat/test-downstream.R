@@ -249,7 +249,7 @@ test_that('requireNamespace stubbing (UMAP)', {
 
   expect_error(
     make_network_umap(testing_results$community_membership),
-    "Must have the following R packages installed for this function: ggplot2, umap")
+    "Must have the following R packages installed for this function: ggplot2, rlang, umap")
 
 })
 

@@ -117,16 +117,6 @@ icwgcna <- function(ex,
     stop("covCut must be >0 and <1")
   }
 
-  # checking if 1st pca component is over 35%
-  pc <- stats::prcomp(t(ex), scale. = T)
-  pc1_var <- pc$sdev[1]^2 / sum(pc$sdev^2)
-  if (pc1_var  > .35) {
-    warning('1st PCA component percent of variance explained is ',
-            round(pc1_var, 3) * 100,
-            '%, which is higher than the expected 15-30% to successfully run icWGCNA.',
-            ' Please check for batch effects, outliers, or other reasons the ',
-            '1st PCA component percent of variance explained is so high.')
-  }
 
   Method <- match.arg(Method)
   mat_mult_method <- match.arg(mat_mult_method)
@@ -146,6 +136,18 @@ icwgcna <- function(ex,
     ex <- ex[!SD_zero_index, , drop = FALSE]
     SD <- SD[!SD_zero_index, , drop = FALSE]
   }
+
+  # checking if 1st pca component is over 35%
+  pc <- stats::prcomp(t(ex), scale. = T)
+  pc1_var <- pc$sdev[1]^2 / sum(pc$sdev^2)
+  if (pc1_var  > .35) {
+    warning('1st PCA component percent of variance explained is ',
+            round(pc1_var, 3) * 100,
+            '%, which is higher than the expected 15-30% to successfully run icWGCNA.',
+            ' Please check for batch effects, outliers, or other reasons the ',
+            '1st PCA component percent of variance explained is so high.')
+  }
+
 
   # average expression of each gene
   M <- apply(ex, 1, mean)
