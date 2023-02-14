@@ -23,7 +23,6 @@ Depends:
 Imports: 
     dynamicTreeCut,
     plyr,
-    prcomp,
     Rcpp,
     RcppEigen,
     Rfast
