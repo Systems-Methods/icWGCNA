@@ -118,7 +118,7 @@ icwgcna <- function(ex,
   }
 
   # checking if 1st pca component is over 35%
-  pc <- prcomp(t(ex), scale. = T)
+  pc <- stats::prcomp(t(ex), scale. = T)
   pc1_var <- pc$sdev[1]^2 / sum(pc$sdev^2)
   if (pc1_var  > .35) {
     warning('1st PCA component percent of variance explained is ',
