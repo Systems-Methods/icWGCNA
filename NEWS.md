@@ -1,3 +1,10 @@
+# icWGCNA 0.2.1
+
+Bug fixes and checking for PC1 > 35% in input expression
+
+`icWGCNA` returns `uncorrected_community_signature` instead of 
+`full_community_membership` and `full_community_signature`
+
 # icWGCNA 0.2.0
 
 ### New Features
