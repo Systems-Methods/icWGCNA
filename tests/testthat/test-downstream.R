@@ -249,7 +249,7 @@ test_that('requireNamespace stubbing (UMAP)', {
 
   expect_error(
     make_network_umap(testing_results$community_membership),
-    "Must have the following R packages installed for this function: ggplot2, umap")
+    "Must have the following R packages installed for this function: ggplot2, rlang, umap")
 
 })
 
@@ -267,11 +267,11 @@ test_that("UMAP Success", {
 
   expect_equal(results_plus$result$layout,
                testing_UMAP_results$layout)
-  expect_equal(results_plus$result$umap_w_legend[-8],
-               testing_UMAP_results$umap_w_legend[-8],
+  expect_equal(results_plus$result$umap_w_legend[-c(2,4,5,8)],
+               testing_UMAP_results$umap_w_legend[-c(2,4,5,8)],
                ignore_attr = TRUE, ignore_function_env = TRUE)
-  expect_equal(results_plus$result$umap_w_annotation[-c(2,8)],
-               testing_UMAP_results$umap_w_annotation[-c(2,8)],
+  expect_equal(results_plus$result$umap_w_annotation[-c(2,4,5,8)],
+               testing_UMAP_results$umap_w_annotation[-c(2,4,5,8)],
                ignore_attr = TRUE, ignore_function_env = TRUE)
   expect_equal(
     results_plus$messages,

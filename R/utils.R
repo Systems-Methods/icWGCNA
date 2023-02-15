@@ -149,7 +149,7 @@ dropModuels <- function(eigenGenes,
                         corCut = .95) {
   eigen_Cors <- stats::cor(t(eigenGenes))
   diag(eigen_Cors) <- 0
-  while (any(eigen_Cors > corCut)) {
+  while (any(eigen_Cors > corCut) & ncol(eigen_Cors) > 2) {
     doubleBreak <- FALSE
 
     for (i in 1:(nrow(eigen_Cors)))
@@ -167,7 +167,6 @@ dropModuels <- function(eigenGenes,
             }
             Kurts <- Kurts[-removeInd]
           }
-
           eigenGenes <- eigenGenes[-removeInd, ]
           eigen_Cors <- stats::cor(t(eigenGenes))
           diag(eigen_Cors) <- 0
