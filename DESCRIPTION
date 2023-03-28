@@ -30,6 +30,7 @@ Suggests:
     covr,
     data.table,
     doParallel,
+    fastcluster,
     foreach,
     ggplot2,
     mockery,

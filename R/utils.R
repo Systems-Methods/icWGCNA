@@ -125,7 +125,7 @@ calcEigenGene <- function(tEx) {
 # i.e. we'll be selecting between two correlated modules
 cutreeHybridWrapper <- function(d,
                                 quantCut = 0.75) {
-  dend <- stats::hclust(stats::as.dist(d), method = "average")
+  dend <- fastcluster::hclust(stats::as.dist(d), method = "average")
   refHeight <- stats::quantile(dend$height, .05, type = 1)
   cutHeight <- as.numeric(quantCut * (max(dend$height) - refHeight) + refHeight)
   modules <- dynamicTreeCut::cutreeHybrid(
