@@ -242,6 +242,8 @@ icwgcna <- function(ex,
     list(
       community_membership = metaGenes,
       community_signature = eigenGenes,
+      .community_membership = full_metaGenes, 
+      .full_eigenGenes = full_eigenGenes,
       uncorrected_community_signature = uncor_eigenGenes,
       controlled_for = cont_for
     )
