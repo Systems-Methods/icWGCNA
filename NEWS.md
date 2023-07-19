@@ -1,3 +1,9 @@
+# icWGCNA 0.2.2
+
+- Bug fixes and internal function improvements
+- Add p value output for `compute_MSigDB_enrichment()`
+- Add full_metaGenes and full_eigenGenes output for `icwgcna()`
+
 # icWGCNA 0.2.1
 
 Bug fixes and checking for PC1 > 35% in input expression
