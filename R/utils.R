@@ -147,8 +147,11 @@ cutreeHybridWrapper <- function(d,
 dropModuels <- function(eigenGenes,
                         Kurts = NULL,
                         corCut = .95,
-                        method = "pearson") {
-  eigen_Cors <- stats::cor(t(eigenGenes), method=method)
+                        method = c("pearson",
+                                   "kendall",
+                                   "spearman")) {
+  method <- match.arg(method)
+  eigen_Cors <- stats::cor(t(eigenGenes), method = method)
   diag(eigen_Cors) <- 0
   while (any(eigen_Cors > corCut) & ncol(eigen_Cors) > 2) {
     doubleBreak <- FALSE
