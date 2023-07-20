@@ -146,8 +146,14 @@ cutreeHybridWrapper <- function(d,
 # we use kurtosis
 dropModuels <- function(eigenGenes,
                         Kurts = NULL,
-                        corCut = .95) {
-  eigen_Cors <- stats::cor(t(eigenGenes))
+                        corCut = .95,
+                        method = c("pearson",
+                                   "kendall",
+                                   "spearman"),
+                        logFlag=F) {
+  method <- match.arg(method)
+  if(logFlag){eigenGenes <- log(eigenGenes+1)}
+  eigen_Cors <- stats::cor(t(eigenGenes), method = method)
   diag(eigen_Cors) <- 0
   while (any(eigen_Cors > corCut) & ncol(eigen_Cors) > 2) {
     doubleBreak <- FALSE
@@ -168,7 +174,7 @@ dropModuels <- function(eigenGenes,
             Kurts <- Kurts[-removeInd]
           }
           eigenGenes <- eigenGenes[-removeInd, ]
-          eigen_Cors <- stats::cor(t(eigenGenes))
+          eigen_Cors <- stats::cor(t(eigenGenes), method = method)
           diag(eigen_Cors) <- 0
           doubleBreak <- TRUE
           break()
