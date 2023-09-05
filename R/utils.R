@@ -150,9 +150,11 @@ dropModuels <- function(eigenGenes,
                         method = c("pearson",
                                    "kendall",
                                    "spearman"),
-                        logFlag=F) {
+                        logFlag = FALSE) {
   method <- match.arg(method)
-  if(logFlag){eigenGenes <- log(eigenGenes+1)}
+  if (logFlag) {
+    eigenGenes <- log(eigenGenes + 1)
+  }
   eigen_Cors <- stats::cor(t(eigenGenes), method = method)
   diag(eigen_Cors) <- 0
   while (any(eigen_Cors > corCut) & ncol(eigen_Cors) > 2) {
