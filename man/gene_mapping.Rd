@@ -51,5 +51,25 @@ library(hgu133plus2.db)
 mapping_file     <- as.data.frame(hgu133plus2SYMBOL)
 
 gene_mapping(exprs_data, mapping_file, "highest_mean", "none")
+
+### Using a more complicated case for GSE83834
+temp_dir <- tempdir()
+geo <- GEOquery::getGEO("GSE83834", destdir = temp_dir)
+sup_mat <- GEOquery::getGEOSuppFiles("GSE83834", baseDir = temp_dir)
+exprs_data_raw <- as.data.frame(readxl::read_excel(rownames(sup_mat)))
+table(table(exprs_data_raw$ID))
+
+exprs_data <- exprs_data_raw[,-1]
+rownames(exprs_data) <- sub('\\\\.[0-9]*$', '', exprs_data_raw$ID)
+
+library('biomaRt')
+mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+genes <-  rownames(exprs_data)
+mapping_file <- getBM(filters= "ensembl_gene_id",
+                      attributes= c("ensembl_gene_id","hgnc_symbol"),
+                      values = genes, mart= mart)
+
+exprs_data_symbols <- gene_mapping(exprs_data, mapping_file)
+
 }
 }
