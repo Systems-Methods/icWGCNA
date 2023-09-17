@@ -7,8 +7,8 @@
 gene_mapping(
   exprs_data,
   mapping_file,
-  compress_fun = c("highest_mean", "highest_median", "mean", "median", "sum"),
-  compress_trans = c("none", "log", "exp"),
+  compress_fun = c("mean", "median", "sum", "pca", "highest_mean", "highest_median"),
+  compress_trans = c("none", "log_exp", "exp_log"),
   verbose = TRUE
 )
 }
@@ -26,7 +26,8 @@ pick the highest row based on mean or median, respectively, while "mean",
 "median", and "sum" aggregate the duplicate rows based on method chosen.}
 
 \item{compress_trans}{the transformation used when compressing the
-duplicate rows. "log" would take the log of the data, apply the
+duplicate rows. For example, "log_exp" would take the log of the data,
+apply the
 \code{compress_fun} method, then transpose back using exp (i.e. geometric mean).}
 
 \item{verbose}{should messages about the compression process be displayed}

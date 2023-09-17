@@ -12,7 +12,8 @@
 #' pick the highest row based on mean or median, respectively, while "mean",
 #' "median", and "sum" aggregate the duplicate rows based on method chosen.
 #' @param compress_trans the transformation used when compressing the
-#' duplicate rows. "log" would take the log of the data, apply the
+#' duplicate rows. For example, "log_exp" would take the log of the data,
+#' apply the
 #' `compress_fun` method, then transpose back using exp (i.e. geometric mean).
 #' @param verbose should messages about the compression process be displayed
 #'
@@ -57,9 +58,9 @@
 #'
 #' }
 gene_mapping <- function(exprs_data, mapping_file,
-                         compress_fun = c("highest_mean","highest_median",
-                                          "mean", "median", "sum"),
-                         compress_trans = c("none", "log", "exp"),
+                         compress_fun = c("mean", "median", "sum", "pca",
+                                          "highest_mean","highest_median"),
+                         compress_trans = c("none", "log_exp", "exp_log"),
                          verbose = TRUE
                          ) {
   compress_fun <- match.arg(compress_fun)
@@ -95,7 +96,7 @@ gene_mapping <- function(exprs_data, mapping_file,
   }
 
   exprs_data <- exprs_data[rownames(exprs_data) %in% mapping_file_linked$id, ]
-  if (compress_trans == "log" && any(exprs_data <= 0)) {
+  if (compress_trans == "log_exp" && any(exprs_data <= 0)) {
     stop("Can't do log transformation with exprs_data values <= 0")
   }
 
@@ -113,8 +114,8 @@ gene_mapping <- function(exprs_data, mapping_file,
       tmp_subset <- switch(
         compress_trans,
         none = tmp_subset,
-        log = log(tmp_subset),
-        exp = exp(tmp_subset),
+        log_exp = log(tmp_subset),
+        exp_log = exp(tmp_subset),
       )
 
       if (compress_fun %in% c("highest_mean", "highest_median")) {
@@ -132,8 +133,8 @@ gene_mapping <- function(exprs_data, mapping_file,
       tmp_compressed <- switch(
         compress_trans,
         none = tmp_compressed,
-        log = exp(tmp_compressed),
-        exp = log(tmp_compressed),
+        log_exp = exp(tmp_compressed),
+        exp_log = log(tmp_compressed),
       )
     })
     dup_df <- do.call(rbind.data.frame, dup_compressed)
