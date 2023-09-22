@@ -150,3 +150,70 @@ test_that("spearman test", {
     )
   )
 })
+
+
+test_that("high PCA error", {
+  tmp_data <- withr::with_seed(
+    seed = 53153245,
+    data.frame(
+      a = seq(1,20,length(1000)),
+      b = rnorm(1000, 20, .1) + seq(1,20,length(1000)),
+      c = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      d = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      e = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      f = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      g = rnorm(1000, 10, .1))
+  )
+  expect_snapshot(icwgcna(tmp_data, maxIt = 1))
+})
+
+test_that("low maxComm", {
+  tmp_data <- withr::with_seed(
+    seed = 53153245,
+    data.frame(
+      a = seq(1,20,length(1000)),
+      b = rnorm(1000, 20, .1) + seq(1,20,length(1000)),
+      c = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      d = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      e = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      f = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      g = rnorm(1000, 10, .1))
+  )
+  expect_snapshot(icwgcna(tmp_data, maxComm = 1))
+})
+
+test_that("high covCut", {
+  tmp_data <- withr::with_seed(
+    seed = 53153245,
+    data.frame(
+      a = seq(1,20,length(1000)),
+      b = rnorm(1000, 20, .1) + seq(1,20,length(1000)),
+      c = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      d = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      e = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      f = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      g = rnorm(1000, 20, .1) + seq(1,20,length(1000)),
+      i = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      j = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      k = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      l = rnorm(1000, 10, .1) + seq(1,20,length(1000)),
+      m = rnorm(1000, 10, .1))
+  )
+  expect_snapshot(icwgcna(tmp_data, covCut = .99999))
+})
+
+
+test_that("one row tEigenGenes", {
+  tmp_data <- withr::with_seed(
+    seed = 53153245,
+    data.frame(
+      a = seq(1,20,length(100)),
+      b = rnorm(100, 20, .1) + seq(1,20,length(100)),
+      c = rnorm(100, 10, .1) + seq(1,20,length(100)),
+      d = rnorm(100, 10, .1) + seq(1,20,length(100)),
+      e = rnorm(100, 10, .1) + seq(1,20,length(100)),
+      f = rnorm(100, 10, .1) + seq(1,20,length(100)),
+      g = rnorm(100, 10, .1))
+  )
+  expect_snapshot(icwgcna(tmp_data, maxIt = 2))
+})
