@@ -11,6 +11,8 @@
 #' gene IDs link to a single new gene ID. "highest_mean" and "highest_median"
 #' pick the highest row based on mean or median, respectively, while "mean",
 #' "median", and "sum" aggregate the duplicate rows based on method chosen.
+#' "pc1" and "pc1_unscaled" are using the first principal component in
+#' [stats::prcomp()], with `scale.` set to TRUE or FALSE, respectively.
 #' @param compress_trans the transformation used when compressing the
 #' duplicate rows. For example, "log_exp" would take the log of the data,
 #' apply the
@@ -20,6 +22,10 @@
 #' @details
 #' Gene IDs in the `exprs_data` that do not link to the first column of
 #' `mapping_file` will be excluded from the final output.
+#'
+#' When pc1 or pc1_unscaled `compress_fun` are specified the 1st principal
+#' component is flipped if there is negative correlation with the duplicate
+#' rows.
 #'
 #'
 #' @return
@@ -58,7 +64,8 @@
 #'
 #' }
 gene_mapping <- function(exprs_data, mapping_file,
-                         compress_fun = c("mean", "median", "sum", "pca",
+                         compress_fun = c("mean", "median", "sum",
+                                          "pc1", "pc1_unscaled",
                                           "highest_mean","highest_median"),
                          compress_trans = c("none", "log_exp", "exp_log"),
                          verbose = TRUE
@@ -118,7 +125,19 @@ gene_mapping <- function(exprs_data, mapping_file,
         exp_log = exp(tmp_subset),
       )
 
-      if (compress_fun %in% c("highest_mean", "highest_median")) {
+      if (compress_fun %in% c("pc1", "pc1_unscaled")) {
+        tmp_scale. <- switch(compress_fun, pc1 = TRUE, pc1_unscaled = FALSE)
+        tmp_ave <- switch(
+          compress_fun,
+          pc1 = apply(t(scale(t(tmp_subset))), 2, mean),
+          pc1_unscaled = apply(tmp_subset, 2, mean)
+        )
+        tmp_compressed <- stats::prcomp(t(tmp_subset),
+                                        scale. = tmp_scale.)$x[, 1]
+        if (stats::cor(tmp_ave, tmp_compressed) < 0) {
+          tmp_compressed <- -tmp_compressed
+        }
+      }else if (compress_fun %in% c("highest_mean", "highest_median")) {
         tmp_fun <- substr(compress_fun,
                           regexpr('_', compress_fun) + 1,
                           nchar(compress_fun))

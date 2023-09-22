@@ -7,7 +7,8 @@
 gene_mapping(
   exprs_data,
   mapping_file,
-  compress_fun = c("mean", "median", "sum", "pca", "highest_mean", "highest_median"),
+  compress_fun = c("mean", "median", "sum", "pc1", "pc1_unscaled", "highest_mean",
+    "highest_median"),
   compress_trans = c("none", "log_exp", "exp_log"),
   verbose = TRUE
 )
@@ -23,7 +24,9 @@ Can have multiple to multiple linking.}
 \item{compress_fun}{the compression method to use in cases where multiple
 gene IDs link to a single new gene ID. "highest_mean" and "highest_median"
 pick the highest row based on mean or median, respectively, while "mean",
-"median", and "sum" aggregate the duplicate rows based on method chosen.}
+"median", and "sum" aggregate the duplicate rows based on method chosen.
+"pc1" and "pc1_unscaled" are using the first principal component in
+\code{\link[stats:prcomp]{stats::prcomp()}}, with \code{scale.} set to TRUE or FALSE, respectively.}
 
 \item{compress_trans}{the transformation used when compressing the
 duplicate rows. For example, "log_exp" would take the log of the data,
@@ -42,6 +45,10 @@ Converts between Gene IDs For a given expression dataset and mapping file.
 \details{
 Gene IDs in the \code{exprs_data} that do not link to the first column of
 \code{mapping_file} will be excluded from the final output.
+
+When pc1 or pc1_unscaled \code{compress_fun} are specified the 1st principal
+component is flipped if there is negative correlation with the duplicate
+rows.
 }
 \examples{
 \dontrun{
