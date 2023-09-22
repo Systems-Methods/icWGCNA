@@ -169,7 +169,9 @@ icwgcna <- function(ex,
       corCut = corCut,
       mat_mult_method = mat_mult_method
     )
-
+    if (all(class(tEigenGenes) == "numeric")) {
+      tEigenGenes <- matrix(tEigenGenes, nrow = 1)
+    }
     if (is.null(tEigenGenes)) {
       message("No more modules to be added. -- Stopping Iterations --")
       break()
@@ -177,7 +179,6 @@ icwgcna <- function(ex,
 
     rownames(tEigenGenes) <- paste0(LETTERS[i], 1:nrow(tEigenGenes))
     tMetaGenes <- as.data.frame(stats::cor(t(tEx), t(tEigenGenes), method = Method))
-
     if (i == 1) {
       eigenGenes <- tEigenGenes
       metaGenes <- tMetaGenes

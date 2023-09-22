@@ -57,6 +57,16 @@ test_that("compute eigengene matrix status results", {
 })
 
 
+test_that("compute eigengene matrix more options", {
+  expect_snapshot(
+    compute_eigengene_matrix(
+      testing_data,
+      testing_results$community_membership,
+      pc_flag = FALSE
+    )
+  )
+})
+
 
 
 
@@ -116,6 +126,20 @@ test_that('requireNamespace stubbing (MSigDB)', {
   expect_error(
     compute_MSigDB_enrichment(testing_results$community_membership),
     "Must have the following R packages installed for this function: msigdbr, foreach, tidyr")
+
+})
+
+
+test_that('parallel process issue', {
+  mockery::stub(compute_MSigDB_enrichment, 'table',
+                table(
+                  rep(paste0('mA',1:10), 10),
+                  rep(c("C3", "C6", "C7", "C8", "H"), 20))
+                )
+
+  expect_error(
+    compute_MSigDB_enrichment(testing_results$community_membership, cats = 'H'),
+    "problem computing enrichments, try a different parallel computing setup")
 
 })
 
