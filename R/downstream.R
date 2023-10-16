@@ -417,7 +417,7 @@ compute_MSigDB_enrichment <- function(membership_matrix,
                              id_cols = 'community',
                              names_from = 'cat',
                              values_from = c('best', 'top_comm_gene_n',
-                                             'go_n', 'overlap', 'p'))
+                                             'go_n', 'overlap', 'p_val'))
   # reorder col
   best <- best[, c(1, unlist(lapply(cats,
                              function(xx) {
