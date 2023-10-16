@@ -2,7 +2,7 @@
 
     Code
       gene_mapping(tmp_expr_data, tmp_mapping_file)
-    Message <simpleMessage>
+    Message
       3 exprs_data rows could not be linked using the mapping file, resulting in 7 rows. 
       These rows link to 6 distinct gene symbols. 
       Will compress duplicate rows using the mean method with no transformation.
@@ -32,7 +32,7 @@
 
     Code
       gene_mapping(tmp_expr_data, tmp_mapping_file, compress_fun = "pc1")
-    Message <simpleMessage>
+    Message
       3 exprs_data rows could not be linked using the mapping file, resulting in 7 rows. 
       These rows link to 6 distinct gene symbols. 
       Will compress duplicate rows using the pc1 method with no transformation.
@@ -49,7 +49,7 @@
 
     Code
       gene_mapping(tmp_expr_data, tmp_mapping_file)
-    Message <simpleMessage>
+    Message
       0 exprs_data rows could not be linked using the mapping file, resulting in 10 rows. 
       These rows link to 10 distinct gene symbols. 
       Will compress duplicate rows using the mean method with no transformation.

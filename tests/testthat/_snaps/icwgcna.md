@@ -2,10 +2,12 @@
 
     Code
       icwgcna(tmp_data, maxIt = 1)
-    Warning <simpleWarning>
+    Condition
+      Warning in `icwgcna()`:
       advisable to use WGCNA package when maxIt = 1
+      Warning in `icwgcna()`:
       1st PCA component percent of variance explained is 93.5%, which is higher than the expected 15-30% to successfully run icWGCNA. Please check for batch effects, outliers, or other reasons the 1st PCA component percent of variance explained is so high.
-    Message <simpleMessage>
+    Message
       Computing 699 x 699 TOM distance for subset of genes with higher variance
       number of modules found is 2
       eigegenes trimmed to 2 due to correlation > 0.8 max eigenCor = 0.96
@@ -2045,9 +2047,10 @@
 
     Code
       icwgcna(tmp_data, maxComm = 1)
-    Warning <simpleWarning>
+    Condition
+      Warning in `icwgcna()`:
       1st PCA component percent of variance explained is 93.5%, which is higher than the expected 15-30% to successfully run icWGCNA. Please check for batch effects, outliers, or other reasons the 1st PCA component percent of variance explained is so high.
-    Message <simpleMessage>
+    Message
       Computing 699 x 699 TOM distance for subset of genes with higher variance
       number of modules found is 2
       eigegenes trimmed to 2 due to correlation > 0.8 max eigenCor = 0.96
@@ -4087,9 +4090,10 @@
 
     Code
       icwgcna(tmp_data, covCut = 0.99999)
-    Warning <simpleWarning>
+    Condition
+      Warning in `icwgcna()`:
       1st PCA component percent of variance explained is 94.8%, which is higher than the expected 15-30% to successfully run icWGCNA. Please check for batch effects, outliers, or other reasons the 1st PCA component percent of variance explained is so high.
-    Message <simpleMessage>
+    Message
       Computing 699 x 699 TOM distance for subset of genes with higher variance
       number of modules found is 2
       eigegenes trimmed to 2 due to correlation > 0.8 max eigenCor = 0.97
@@ -6141,9 +6145,10 @@
 
     Code
       icwgcna(tmp_data, maxIt = 2)
-    Warning <simpleWarning>
+    Condition
+      Warning in `icwgcna()`:
       1st PCA component percent of variance explained is 93.4%, which is higher than the expected 15-30% to successfully run icWGCNA. Please check for batch effects, outliers, or other reasons the 1st PCA component percent of variance explained is so high.
-    Message <simpleMessage>
+    Message
       Computing 70 x 70 TOM distance for subset of genes with higher variance
       number of modules found is 2
       eigegenes trimmed to 2 due to correlation > 0.8 max eigenCor = 0.96

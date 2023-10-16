@@ -3,7 +3,7 @@
     Code
       compute_eigengene_matrix(testing_data, testing_results$community_membership,
       pc_flag = FALSE)
-    Message <simpleMessage>
+    Message
       Removing 2 genes with a 0 standard deviation
     Output
             

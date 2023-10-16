@@ -2,7 +2,7 @@
 
     Code
       dropModuels(testing_data[2:10, 1:10], Kurts = 1:9, corCut = 0.01, logFlag = TRUE)
-    Message <simpleMessage>
+    Message
       eigegenes trimmed to 2 due to correlation > 0.01 max eigenCor = 0
     Output
             TCGA-05-4389-01 TCGA-91-6829-01 TCGA-69-7763-01 TCGA-05-4410-01
@@ -19,7 +19,7 @@
 
     Code
       dropModuels(testing_data[2:10, 1:10], corCut = 0.01, logFlag = TRUE)
-    Message <simpleMessage>
+    Message
       eigegenes trimmed to 4 due to correlation > 0.01 max eigenCor = 0
     Output
               TCGA-05-4389-01 TCGA-91-6829-01 TCGA-69-7763-01 TCGA-05-4410-01
