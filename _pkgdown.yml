@@ -37,6 +37,9 @@ reference:
     - compute_xCell_enrichment
     - compute_eigengene_matrix
     - make_network_umap
+  - title: Gene Mapping
+    contents:
+    - gene_mapping
   - title: Utility Functions
     desc: >
       These functions are rarely used directly

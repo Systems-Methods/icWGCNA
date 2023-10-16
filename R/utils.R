@@ -125,7 +125,7 @@ calcEigenGene <- function(tEx) {
 # i.e. we'll be selecting between two correlated modules
 cutreeHybridWrapper <- function(d,
                                 quantCut = 0.75) {
-  dend <- stats::hclust(stats::as.dist(d), method = "average")
+  dend <- fastcluster::hclust(stats::as.dist(d), method = "average")
   refHeight <- stats::quantile(dend$height, .05, type = 1)
   cutHeight <- as.numeric(quantCut * (max(dend$height) - refHeight) + refHeight)
   modules <- dynamicTreeCut::cutreeHybrid(
@@ -150,9 +150,11 @@ dropModuels <- function(eigenGenes,
                         method = c("pearson",
                                    "kendall",
                                    "spearman"),
-                        logFlag=F) {
+                        logFlag = FALSE) {
   method <- match.arg(method)
-  if(logFlag){eigenGenes <- log(eigenGenes+1)}
+  if (logFlag) {
+    eigenGenes <- log(eigenGenes + 1)
+  }
   eigen_Cors <- stats::cor(t(eigenGenes), method = method)
   diag(eigen_Cors) <- 0
   while (any(eigen_Cors > corCut) & ncol(eigen_Cors) > 2) {

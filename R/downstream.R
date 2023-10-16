@@ -76,10 +76,7 @@ compute_eigengene_matrix <- function(ex,
 
   tEigen <- plyr::aaply(as.matrix(membership_matrix), 2, function(k) {
     tInds <- rank(-k) <= cutoff
-    tEx <- ex[e_genes %in% m_genes[tInds], ]
-    if (all(tEx == 0)) {
-      return(rep(0, ncol(tEx)))
-    }
+    tEx <- ex[e_genes %in% m_genes[tInds], , drop = FALSE]
 
     scaled_ave <- apply(t(scale(t(tEx))), 2, mean)
     if (!pc_flag) {

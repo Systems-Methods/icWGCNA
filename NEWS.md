@@ -1,3 +1,15 @@
+# icWGCNA 0.2.3
+
+### New Features
+
+`gene_mapping()` function for converting between gene types (i.e. ENTREZ to
+Hugo), which many options for compression of duplicate rows.
+
+### Other Changes
+
+- Minor bug fixes
+- Switching to  `fastcluster::hclust()` from stats pacakge (#16)
+
 # icWGCNA 0.2.2
 
 - Bug fixes and internal function improvements
