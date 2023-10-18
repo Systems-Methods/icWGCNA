@@ -67,6 +67,17 @@ test_that("compute eigengene matrix more options", {
   )
 })
 
+test_that("compute eigengene matrix even more options", {
+  expect_snapshot(
+    compute_eigengene_matrix(
+      testing_data,
+      testing_results$community_membership,
+      cutoff = 0
+    )
+  )
+})
+
+
 
 
 

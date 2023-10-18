@@ -1,3 +1,7 @@
+# icWGCNA 0.2.4
+
+- Fixed bug in `compute_eigengene_matrix()` when all genes are above cutoff
+
 # icWGCNA 0.2.3
 
 ### New Features
