@@ -1,8 +1,8 @@
 # icWGCNA 0.2.5
 
 - Removed uncorrected_community_signature output from `icwgcna()`
-    - User should run `compute_eigengene_matrix()` function after for 
-    uncorrected community signatures
+    - Now users should run `compute_eigengene_matrix()` function after 
+    `icwgcna()`for uncorrected community signatures
 
 # icWGCNA 0.2.4
 
