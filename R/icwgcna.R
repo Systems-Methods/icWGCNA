@@ -240,14 +240,12 @@ icwgcna <- function(ex,
 
   colnames(metaGenes) <- paste0("m", colnames(metaGenes))
   row.names(eigenGenes) <- colnames(metaGenes)
-  uncor_eigenGenes <- compute_eigengene_matrix(ex = ex, membership_matrix = metaGenes)
   return(
     list(
       community_membership = metaGenes,
       community_signature = eigenGenes,
       .community_membership = full_metaGenes,
       .community_signature = full_eigenGenes,
-      uncorrected_community_signature = uncor_eigenGenes,
       controlled_for = cont_for
     )
   )

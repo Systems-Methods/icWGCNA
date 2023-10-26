@@ -23,7 +23,7 @@ test_that("input checking", {
   )()
   expect_equal(
     tmp_results_plus$warnings,
-    rep("some values of ex are >100, strongly indicating ex is not in log space", 2)
+    "some values of ex are >100, strongly indicating ex is not in log space"
   )
   expect_warning(
     suppressMessages(icwgcna(testing_data[1:1000, ], maxIt = 1)),
