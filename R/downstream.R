@@ -731,3 +731,64 @@ make_network_umap <- function(membership_matrix,
        layout = layout_df)
 }
 
+
+
+#' Identify Top Gene of Communities that are unique (only belong to one community)
+#'
+#' @param membership_matrix a community membership (kME) matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]
+#' @param K number of unique genes to find.
+#' @param maxIt maximum number of iterations to avoid looping to meaningless top genes
+#'
+#' @return data.frame with key = community and value = top gene ID. Top genes will only
+#' be associated with one module.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' unique_top_genes <- find_unique_top_genes(
+#'     results$community_membership,
+#'     K = 100,
+#'     maxIt = 10)
+#' }
+#'
+find_unique_top_genes <- function(membership_matrix,
+                                  K = 10,
+                                  maxIt = 10) {
+  if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
+    stop("membership_matrix must be a martix or data.frame")
+  }
+  if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
+    stop("membership_matrix values can't be <-1 or >1")
+  }
+
+  converged <- FALSE
+  it        <- 1
+  while (it <= maxIt & !converged) {
+    metaGeneRanks   <- t(plyr::aaply(-as.matrix(membership_matrix),2,rank))
+    multiMembInd    <- apply(metaGeneRanks <= K,1,sum) >  1
+    nFound <- sum(apply(metaGeneRanks <= K, 1,any) & !multiMembInd)
+    message(nFound," unique genes found with ",
+            sum(multiMembInd)," non-unique")
+    if (sum(multiMembInd) == 0) {converged <- TRUE}
+    membership_matrix <- membership_matrix[!multiMembInd,]
+    it <- it + 1
+  }
+  if (nrow(membership_matrix) == 0) {
+    stop('No unique genes found. Try reducing "K"')
+  }
+  metaGeneRanks     <- t(plyr::aaply(-as.matrix(membership_matrix),2,rank))
+  members           <- plyr::ldply(plyr::alply(metaGeneRanks <= K, 2, which),
+                                   names)
+  rownames(members) <- members[,1]
+  members           <- as.data.frame(t(members[,-1]))
+  temp              <- tidyr::gather(members)
+  ret               <- plyr::ddply(temp, .variables = "value",
+                                   .fun = function(x){paste(sort(x$key),
+                                                            collapse = ";")})
+  ret <- data.frame(key = ret[,2], value = ret[,1])
+  ret <- ret[order(ret$key),]
+  ret
+}

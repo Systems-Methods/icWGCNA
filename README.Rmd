@@ -181,6 +181,16 @@ network_umap$umap_w_annotation
 
 ```
 
+#### Identify Top Gene of Communities that are unique (only belong to one community)
+
+```{r}
+unique_top_genes <- find_unique_top_genes(
+  results$community_membership,
+  K = 10,
+  maxIt = 10
+)
+```
+
 
 ## Code of Conduct
   

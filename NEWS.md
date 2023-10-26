@@ -1,5 +1,12 @@
 # icWGCNA 0.2.5
 
+### New Features
+
+- `find_unique_top_genes()` to identify top gene of communities that are unique 
+(only belong to one community)
+
+### Other Changes
+
 - Removed uncorrected_community_signature output from `icwgcna()`
     - Now users should run `compute_eigengene_matrix()` after 
     `icwgcna()`if uncorrected community signatures are needed.
