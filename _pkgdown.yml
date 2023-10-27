@@ -37,6 +37,7 @@ reference:
     - compute_xCell_enrichment
     - compute_eigengene_matrix
     - make_network_umap
+    - find_unique_top_genes
   - title: Gene Mapping
     contents:
     - gene_mapping
