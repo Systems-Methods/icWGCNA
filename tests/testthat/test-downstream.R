@@ -316,3 +316,32 @@ test_that("UMAP Success", {
   expect_equal(results_plus$output, "")
   expect_equal(results_plus$warnings, character(0))
 })
+
+test_that("find_unique_top_genes Success", {
+  expect_snapshot(
+    find_unique_top_genes(
+      testing_results$community_membership
+    )
+  )
+})
+
+test_that("find_unique_top_genes high k", {
+  expect_snapshot(
+    find_unique_top_genes(
+      testing_results$community_membership,
+      K = 100
+    ),
+    error = TRUE
+  )
+})
+
+test_that("find_unique_top_genes input checking", {
+  expect_error(
+    find_unique_top_genes(testing_results),
+    "membership_matrix must be a martix or data.frame"
+  )
+  expect_error(
+    find_unique_top_genes(testing_results$community_signature),
+    "membership_matrix values can't be <-1 or >1"
+  )
+})

@@ -15,7 +15,7 @@ coverage](https://codecov.io/gh/Systems-Methods/icWGCNA/branch/main/graph/badge.
 
 Iterative Correcting Weighted Gene Co-expression Network Analysis
 function for constructing a gene network from a gene expression matrix.
-The algorithm: 
+The algorithm:
 
     1. Constructs a signed wgcna network
     2. Drops correlated modules based on membership kurtosis
@@ -25,25 +25,25 @@ The algorithm:
 Some differences from standard [WGNCA
 (Horvath/Langfelder)](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559):
 
--   Makes heavy use of
-    [Rfast](https://cran.r-project.org/web/packages/Rfast/) to compute
-    adjacencies and [topological overlap measure
-    (TOM)](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559),
-    which enables iterative network creation on \> 20K features.
--   Always uses [signed
-    adjacency](https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-10-327)
-    in order to avoid possible distortions of community signatures
-    (eigengenes).
--   Iteratively regresses out strongest community in order to facilitate
-    discovery of communities possibly obscured by larger module(s).
--   Clustering does not focus on merging communities but dropping to
-    identify strongest module(s), keeping communities with higher
-    membership kurtosis.
--   In addition to Pearson correlation, there is an option for Spearman
-    correlation as the base constructing adjacency matrix measure in
-    order to enable robust application in RNA-seq and micro-array data.
-    Future updates may include mutual information and other measures of
-    similarity.
+- Makes heavy use of
+  [Rfast](https://cran.r-project.org/web/packages/Rfast/) to compute
+  adjacencies and [topological overlap measure
+  (TOM)](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559),
+  which enables iterative network creation on \> 20K features.
+- Always uses [signed
+  adjacency](https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-10-327)
+  in order to avoid possible distortions of community signatures
+  (eigengenes).
+- Iteratively regresses out strongest community in order to facilitate
+  discovery of communities possibly obscured by larger module(s).
+- Clustering does not focus on merging communities but dropping to
+  identify strongest module(s), keeping communities with higher
+  membership kurtosis.
+- In addition to Pearson correlation, there is an option for Spearman
+  correlation as the base constructing adjacency matrix measure in order
+  to enable robust application in RNA-seq and micro-array data. Future
+  updates may include mutual information and other measures of
+  similarity.
 
 ## Installation
 
@@ -174,6 +174,16 @@ network_umap <- make_network_umap(
 )
 
 network_umap$umap_w_annotation
+```
+
+#### Identify Top Gene of Communities that are unique (only belong to one community)
+
+``` r
+unique_top_genes <- find_unique_top_genes(
+  results$community_membership,
+  K = 10,
+  maxIt = 10
+)
 ```
 
 ## Code of Conduct

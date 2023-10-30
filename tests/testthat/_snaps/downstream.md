@@ -316,3 +316,210 @@
         mC7   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
         mC9   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
 
+# find_unique_top_genes Success
+
+    Code
+      find_unique_top_genes(testing_results$community_membership)
+    Message
+      172 unique genes found with 4 non-unique
+      180 unique genes found with 0 non-unique
+    Output
+           key     value
+      4    mA1   ADAMTS8
+      5    mA1     ADH1A
+      6    mA1     ADH1B
+      69   mA1      FHL1
+      70   mA1      FIGF
+      95   mA1      INMT
+      132  mA1    PKNOX2
+      147  mA1     SCN4B
+      159  mA1      TBX4
+      160  mA1     TCF21
+      51  mA10    CXCL10
+      52  mA10    CXCL11
+      53  mA10     CXCL9
+      54  mA10   CXCR2P1
+      71  mA10      GBP5
+      78  mA10      GZMK
+      92  mA10      IDO1
+      93  mA10      IFNG
+      97  mA10    KCNJ10
+      174 mA10       UBD
+      18  mA11       BLK
+      22  mA11    C4orf7
+      30  mA11      CD19
+      42  mA11      CNR2
+      55  mA11     CXCR5
+      67  mA11     FCRL3
+      68  mA11     FCRLA
+      119 mA11     MS4A1
+      155 mA11      SPIB
+      164 mA11     TLR10
+      17   mA2     BIRC5
+      36   mA2     CDC20
+      39   mA2     CENPA
+      61   mA2    DLGAP5
+      80   mA2     HJURP
+      99   mA2     KIF2C
+      116  mA2      MELK
+      123  mA2     NCAPH
+      133  mA2      PLK1
+      169  mA2      TPX2
+      21   mA3  C1orf186
+      47   mA3      CPA3
+      79   mA3       HDC
+      91   mA3     HPGDS
+      117  mA3     MFAP4
+      120  mA3     MS4A2
+      148  mA3     SCN7A
+      153  mA3  SIGLECP3
+      167  mA3    TPSAB1
+      168  mA3     TPSB2
+      3    mA5    ADAM12
+      43   mA5   COL11A1
+      44   mA5    COL1A1
+      45   mA5    COL3A1
+      49   mA5    CTHRC1
+      76   mA5     GREM1
+      96   mA5    ITGA11
+      118  mA5     MMP11
+      158  mA5     SULF1
+      163  mA5     THBS2
+      20   mA6  C16orf89
+      56   mA6  CYP2B7P1
+      73   mA6    GGTLC1
+      81   mA6      HOPX
+      111  mA6      LMO3
+      122  mA6     NAPSA
+      125  mA6    NKX2-1
+      149  mA6     SFTA2
+      150  mA6     SFTA3
+      151  mA6     SFTPB
+      7    mA8   AKR1B10
+      8    mA8    AKR1C1
+      9    mA8    AKR1C2
+      10   mA8    AKR1C3
+      24   mA8     CABYR
+      57   mA8    CYP4F3
+      75   mA8      GPX2
+      126  mA8      NQO1
+      128  mA8    OSGIN1
+      170  mA8   TRIM16L
+      14   mB1   APOBEC4
+      19   mB1  C11orf88
+      23   mB1  C6orf118
+      26   mB1     CAPSL
+      37   mB1     CDHR4
+      62   mB1     DNAI2
+      63   mB1    EFCAB1
+      139  mB1    ROPN1L
+      161  mB1     TEKT1
+      171  mB1     TTC29
+      58   mB2  CYorf15A
+      59   mB2  CYorf15B
+      60   mB2     DDX3Y
+      64   mB2    EIF1AY
+      98   mB2     KDM5D
+      140  mB2    RPS4Y1
+      173  mB2    TTTY15
+      175  mB2     USP9Y
+      176  mB2       UTY
+      180  mB2       ZFY
+      82   mB3    HOXB13
+      83   mB3    HOXC10
+      84   mB3    HOXC11
+      85   mB3    HOXC13
+      86   mB3     HOXC4
+      87   mB3     HOXC5
+      88   mB3     HOXC6
+      89   mB3     HOXC8
+      90   mB3     HOXC9
+      165  mB3  TMEM150C
+      15   mC1     ASCL1
+      25   mC1     CALCA
+      50   mC1    CTNND2
+      100  mC1     KLK11
+      101  mC1     KLK12
+      102  mC1     KLK13
+      112  mC1 LOC145837
+      121  mC1     MTMR7
+      127  mC1     NR0B2
+      136  mC1       RET
+      2    mC2     ACSS3
+      38   mC2       CEL
+      48   mC2     CPLX2
+      110  mC2     LIN7A
+      129  mC2       PAH
+      131  mC2   PHYHIPL
+      134  mC2     PPM1E
+      138  mC2    RIMBP2
+      145  mC2     SCN2A
+      156  mC2     SSTR1
+      40   mC3      CHGB
+      130  mC3     PCSK1
+      135  mC3     PTPRN
+      141  mC3   RUNDC3A
+      143  mC3      SCG2
+      144  mC3      SCG3
+      146  mC3     SCN3A
+      154  mC3    SNAP25
+      157  mC3      ST18
+      177  mC3       VGF
+      28   mC5     CCL17
+      29   mC5     CCL22
+      31   mC5      CD1A
+      32   mC5      CD1B
+      33   mC5      CD1C
+      34   mC5      CD1E
+      35   mC5     CD207
+      66   mC5    FCER1A
+      94   mC5   IL22RA2
+      142  mC5     S100B
+      1    mC6     ABCC2
+      16   mC6      BAI2
+      65   mC6   FAM133A
+      77   mC6    GRIN2C
+      113  mC6    MAGEA3
+      114  mC6    MAGEA6
+      115  mC6     MAT1A
+      124  mC6     NEURL
+      137  mC6     RIBC2
+      172  mC6     TTLL7
+      11   mC7    ANKRD1
+      12   mC7     ANXA8
+      13   mC7   ANXA8L2
+      27   mC7      CAV1
+      72   mC7     GCOM1
+      74   mC7      GJB4
+      152  mC7    SH3TC2
+      162  mC7      TGM1
+      178  mC7     VGLL1
+      179  mC7     WNT7A
+      41   mC9     CLCA2
+      46   mC9    COL7A1
+      103  mC9     KRT14
+      104  mC9     KRT16
+      105  mC9     KRT17
+      106  mC9      KRT5
+      107  mC9     KRT6A
+      108  mC9     KRT6B
+      109  mC9     KRT6C
+      166  mC9      TNS4
+
+# find_unique_top_genes high k
+
+    Code
+      find_unique_top_genes(testing_results$community_membership, K = 100)
+    Message
+      815 unique genes found with 424 non-unique
+      843 unique genes found with 401 non-unique
+      757 unique genes found with 446 non-unique
+      579 unique genes found with 506 non-unique
+      261 unique genes found with 550 non-unique
+      6 unique genes found with 352 non-unique
+      0 unique genes found with 6 non-unique
+      0 unique genes found with 0 non-unique
+    Condition
+      Error in `find_unique_top_genes()`:
+      ! No unique genes found. Try reducing "K"
+
