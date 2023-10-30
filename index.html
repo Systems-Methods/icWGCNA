@@ -43,7 +43,7 @@
     
     <a class="navbar-brand me-2" href="index.html">icWGCNA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -218,6 +218,16 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">network_umap</span><span class="op">$</span><span class="va">umap_w_annotation</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="identify-top-gene-of-communities-that-are-unique-only-belong-to-one-community">Identify Top Gene of Communities that are unique (only belong to one community)<a class="anchor" aria-label="anchor" href="#identify-top-gene-of-communities-that-are-unique-only-belong-to-one-community"></a>
+</h4>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">unique_top_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/find_unique_top_genes.html">find_unique_top_genes</a></span><span class="op">(</span></span>
+<span>  <span class="va">results</span><span class="op">$</span><span class="va">community_membership</span>,</span>
+<span>  K <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  maxIt <span class="op">=</span> <span class="fl">10</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 </div>
