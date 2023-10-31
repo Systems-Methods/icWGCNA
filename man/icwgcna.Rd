@@ -42,7 +42,6 @@ Returns a list with the following items:
 \item \code{community_signature} - community eigengene, the first principal component of the expression of genes in this community (with proper direction). This can be thought of as the average of the scaled expression of top community genes.
 \item \code{.community_membership} - full community membership score (for exploratory purposes)
 \item \code{.community_signature} - full community eigengene (for exploratory purposes)
-\item \code{uncorrected_community_signature} - similar to community_signature, but based on expression data that has not been corrected at each iteration.
 \item \code{controlled_for} - The communities whose signatures were regressed out at each iteration.
 }
 }
