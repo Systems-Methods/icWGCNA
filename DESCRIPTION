@@ -1,6 +1,6 @@
 Package: icWGCNA
 Title: Iterative Correcting Weighted Gene Co-expression Network Analysis
-Version: 0.2.5
+Version: 0.2.5.9000
 Authors@R: c(
     person("Mike", "Mason", , "mike.mason@bms.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5652-7739")),
