@@ -870,7 +870,7 @@ map_eigengenes_on_seurat <- function(
           which(reordered_genes_values >= value_cutoff)
         ]
         res <- row.names(membership)[reordered_genes]
-        if (cutoff_method == 'either') {
+        if (cutoff_method == 'both') {
           if (length(res) > top_genes_cutoff) {
             res <- res[1:top_genes_cutoff]
           }
