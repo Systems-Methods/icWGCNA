@@ -792,3 +792,114 @@ find_unique_top_genes <- function(membership_matrix,
   ret <- ret[order(ret$key),]
   ret
 }
+
+
+#' Map Eigengenes on Seurat Object
+#'
+#' Use scores to calculate module scores for feature expression
+#' programs in single cells and applies to Seurat object using
+#' [UCell::AddModuleScore_UCell()]
+#'
+#' @param seurat_obj Seurat Object
+#' @param membership a data.frame or matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]. Doesn't have to be
+#' kME scores.
+#' @param cutoff_method should cutoff be based on a value, number of
+#' top genes, or either method, whichever yields a smaller gene subset
+#' @param value_cutoff value cutoff (ignored when `cutoff_method` = "top_gene")
+#' @param top_genes_cutoff number of top genes to include
+#' (ignored when `cutoff_method` = "value")
+#' @param assay Seurat object assay element to use
+#' @param slot Pull out data from this slot of the Seurat object
+#' @param prefix prefix to add to column names of the Seurat object meta.data
+#' @param suffix suffix to add to column names of the Seurat object meta.data
+#' @param ncores Number of processors to parallelize computation for
+#' [UCell::AddModuleScore_UCell()]
+#'
+#' @return
+#' Seurat Object with additional meta.data columns of community results
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' unique_top_genes <- map_eigengenes_on_seurat(
+#'     seurat_obj
+#'     results$community_membership
+#'     )
+#' }
+map_eigengenes_on_seurat <- function(
+    seurat_obj,
+    membership,
+    cutoff_method = c('value', 'top_gene', 'both'),
+    value_cutoff = 0.75,
+    top_genes_cutoff = 10,
+    assay = "RNA",
+    slot = "data",
+    prefix = NULL,
+    suffix = "_UCell",
+    ncores = 1){
+
+  cutoff_method <- match.arg(cutoff_method)
+
+  needed_packages <- c("Seurat", "UCell")
+  missing_packages <- !vapply(needed_packages,
+                              FUN = requireNamespace, quietly = TRUE,
+                              FUN.VALUE = logical(1))
+  if (any(missing_packages)) {
+    stop('Must have the following R packages installed for this function: ',
+         paste0(names(missing_packages[missing_packages]), collapse = ', '))
+  }
+
+  membership <- as.data.frame(membership[
+    row.names(membership) %in% row.names(seurat_obj@assays[[assay]]),
+  ])
+
+  message('Collecting signatures...')
+
+  if (cutoff_method %in% c('kme', 'both')) {
+
+    genelist <- lapply(
+      membership,
+      \(x) {
+        reordered_genes <- order(x, decreasing = TRUE)
+        reordered_genes_values <- x[reordered_genes]
+        reordered_genes <- reordered_genes[
+          which(reordered_genes_values >= value_cutoff)
+        ]
+        res <- row.names(membership)[reordered_genes]
+        if (cutoff_method == 'either') {
+          if (length(res) > top_genes_cutoff) {
+            res <- res[1:top_genes_cutoff]
+          }
+        }
+        return(res)
+      })
+  } else {
+    genelist <- lapply(
+      membership,
+      \(x) row.names(membership)[order(x, decreasing = TRUE)[1:top_genes_cutoff]])
+  }
+
+
+  genelist <- genelist[!sapply(genelist, function(x) length(x) <= 1)]
+  comm_names <- names(genelist)
+  if (!is.null(prefix)) {
+    comm_names <- paste0(prefix, '_', comm_names)
+  }
+  names(genelist) <- comm_names
+
+  message('Mapping signatures...')
+  UCell::AddModuleScore_UCell(
+    obj = seurat_obj,
+    features = genelist,
+    assay = assay,
+    slot = slot,
+    name = suffix,
+    ncores = ncores
+  )
+}
+
+

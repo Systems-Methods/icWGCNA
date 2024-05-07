@@ -1,5 +1,4 @@
 #' icWGCNA
-#' @docType package
 #' @name icWGCNA
 #' @useDynLib icWGCNA, .registration=TRUE
 #' @importFrom Rcpp sourceCpp
