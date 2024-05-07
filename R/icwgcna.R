@@ -10,7 +10,7 @@
 #' @param maxComm maximum number of communities to be found
 #' @param corCut correlation threshold used for dropping communities
 #' @param covCut coefficient of variation (CoV) quantile threshold to use at each iteration  for selecting genes to build network. covCut = .667 would use the top third of genes based on CoV after regressing out largest community
-#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see {details})
+#' @param mat_mult_method method for large matrix multiplication, "Rfast" (default) or "RcppEigen" (see `Details`)
 #'
 #' @return Returns a list with the following items:
 #' * `community_membership` - community membership score (kME). Analogous to loadings in PCA.

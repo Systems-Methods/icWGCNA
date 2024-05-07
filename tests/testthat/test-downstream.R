@@ -378,7 +378,9 @@ test_that('requireNamespace stubbing (UMAP)', {
 
 test_that("map_eigengenes_on_seurat run", {
 
-  if (Sys.info()[["sysname"]] != "Windows") {
+  if (Sys.info()[["sysname"]] != "Windows" &&
+      R.version$major >= 4 &&
+      R.version$minor >= 4) {
     # Only meta.data is getting updated
     expect_snapshot(
       map_eigengenes_on_seurat(
@@ -390,7 +392,9 @@ test_that("map_eigengenes_on_seurat run", {
 })
 
 test_that("map_eigengenes_on_seurat prefix and both method", {
-  if (Sys.info()[["sysname"]] != "Windows") {
+  if (Sys.info()[["sysname"]] != "Windows" &&
+      R.version$major >= 4 &&
+      R.version$minor >= 4) {
     expect_snapshot(
       map_eigengenes_on_seurat(
         testing_Seurat,

@@ -569,7 +569,7 @@ compute_xCell_enrichment <- function(membership_matrix,
 #' and second column to contain text of labels associated with each community
 #' @param umap_specs configuration for UMAP (default is [umap::umap.defaults]).
 #' To use custom specs copy [umap::umap.defaults] and make specific changes
-#' (see {Examples})
+#' (see `Examples`)
 #'
 #' @return Returns a list with the following items:
 #' * `umap_w_annotation` - a UMAP plot of genes with labeled clusters overlaid
