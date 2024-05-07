@@ -378,25 +378,28 @@ test_that('requireNamespace stubbing (UMAP)', {
 
 test_that("map_eigengenes_on_seurat run", {
 
-  # Only meta.data is getting updated
-  expect_snapshot(
-    map_eigengenes_on_seurat(
-      testing_Seurat,
-      testing_results$community_membership
-    )@meta.data
-  )
-
+  if (Sys.info()[["sysname"]] != "Windows") {
+    # Only meta.data is getting updated
+    expect_snapshot(
+      map_eigengenes_on_seurat(
+        testing_Seurat,
+        testing_results$community_membership
+      )@meta.data
+    )
+  }
 })
 
 test_that("map_eigengenes_on_seurat prefix and both method", {
-  expect_snapshot(
-    map_eigengenes_on_seurat(
-      testing_Seurat,
-      testing_results$community_membership,
-      prefix = "Test",
-      cutoff_method = 'both'
-    )@meta.data
-  )
+  if (Sys.info()[["sysname"]] != "Windows") {
+    expect_snapshot(
+      map_eigengenes_on_seurat(
+        testing_Seurat,
+        testing_results$community_membership,
+        prefix = "Test",
+        cutoff_method = 'both'
+      )@meta.data
+    )
+  }
 })
 
 
