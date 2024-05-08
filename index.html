@@ -219,6 +219,17 @@
 <span>  maxIt <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level4">
+<h4 id="map-icwgcna-eigengenes-on-a-seurat-object">Map icWGCNA Eigengenes on a Seurat Object<a class="anchor" aria-label="anchor" href="#map-icwgcna-eigengenes-on-a-seurat-object"></a>
+</h4>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">unique_top_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_eigengenes_on_seurat.html">map_eigengenes_on_seurat</a></span><span class="op">(</span></span>
+<span>  <span class="fu">SeuratObject</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/SeuratObject/man/pbmc_small.html" class="external-link">pbmc_small</a></span>,</span>
+<span>  <span class="va">results</span><span class="op">$</span><span class="va">community_membership</span>,</span>
+<span>  cutoff_method <span class="op">=</span> <span class="st">"top_gene"</span>,</span>
+<span>  top_genes_cutoff <span class="op">=</span> <span class="fl">20</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 </div>
 <div class="section level2">
