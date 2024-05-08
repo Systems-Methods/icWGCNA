@@ -24,6 +24,13 @@ Identify Top Gene of Communities that are unique (only belong to one community)
 }
 \examples{
 \dontrun{
+library("UCSCXenaTools")
+luad <- getTCGAdata(
+  project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+  clinical = FALSE, download = TRUE
+)
+ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+results <- icwgcna(ex)
 
 unique_top_genes <- find_unique_top_genes(
     results$community_membership,

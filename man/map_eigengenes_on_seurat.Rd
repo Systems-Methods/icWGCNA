@@ -2,7 +2,7 @@
 % Please edit documentation in R/downstream.R
 \name{map_eigengenes_on_seurat}
 \alias{map_eigengenes_on_seurat}
-\title{Map Eigengenes on Seurat Object}
+\title{Map Eigengenes on a Seurat Object}
 \usage{
 map_eigengenes_on_seurat(
   seurat_obj,
@@ -20,13 +20,13 @@ map_eigengenes_on_seurat(
 \arguments{
 \item{seurat_obj}{Seurat Object}
 
-\item{membership}{a data.frame or matrix with genes as
-rows and communities as columns. Often \code{community_membership} or
-\code{full_community_membership} output from \code{\link[=icwgcna]{icwgcna()}}. Doesn't have to be
-kME scores.}
+\item{membership}{a data.frame or matrix of continuous values, with genes as
+rows and communities as columns. Often this is the \code{community_membership} or
+\code{full_community_membership} output from \code{\link[=icwgcna]{icwgcna()}}.}
 
 \item{cutoff_method}{should cutoff be based on a value, number of
-top genes, or either method, whichever yields a smaller gene subset}
+top genes, or both method. Both method will apply the top gene method,
+but only for genes higher than the \code{value_cutoff}.}
 
 \item{value_cutoff}{value cutoff (ignored when \code{cutoff_method} = "top_gene")}
 
@@ -52,11 +52,22 @@ Use scores to calculate module scores for feature expression
 programs in single cells and applies to Seurat object using
 \code{\link[UCell:AddModuleScore_UCell]{UCell::AddModuleScore_UCell()}}
 }
+\details{
+For typical Seurat objects this function may take a few minutes if only
+using one core.
+}
 \examples{
 \dontrun{
+library("UCSCXenaTools")
+luad <- getTCGAdata(
+  project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+  clinical = FALSE, download = TRUE
+)
+ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+results <- icwgcna(ex)
 
 unique_top_genes <- map_eigengenes_on_seurat(
-    seurat_obj
+    SeuratObject::pbmc_small
     results$community_membership
     )
 }

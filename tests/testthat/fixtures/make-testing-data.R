@@ -81,11 +81,3 @@ saveRDS(list(layout = testing_UMAP_results$layout[,1:2]),
         file = testthat::test_path("fixtures",
                                    "UMAP_testing_layout.rds"))
 
-# Making Seurat obj and mapping results
-
-testing_seurat <- readRDS('~/Downloads/cell1k_gene1k_singleR_BP_res.RDS')
-testing_seurat <- Seurat::SCTransform(testing_seurat)
-
-saveRDS(testing_seurat,
-        file = testthat::test_path("fixtures",
-                                   "testing_Seurat.rds"))

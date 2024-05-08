@@ -747,6 +747,13 @@ make_network_umap <- function(membership_matrix,
 #'
 #' @examples
 #' \dontrun{
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+#' results <- icwgcna(ex)
 #'
 #' unique_top_genes <- find_unique_top_genes(
 #'     results$community_membership,
@@ -794,19 +801,19 @@ find_unique_top_genes <- function(membership_matrix,
 }
 
 
-#' Map Eigengenes on Seurat Object
+#' Map Eigengenes on a Seurat Object
 #'
 #' Use scores to calculate module scores for feature expression
 #' programs in single cells and applies to Seurat object using
 #' [UCell::AddModuleScore_UCell()]
 #'
 #' @param seurat_obj Seurat Object
-#' @param membership a data.frame or matrix with genes as
-#' rows and communities as columns. Often `community_membership` or
-#' `full_community_membership` output from [icwgcna()]. Doesn't have to be
-#' kME scores.
+#' @param membership a data.frame or matrix of continuous values, with genes as
+#' rows and communities as columns. Often this is the `community_membership` or
+#' `full_community_membership` output from [icwgcna()].
 #' @param cutoff_method should cutoff be based on a value, number of
-#' top genes, or either method, whichever yields a smaller gene subset
+#' top genes, or both method. Both method will apply the top gene method,
+#' but only for genes higher than the `value_cutoff`.
 #' @param value_cutoff value cutoff (ignored when `cutoff_method` = "top_gene")
 #' @param top_genes_cutoff number of top genes to include
 #' (ignored when `cutoff_method` = "value")
@@ -820,13 +827,24 @@ find_unique_top_genes <- function(membership_matrix,
 #' @return
 #' Seurat Object with additional meta.data columns of community results
 #'
+#' @details
+#' For typical Seurat objects this function may take a few minutes if only
+#' using one core.
+#'
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+#' results <- icwgcna(ex)
 #'
 #' unique_top_genes <- map_eigengenes_on_seurat(
-#'     seurat_obj
+#'     SeuratObject::pbmc_small
 #'     results$community_membership
 #'     )
 #' }

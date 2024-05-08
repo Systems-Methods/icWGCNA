@@ -368,7 +368,7 @@ test_that('requireNamespace stubbing (UMAP)', {
 
   expect_error(
     map_eigengenes_on_seurat(
-      testing_Seurat,
+      SeuratObject::pbmc_small,
       testing_results$community_membership
     ),
     "Must have the following R packages installed for this function: Seurat, UCell")
@@ -378,13 +378,11 @@ test_that('requireNamespace stubbing (UMAP)', {
 
 test_that("map_eigengenes_on_seurat run", {
 
-  if (Sys.info()[["sysname"]] != "Windows" &&
-      R.version$major >= 4 &&
-      R.version$minor >= 4) {
+  if (Sys.info()[["sysname"]] != "Windows") {
     # Only meta.data is getting updated
     expect_snapshot(
       map_eigengenes_on_seurat(
-        testing_Seurat,
+        SeuratObject::pbmc_small,
         testing_results$community_membership
       )@meta.data
     )
@@ -392,12 +390,10 @@ test_that("map_eigengenes_on_seurat run", {
 })
 
 test_that("map_eigengenes_on_seurat prefix and both method", {
-  if (Sys.info()[["sysname"]] != "Windows" &&
-      R.version$major >= 4 &&
-      R.version$minor >= 4) {
+  if (Sys.info()[["sysname"]] != "Windows") {
     expect_snapshot(
       map_eigengenes_on_seurat(
-        testing_Seurat,
+        SeuratObject::pbmc_small,
         testing_results$community_membership,
         prefix = "Test",
         cutoff_method = 'both'

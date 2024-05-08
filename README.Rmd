@@ -192,6 +192,19 @@ unique_top_genes <- find_unique_top_genes(
 ```
 
 
+
+#### Map icWGCNA Eigengenes on a Seurat Object
+
+```{r}
+unique_top_genes <- map_eigengenes_on_seurat(
+  SeuratObject::pbmc_small,
+  results$community_membership,
+  cutoff_method = "top_gene",
+  top_genes_cutoff = 20
+)
+```
+
+
 ## Code of Conduct
   
 Please note that the icWGCNA project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.

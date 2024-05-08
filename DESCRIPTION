@@ -40,6 +40,7 @@ Suggests:
     R.utils,
     rlang,
     Seurat,
+    SeuratObject,
     testthat (>= 3.2.0),
     tidyr,
     UCell,
