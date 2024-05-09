@@ -54,7 +54,7 @@ and second column to contain text of labels associated with each community}
 
 \item{umap_specs}{configuration for UMAP (default is \link[umap:umap.defaults]{umap::umap.defaults}).
 To use custom specs copy \link[umap:umap.defaults]{umap::umap.defaults} and make specific changes
-(see {Examples})}
+(see \code{Examples})}
 }
 \value{
 Returns a list with the following items:

@@ -302,11 +302,27 @@ test_that("UMAP Success", {
 
   expect_equal(results_plus$result$layout,
                testing_UMAP_results$layout)
-  expect_equal(results_plus$result$umap_w_legend[-c(2,4,5,8)],
-               testing_UMAP_results$umap_w_legend[-c(2,4,5,8)],
+  expect_equal(results_plus$result$umap_w_legend[c("data",
+                                                    "scales",
+                                                    "coordinates",
+                                                    "facet",
+                                                    "labels")],
+               testing_UMAP_results$umap_w_legend[c("data",
+                                                    "scales",
+                                                    "coordinates",
+                                                    "facet",
+                                                    "labels")],
                ignore_attr = TRUE, ignore_function_env = TRUE)
-  expect_equal(results_plus$result$umap_w_annotation[-c(2,4,5,8)],
-               testing_UMAP_results$umap_w_annotation[-c(2,4,5,8)],
+  expect_equal(results_plus$result$umap_w_annotation[c("data",
+                                                       "scales",
+                                                       "coordinates",
+                                                       "facet",
+                                                       "labels")],
+               testing_UMAP_results$umap_w_annotation[c("data",
+                                                        "scales",
+                                                        "coordinates",
+                                                        "facet",
+                                                        "labels")],
                ignore_attr = TRUE, ignore_function_env = TRUE)
   expect_equal(
     results_plus$messages,
@@ -345,3 +361,51 @@ test_that("find_unique_top_genes input checking", {
     "membership_matrix values can't be <-1 or >1"
   )
 })
+
+
+test_that('requireNamespace stubbing (UMAP)', {
+  mockery::stub(map_eigengenes_on_seurat, 'requireNamespace', FALSE)
+
+  expect_error(
+    map_eigengenes_on_seurat(
+      SeuratObject::pbmc_small,
+      testing_results$community_membership
+    ),
+    "Must have the following R packages installed for this function: Seurat, UCell")
+
+})
+
+
+test_that("map_eigengenes_on_seurat run", {
+
+  if (Sys.info()[["sysname"]] != "Windows" &&
+      ((R.version$major == 4 && R.version$minor >= 4) ||
+       R.version$major > 4)) {
+    # Only meta.data is getting updated
+    expect_snapshot(
+      map_eigengenes_on_seurat(
+        SeuratObject::pbmc_small,
+        testing_results$community_membership
+      )@meta.data
+    )
+  }
+})
+
+test_that("map_eigengenes_on_seurat prefix and both method", {
+  if (Sys.info()[["sysname"]] != "Windows" &&
+      ((R.version$major == 4 && R.version$minor >= 4) ||
+       R.version$major > 4)) {
+    expect_snapshot(
+      map_eigengenes_on_seurat(
+        SeuratObject::pbmc_small,
+        testing_results$community_membership,
+        prefix = "Test",
+        cutoff_method = 'both'
+      )@meta.data
+    )
+  }
+})
+
+
+
+
