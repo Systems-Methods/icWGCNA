@@ -38,13 +38,10 @@ reference:
     - compute_eigengene_matrix
     - make_network_umap
     - find_unique_top_genes
-  - title: Gene Mapping
+    - map_eigengenes_on_seurat
+  - title: Utility Functions
     contents:
     - gene_mapping
-  - title: Utility Functions
-    desc: >
-      These functions are rarely used directly
-    contents:
     - eigenMapMatMult
     - RfastTOMdist
     - fastTOMwrapper

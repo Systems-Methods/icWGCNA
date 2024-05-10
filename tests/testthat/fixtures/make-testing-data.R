@@ -35,6 +35,11 @@ saveRDS(testing_eigengene_matrix, file = testthat::test_path("fixtures", "testin
 
 
 # saving pangDB results
+testing_pangDB <- data.table::fread(pangDB_link, showProgress = FALSE)
+saveRDS(testing_pangDB,
+        file = testthat::test_path("fixtures",
+                                   "testing_pangDB.rds"))
+
 testing_panglaoDB_enrichment <- compute_panglaoDB_enrichment(testing_results$community_membership,
   pangDB = testing_pangDB
 )

@@ -1,3 +1,9 @@
+# icWGCNA 0.3.0
+
+### New Features
+
+- `map_eigengenes_on_seurat()` to map eigengenes on a Seurat Object
+
 # icWGCNA 0.2.5
 
 ### New Features
