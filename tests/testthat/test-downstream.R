@@ -400,7 +400,8 @@ test_that("map_eigengenes_on_seurat prefix and both method", {
         SeuratObject::pbmc_small,
         testing_results$community_membership,
         prefix = "Test",
-        cutoff_method = 'both'
+        cutoff_method = 'both',
+        top_genes_cutoff = 5
       )@meta.data
     )
   }
