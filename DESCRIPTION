@@ -28,6 +28,7 @@ Imports:
     Rfast
 Suggests:
     covr,
+    dplyr,
     data.table,
     doParallel,
     fastcluster,

@@ -523,6 +523,235 @@
       Error in `find_unique_top_genes()`:
       ! No unique genes found. Try reducing "K"
 
+# display_top_genes Success both
+
+    Code
+      display_top_genes(testing_results$community_membership, output = "both")
+    Output
+          Community      Gene     Value Rank
+      1         mA1   ADAMTS8 0.9546129    1
+      2         mA1      INMT 0.9324544    2
+      3         mA1     ADH1A 0.9314577    3
+      4         mA1     TCF21 0.9248288    4
+      5         mA1     SCN4B 0.9178932    5
+      6         mA1     ADH1B 0.9150073    6
+      7         mA1    PKNOX2 0.9142021    7
+      8         mA1      TBX4 0.9135027    8
+      9         mA1      FIGF 0.9115570    9
+      10        mA1      FHL1 0.9077818   10
+      11        mA2     KIF2C 0.9719991    1
+      12        mA2      PLK1 0.9709598    2
+      13        mA2     HJURP 0.9682504    3
+      14        mA2     BIRC5 0.9677256    4
+      15        mA2     CENPA 0.9671793    5
+      16        mA2     CDC20 0.9661800    6
+      17        mA2      TPX2 0.9644715    7
+      18        mA2      MELK 0.9624784    8
+      19        mA2     NCAPH 0.9620274    9
+      20        mA2    DLGAP5 0.9611658   10
+      21        mA3      CPA3 0.9781637    1
+      22        mA3    TPSAB1 0.9637906    2
+      23        mA3     TPSB2 0.9569600    3
+      24        mA3     MS4A2 0.9511302    4
+      25        mA3  C1orf186 0.9150809    5
+      26        mA3       HDC 0.8657580    6
+      27        mA3     HPGDS 0.8450505    7
+      28        mA3     SCN7A 0.8313310    8
+      29        mA3     MFAP4 0.8151059    9
+      30        mA3  SIGLECP3 0.8121400   10
+      31        mA5     THBS2 0.9599639    1
+      32        mA5     GREM1 0.9412087    2
+      33        mA5    ITGA11 0.9325220    3
+      34        mA5   COL11A1 0.9243568    4
+      35        mA5     SULF1 0.9186571    5
+      36        mA5    CTHRC1 0.8943273    6
+      37        mA5    COL3A1 0.8854298    7
+      38        mA5    COL1A1 0.8765349    8
+      39        mA5     MMP11 0.8714948    9
+      40        mA5    ADAM12 0.8677156   10
+      41        mA6     NAPSA 0.9651058    1
+      42        mA6  C16orf89 0.9227230    2
+      43        mA6     SFTPB 0.9062676    3
+      44        mA6     SFTA3 0.8907707    4
+      45        mA6      HOPX 0.8535427    5
+      46        mA6    GGTLC1 0.8413603    6
+      47        mA6     SFTA2 0.8307226    7
+      48        mA6      LMO3 0.8274227    8
+      49        mA6    NKX2-1 0.8261088    9
+      50        mA6  CYP2B7P1 0.8017579   10
+      51        mA8    AKR1C2 0.9118534    1
+      52        mA8    AKR1C3 0.9117083    2
+      53        mA8    AKR1C1 0.9063563    3
+      54        mA8   AKR1B10 0.8629501    4
+      55        mA8   TRIM16L 0.8547593    5
+      56        mA8      GPX2 0.8449776    6
+      57        mA8      NQO1 0.8251312    7
+      58        mA8    OSGIN1 0.7796226    8
+      59        mA8    CYP4F3 0.7648727    9
+      60        mA8     CABYR 0.6726544   10
+      61       mA10    CXCL10 0.9580406    1
+      62       mA10    CXCL11 0.9391407    2
+      63       mA10     CXCL9 0.9194136    3
+      64       mA10       UBD 0.8655087    4
+      65       mA10      GBP5 0.8566671    5
+      66       mA10      IDO1 0.8165031    6
+      67       mA10      IFNG 0.8164970    7
+      68       mA10   CXCR2P1 0.7728214    8
+      69       mA10      GZMK 0.7249481    9
+      70       mA10    KCNJ10 0.7221968   10
+      71       mA11     MS4A1 0.9612302    1
+      72       mA11     CXCR5 0.9452692    2
+      73       mA11      CD19 0.9450564    3
+      74       mA11      SPIB 0.9134800    4
+      75       mA11       BLK 0.9075580    5
+      76       mA11     FCRLA 0.9010385    6
+      77       mA11      CNR2 0.8987473    7
+      78       mA11     TLR10 0.8897100    8
+      79       mA11    C4orf7 0.8835357    9
+      80       mA11     FCRL3 0.8828230   10
+      81        mB1     CDHR4 0.9762193    1
+      82        mB1     TEKT1 0.9686923    2
+      83        mB1   APOBEC4 0.9595685    3
+      84        mB1  C6orf118 0.9589988    4
+      85        mB1     DNAI2 0.9578182    5
+      86        mB1    ROPN1L 0.9543844    6
+      87        mB1     TTC29 0.9539533    7
+      88        mB1     CAPSL 0.9536376    8
+      89        mB1    EFCAB1 0.9515669    9
+      90        mB1  C11orf88 0.9483639   10
+      91        mB2     USP9Y 0.9972207    1
+      92        mB2       UTY 0.9960813    2
+      93        mB2  CYorf15A 0.9960477    3
+      94        mB2       ZFY 0.9959107    4
+      95        mB2     KDM5D 0.9954213    5
+      96        mB2     DDX3Y 0.9950781    6
+      97        mB2    EIF1AY 0.9948606    7
+      98        mB2    TTTY15 0.9934441    8
+      99        mB2    RPS4Y1 0.9927693    9
+      100       mB2  CYorf15B 0.9841187   10
+      101       mB3    HOXC10 0.9561639    1
+      102       mB3    HOXC11 0.9446763    2
+      103       mB3    HOXC13 0.9052340    3
+      104       mB3     HOXC9 0.8452138    4
+      105       mB3     HOXC8 0.8248793    5
+      106       mB3     HOXC6 0.7896921    6
+      107       mB3     HOXC4 0.6688474    7
+      108       mB3     HOXC5 0.6656770    8
+      109       mB3  TMEM150C 0.5661423    9
+      110       mB3    HOXB13 0.5605581   10
+      111       mC1     CALCA 0.9367981    1
+      112       mC1     ASCL1 0.9350382    2
+      113       mC1     KLK12 0.9071060    3
+      114       mC1       RET 0.8452046    4
+      115       mC1    CTNND2 0.8055804    5
+      116       mC1     KLK11 0.7798183    6
+      117       mC1     MTMR7 0.7763170    7
+      118       mC1 LOC145837 0.7670397    8
+      119       mC1     KLK13 0.7648993    9
+      120       mC1     NR0B2 0.7537202   10
+      121       mC2     CPLX2 0.9494888    1
+      122       mC2   PHYHIPL 0.8840500    2
+      123       mC2       PAH 0.8591549    3
+      124       mC2     SCN2A 0.8524018    4
+      125       mC2    RIMBP2 0.8094100    5
+      126       mC2     PPM1E 0.7799912    6
+      127       mC2       CEL 0.7762782    7
+      128       mC2       SYP 0.7446357    8
+      129       mC2     LIN7A 0.7393438    9
+      130       mC2    MLLT11 0.7384248   10
+      131       mC3     PCSK1 0.9119014    1
+      132       mC3      SCG2 0.9015401    2
+      133       mC3      SCG3 0.8820302    3
+      134       mC3      CHGB 0.8778329    4
+      135       mC3      ST18 0.8416010    5
+      136       mC3   RUNDC3A 0.8304473    6
+      137       mC3       SYP 0.8298119    7
+      138       mC3       VGF 0.7953251    8
+      139       mC3     SCN3A 0.7938110    9
+      140       mC3     PTPRN 0.7793695   10
+      141       mC5      CD1A 0.9506057    1
+      142       mC5     CD207 0.9245822    2
+      143       mC5      CD1C 0.9240850    3
+      144       mC5    FCER1A 0.9184417    4
+      145       mC5      CD1E 0.9010081    5
+      146       mC5     S100B 0.8915493    6
+      147       mC5      CD1B 0.8438626    7
+      148       mC5     CCL22 0.8438624    8
+      149       mC5     CCL17 0.8344266    9
+      150       mC5   IL22RA2 0.8160896   10
+      151       mC6    MAGEA3 0.9791369    1
+      152       mC6    MAGEA6 0.9689665    2
+      153       mC6   FAM133A 0.8386186    3
+      154       mC6     MAT1A 0.7046770    4
+      155       mC6    GRIN2C 0.6983076    5
+      156       mC6     TTLL7 0.6893024    6
+      157       mC6    MLLT11 0.6592804    7
+      158       mC6      BAI2 0.6463097    8
+      159       mC6     NEURL 0.6330703    9
+      160       mC6     ABCC2 0.6241243   10
+      161       mC7   ANXA8L2 0.9436446    1
+      162       mC7     ANXA8 0.9321090    2
+      163       mC7     WNT7A 0.8203469    3
+      164       mC7     VGLL1 0.8124146    4
+      165       mC7    ANKRD1 0.7553461    5
+      166       mC7    SH3TC2 0.7233355    6
+      167       mC7      CAV1 0.7109947    7
+      168       mC7    TRIM29 0.6767987    8
+      169       mC7      GJB3 0.6691722    9
+      170       mC7      TGM1 0.6587507   10
+      171       mC9     KRT6C 0.9699122    1
+      172       mC9     KRT6A 0.9400551    2
+      173       mC9     KRT6B 0.9319235    3
+      174       mC9     KRT14 0.7421080    4
+      175       mC9     KRT16 0.7168160    5
+      176       mC9     CLCA2 0.6787299    6
+      177       mC9      KRT5 0.6771212    7
+      178       mC9     KRT17 0.6298257    8
+      179       mC9    TRIM29 0.6245277    9
+      180       mC9      GJB3 0.6049028   10
+
+# display_top_genes Success genes
+
+    Code
+      display_top_genes(testing_results$community_membership, output = "genes")
+    Output
+      # A tibble: 10 x 19
+          Rank mA1   mA2   mA3   mA5   mA6   mA8   mA10  mA11  mB1   mB2   mB3   mC1  
+         <int> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr>
+       1     1 ADAM~ KIF2C CPA3  THBS2 NAPSA AKR1~ CXCL~ MS4A1 CDHR4 USP9Y HOXC~ CALCA
+       2     2 INMT  PLK1  TPSA~ GREM1 C16o~ AKR1~ CXCL~ CXCR5 TEKT1 UTY   HOXC~ ASCL1
+       3     3 ADH1A HJURP TPSB2 ITGA~ SFTPB AKR1~ CXCL9 CD19  APOB~ CYor~ HOXC~ KLK12
+       4     4 TCF21 BIRC5 MS4A2 COL1~ SFTA3 AKR1~ UBD   SPIB  C6or~ ZFY   HOXC9 RET  
+       5     5 SCN4B CENPA C1or~ SULF1 HOPX  TRIM~ GBP5  BLK   DNAI2 KDM5D HOXC8 CTNN~
+       6     6 ADH1B CDC20 HDC   CTHR~ GGTL~ GPX2  IDO1  FCRLA ROPN~ DDX3Y HOXC6 KLK11
+       7     7 PKNO~ TPX2  HPGDS COL3~ SFTA2 NQO1  IFNG  CNR2  TTC29 EIF1~ HOXC4 MTMR7
+       8     8 TBX4  MELK  SCN7A COL1~ LMO3  OSGI~ CXCR~ TLR10 CAPSL TTTY~ HOXC5 LOC1~
+       9     9 FIGF  NCAPH MFAP4 MMP11 NKX2~ CYP4~ GZMK  C4or~ EFCA~ RPS4~ TMEM~ KLK13
+      10    10 FHL1  DLGA~ SIGL~ ADAM~ CYP2~ CABYR KCNJ~ FCRL3 C11o~ CYor~ HOXB~ NR0B2
+      # i 6 more variables: mC2 <chr>, mC3 <chr>, mC5 <chr>, mC6 <chr>, mC7 <chr>,
+      #   mC9 <chr>
+
+# display_top_genes Success values
+
+    Code
+      display_top_genes(testing_results$community_membership, output = "values")
+    Output
+      # A tibble: 10 x 19
+          Rank   mA1   mA2   mA3   mA5   mA6   mA8  mA10  mA11   mB1   mB2   mB3   mC1
+         <int> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+       1     1 0.955 0.972 0.978 0.960 0.965 0.912 0.958 0.961 0.976 0.997 0.956 0.937
+       2     2 0.932 0.971 0.964 0.941 0.923 0.912 0.939 0.945 0.969 0.996 0.945 0.935
+       3     3 0.931 0.968 0.957 0.933 0.906 0.906 0.919 0.945 0.960 0.996 0.905 0.907
+       4     4 0.925 0.968 0.951 0.924 0.891 0.863 0.866 0.913 0.959 0.996 0.845 0.845
+       5     5 0.918 0.967 0.915 0.919 0.854 0.855 0.857 0.908 0.958 0.995 0.825 0.806
+       6     6 0.915 0.966 0.866 0.894 0.841 0.845 0.817 0.901 0.954 0.995 0.790 0.780
+       7     7 0.914 0.964 0.845 0.885 0.831 0.825 0.816 0.899 0.954 0.995 0.669 0.776
+       8     8 0.914 0.962 0.831 0.877 0.827 0.780 0.773 0.890 0.954 0.993 0.666 0.767
+       9     9 0.912 0.962 0.815 0.871 0.826 0.765 0.725 0.884 0.952 0.993 0.566 0.765
+      10    10 0.908 0.961 0.812 0.868 0.802 0.673 0.722 0.883 0.948 0.984 0.561 0.754
+      # i 6 more variables: mC2 <dbl>, mC3 <dbl>, mC5 <dbl>, mC6 <dbl>, mC7 <dbl>,
+      #   mC9 <dbl>
+
 # map_eigengenes_on_seurat run
 
     Code

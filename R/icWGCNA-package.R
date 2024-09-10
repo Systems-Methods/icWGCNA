@@ -1,4 +1,4 @@
-#' @keywords network-analysis
+#' @keywords network-analysis internal
 "_PACKAGE"
 
 #' @useDynLib icWGCNA, .registration=TRUE

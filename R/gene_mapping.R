@@ -180,4 +180,5 @@ expression_compression <- function(exprs_data, mapping_df,
 }
 
 #' @inherit expression_compression
+#' @keywords internal
 gene_mapping = expression_compression

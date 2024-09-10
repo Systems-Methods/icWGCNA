@@ -800,6 +800,86 @@ find_unique_top_genes <- function(membership_matrix,
   ret
 }
 
+#' Identify Top Genes and Values of Communities
+#'
+#' @param membership_matrix a community membership (kME) matrix with genes as
+#' rows and communities as columns. Often `community_membership` or
+#' `full_community_membership` output from [icwgcna()]
+#' @param K number of genes to find.
+#' @param output Should output show both top genes and values, genes only, or
+#' values only
+#'
+#' @return
+#' K x Communities data.frame of top genes and ranks (if `output` = "genes")
+#'
+#' K x Communities data.frame of top values and ranks (if `output` = "values")
+#'
+#' Long data.frame with columns Community, Gene, Value, Rank
+#' (if `output` = "both")
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library("UCSCXenaTools")
+#' luad <- getTCGAdata(
+#'   project = "LUAD", mRNASeq = TRUE, mRNASeqType = "normalized",
+#'   clinical = FALSE, download = TRUE
+#' )
+#' ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
+#' results <- icwgcna(ex)
+#'
+#' top_genes <- display_top_genes(
+#'     results$community_membership,
+#'     K = 100,
+#'     output = "both")
+#' }
+display_top_genes <- function(
+    membership_matrix,
+    K = 10,
+    output = c("both", "genes", "values")) {
+  output <- match.arg(output)
+  if (!any(class(membership_matrix) %in% c("matrix", "data.frame"))) {
+    stop("membership_matrix must be a martix or data.frame")
+  }
+  if (min(membership_matrix) < -1 || max(membership_matrix) > 1) {
+    stop("membership_matrix values can't be <-1 or >1")
+  }
+
+  needed_packages <- c('dplyr', 'tidyr')
+  missing_packages <- !vapply(needed_packages,
+                              FUN = requireNamespace, quietly = TRUE,
+                              FUN.VALUE = logical(1))
+  if (any(missing_packages)) {
+    stop('Must have the following R packages installed for this function: ',
+         paste0(names(missing_packages[missing_packages]), collapse = ', '))
+  }
+
+
+  ret <- apply(membership_matrix, 2, \(y) {
+    tmp_output <- sort(y, decreasing = TRUE)[1:K]
+    data.frame(
+      Gene = names(tmp_output),
+      Value = as.vector(tmp_output),
+      Rank = 1:K
+    )
+  }) |>
+    dplyr::bind_rows(.id = "Community")
+
+  if (output == 'both') {
+    ret
+  } else if (output == 'genes') {
+    ret |>
+      dplyr::select(-"Value") |>
+      tidyr::pivot_wider(names_from = "Community", values_from = "Gene")
+  } else if (output == 'values') {
+    ret |>
+      dplyr::select(-"Gene") |>
+      tidyr::pivot_wider(names_from = "Community", values_from = "Value")
+  }
+}
+
+
+
 
 #' Map Eigengenes on a Seurat Object
 #'
