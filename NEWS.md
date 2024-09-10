@@ -1,3 +1,15 @@
+# icWGCNA 0.4.0
+
+### New Features
+
+- `display_top_genes()` to identify top gene and/or values of communities
+
+### Other Changes
+
+- Renamed `gene_mapping()` to `expression_compression()`, and parameter 
+`mapping_file` to `mapping_df`. `gene_mapping()` name kept for backwards 
+compatibility.
+
 # icWGCNA 0.3.0
 
 ### New Features
