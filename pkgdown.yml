@@ -2,7 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.1.0
 pkgdown_sha: ~
 articles: {}
-last_built: 2024-09-10T19:50Z
+last_built: 2024-09-10T20:50Z
 urls:
   reference: https://systems-methods.github.io/icWGCNA/reference
   article: https://systems-methods.github.io/icWGCNA/articles
