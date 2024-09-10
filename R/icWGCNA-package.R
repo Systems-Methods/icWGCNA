@@ -1,5 +1,6 @@
-#' icWGCNA
-#' @name icWGCNA
+#' @keywords network-analysis internal
+"_PACKAGE"
+
 #' @useDynLib icWGCNA, .registration=TRUE
 #' @importFrom Rcpp sourceCpp
 #' @import RcppEigen

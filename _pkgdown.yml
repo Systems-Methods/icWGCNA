@@ -37,11 +37,12 @@ reference:
     - compute_xCell_enrichment
     - compute_eigengene_matrix
     - make_network_umap
+    - display_top_genes
     - find_unique_top_genes
     - map_eigengenes_on_seurat
   - title: Utility Functions
     contents:
-    - gene_mapping
+    - expression_compression
     - eigenMapMatMult
     - RfastTOMdist
     - fastTOMwrapper

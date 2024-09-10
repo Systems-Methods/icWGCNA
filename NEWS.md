@@ -1,3 +1,15 @@
+# icWGCNA 0.4.0
+
+### New Features
+
+- `display_top_genes()` to identify top gene and/or values of communities
+
+### Other Changes
+
+- Renamed `gene_mapping()` to `expression_compression()`, and parameter 
+`mapping_file` to `mapping_df`. `gene_mapping()` name kept for backwards 
+compatibility.
+
 # icWGCNA 0.3.0
 
 ### New Features
@@ -25,7 +37,7 @@
 
 ### New Features
 
-`gene_mapping()` function for converting between gene types (i.e. ENTREZ to
+`expression_compression()` function for converting between gene types (i.e. ENTREZ to
 Hugo), which many options for compression of duplicate rows.
 
 ### Other Changes

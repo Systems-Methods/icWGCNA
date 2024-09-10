@@ -176,6 +176,16 @@ network_umap <- make_network_umap(
 network_umap$umap_w_annotation
 ```
 
+#### Identify Top Genes, with Values, of all Communities
+
+``` r
+top_genes <- display_top_genes(
+  results$community_membership,
+  K = 10,
+  output = "both"
+)
+```
+
 #### Identify Top Gene of Communities that are unique (only belong to one community)
 
 ``` r

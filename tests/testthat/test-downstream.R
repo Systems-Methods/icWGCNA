@@ -335,9 +335,7 @@ test_that("UMAP Success", {
 
 test_that("find_unique_top_genes Success", {
   expect_snapshot(
-    find_unique_top_genes(
-      testing_results$community_membership
-    )
+    find_unique_top_genes(testing_results$community_membership)
   )
 })
 
@@ -363,7 +361,45 @@ test_that("find_unique_top_genes input checking", {
 })
 
 
-test_that('requireNamespace stubbing (UMAP)', {
+test_that("display_top_genes Success both", {
+  expect_snapshot(
+    display_top_genes(testing_results$community_membership, output = 'both')
+  )
+})
+test_that("display_top_genes Success genes", {
+  expect_snapshot(
+    display_top_genes(testing_results$community_membership, output = 'genes')
+  )
+})
+test_that("display_top_genes Success values", {
+  expect_snapshot(
+    display_top_genes(testing_results$community_membership, output = 'values')
+  )
+})
+
+
+test_that("display_top_genes input checking", {
+  expect_error(
+    display_top_genes(testing_results),
+    "membership_matrix must be a martix or data.frame"
+  )
+  expect_error(
+    display_top_genes(testing_results$community_signature),
+    "membership_matrix values can't be <-1 or >1"
+  )
+})
+
+test_that('requireNamespace stubbing (display_top_genes)', {
+  mockery::stub(display_top_genes, 'requireNamespace', FALSE)
+
+  expect_error(
+    display_top_genes(testing_results$community_membership),
+    "Must have the following R packages installed for this function: dplyr, tidyr")
+
+})
+
+
+test_that('requireNamespace stubbing (map_eigengenes_on_seurat)', {
   mockery::stub(map_eigengenes_on_seurat, 'requireNamespace', FALSE)
 
   expect_error(
@@ -400,7 +436,8 @@ test_that("map_eigengenes_on_seurat prefix and both method", {
         SeuratObject::pbmc_small,
         testing_results$community_membership,
         prefix = "Test",
-        cutoff_method = 'both'
+        cutoff_method = 'both',
+        top_genes_cutoff = 5
       )@meta.data
     )
   }
