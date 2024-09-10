@@ -1,10 +1,10 @@
-#' Gene ID Mapping of Expression Dataset
+#' Expression Dataset Conversion Between Two Sets of Gene IDs
 #'
-#' Converts between Gene IDs For a given expression dataset and mapping file.
+#' Converts between Gene IDs for a given expression dataset and mapping file.
 #'
 #' @param exprs_data continuous value data.frame or matrix with Gene IDs as
 #' rownames
-#' @param mapping_file mapping file data.frame with the first column the Gene
+#' @param mapping_df mapping file data.frame with the first column the Gene
 #' IDs in rownames of `exprs_data` and the second column the IDs to map to.
 #' Can have multiple to multiple linking.
 #' @param compress_fun the compression method to use in cases where multiple
@@ -21,17 +21,16 @@
 #'
 #' @details
 #' Gene IDs in the `exprs_data` that do not link to the first column of
-#' `mapping_file` will be excluded from the final output.
+#' `mapping_df` will be excluded from the final output.
 #'
 #' When pc1 or pc1_unscaled `compress_fun` are specified the 1st principal
 #' component is flipped if there is negative correlation with the duplicate
 #' rows.
 #'
-#'
 #' @return
 #' a data.frame at the new gene ID level, with compression of duplicate rows
 #' as outlined in the `compress_fun` and `compress_trans` parameters
-#' @export
+#' @export gene_mapping expression_compression
 #'
 #' @examples
 #' \dontrun{
@@ -39,9 +38,9 @@
 #' exprs_data <- geo$GSE14333_series_matrix.txt.gz@assayData$exprs
 #'
 #' library(hgu133plus2.db)
-#' mapping_file     <- as.data.frame(hgu133plus2SYMBOL)
+#' mapping_df <- as.data.frame(hgu133plus2SYMBOL)
 #'
-#' gene_mapping(exprs_data, mapping_file, "highest_mean", "none")
+#' expression_compression(exprs_data, mapping_df, "highest_mean", "none")
 #'
 #' ### Using a more complicated case for GSE83834
 #' temp_dir <- tempdir()
@@ -56,14 +55,14 @@
 #' library('biomaRt')
 #' mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
 #' genes <-  rownames(exprs_data)
-#' mapping_file <- getBM(filters= "ensembl_gene_id",
+#' mapping_df <- getBM(filters= "ensembl_gene_id",
 #'                       attributes= c("ensembl_gene_id","hgnc_symbol"),
 #'                       values = genes, mart= mart)
 #'
-#' exprs_data_symbols <- gene_mapping(exprs_data, mapping_file)
+#' exprs_data_symbols <- expression_compression(exprs_data, mapping_df)
 #'
 #' }
-gene_mapping <- function(exprs_data, mapping_file,
+expression_compression <- function(exprs_data, mapping_df,
                          compress_fun = c("mean", "median", "sum",
                                           "pc1", "pc1_unscaled",
                                           "highest_mean","highest_median"),
@@ -73,22 +72,22 @@ gene_mapping <- function(exprs_data, mapping_file,
   compress_fun <- match.arg(compress_fun)
   compress_trans <- match.arg(compress_trans)
 
-  mapping_file <- stats::na.omit(mapping_file[, 1:2])
-  mapping_file <- mapping_file[mapping_file[,2] != '', ]
+  mapping_df <- stats::na.omit(mapping_df[, 1:2])
+  mapping_df <- mapping_df[mapping_df[,2] != '', ]
 
-  mapping_file_linked <- merge(
+  mapping_df_linked <- merge(
     data.frame(id = rownames(exprs_data)),
-    mapping_file,
+    mapping_df,
     by.x = "id",
-    by.y = colnames(mapping_file)[1]
+    by.y = colnames(mapping_df)[1]
   )
-  if (nrow(mapping_file_linked) == 0) {
-    stop("Could not link rownames(exprs_data) to mapping_file[,1]!")
+  if (nrow(mapping_df_linked) == 0) {
+    stop("Could not link rownames(exprs_data) to mapping_df[,1]!")
   }
-  colnames(mapping_file_linked)[2] <- "symbol"
+  colnames(mapping_df_linked)[2] <- "symbol"
 
-  n_linked <- length(unique(mapping_file_linked$id))
-  n_symbols <- length(unique(mapping_file_linked$symbol))
+  n_linked <- length(unique(mapping_df_linked$id))
+  n_symbols <- length(unique(mapping_df_linked$symbol))
 
   if (verbose) {
     message(nrow(exprs_data) - n_linked,
@@ -102,19 +101,19 @@ gene_mapping <- function(exprs_data, mapping_file,
             )
   }
 
-  exprs_data <- exprs_data[rownames(exprs_data) %in% mapping_file_linked$id, ]
+  exprs_data <- exprs_data[rownames(exprs_data) %in% mapping_df_linked$id, ]
   if (compress_trans == "log_exp" && any(exprs_data <= 0)) {
     stop("Can't do log transformation with exprs_data values <= 0")
   }
 
   # compressing dups
-  if (any(duplicated(mapping_file_linked$symbol))) {
+  if (any(duplicated(mapping_df_linked$symbol))) {
     dup_symbols <- unique(
-      mapping_file_linked$symbol[duplicated(mapping_file_linked$symbol)]
+      mapping_df_linked$symbol[duplicated(mapping_df_linked$symbol)]
     )
 
     dup_compressed <- lapply(dup_symbols, function(xx) {
-      tmp_mapping <- mapping_file_linked[mapping_file_linked$symbol == xx,]
+      tmp_mapping <- mapping_df_linked[mapping_df_linked$symbol == xx,]
       tmp_subset <- exprs_data[tmp_mapping$id,]
 
       # transforming data for compression
@@ -161,9 +160,9 @@ gene_mapping <- function(exprs_data, mapping_file,
     colnames(dup_df) <- colnames(exprs_data)
 
     # getting non-duplicate cases
-    non_dup_symbols <- setdiff(mapping_file_linked$symbol, dup_symbols)
-    non_dup_ids <- mapping_file_linked$id[match(non_dup_symbols,
-                                                mapping_file_linked$symbol)
+    non_dup_symbols <- setdiff(mapping_df_linked$symbol, dup_symbols)
+    non_dup_ids <- mapping_df_linked$id[match(non_dup_symbols,
+                                                mapping_df_linked$symbol)
       ]
     single_df <- exprs_data[match(non_dup_ids, rownames(exprs_data)), ]
     rownames(single_df) <- non_dup_symbols
@@ -173,10 +172,12 @@ gene_mapping <- function(exprs_data, mapping_file,
     final_data <- final_data[order(rownames(final_data)), ]
 
   } else {
-    final_data <- exprs_data[match(mapping_file_linked$id,
+    final_data <- exprs_data[match(mapping_df_linked$id,
                                    rownames(exprs_data)), ]
-    rownames(final_data) <- mapping_file_linked$symbol
+    rownames(final_data) <- mapping_df_linked$symbol
   }
-
   final_data
 }
+
+#' @inherit expression_compression
+gene_mapping = expression_compression

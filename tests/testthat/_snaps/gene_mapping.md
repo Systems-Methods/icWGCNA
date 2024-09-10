@@ -1,7 +1,7 @@
-# gene_mapping success defaults
+# expression_compression success defaults
 
     Code
-      gene_mapping(tmp_expr_data, tmp_mapping_file)
+      expression_compression(tmp_expr_data, tmp_mapping_df)
     Message
       3 exprs_data rows could not be linked using the mapping file, resulting in 7 rows. 
       These rows link to 6 distinct gene symbols. 
@@ -15,10 +15,11 @@
       Gene_5 3.000000  8.000000    6.000000
       Gene_6 6.000000  5.000000 1000.000000
 
-# gene_mapping success log mean
+# expression_compression success log mean
 
     Code
-      gene_mapping(tmp_expr_data, tmp_mapping_file, "highest_mean", "log", verbose = FALSE)
+      expression_compression(tmp_expr_data, tmp_mapping_df, "highest_mean", "log",
+        verbose = FALSE)
     Output
              ID_1 ID_2 ID_3
       Gene_1    5    6   10
@@ -28,10 +29,10 @@
       Gene_5    3    8    6
       Gene_6    6    5 1000
 
-# gene_mapping pca
+# expression_compression pca
 
     Code
-      gene_mapping(tmp_expr_data, tmp_mapping_file, compress_fun = "pc1")
+      expression_compression(tmp_expr_data, tmp_mapping_df, compress_fun = "pc1")
     Message
       3 exprs_data rows could not be linked using the mapping file, resulting in 7 rows. 
       These rows link to 6 distinct gene symbols. 
@@ -45,10 +46,10 @@
       Gene_5  3.000000000    6.000000  1.000000
       Gene_6  6.000000000 1000.000000 10.000000
 
-# gene_mapping no dups
+# expression_compression no dups
 
     Code
-      gene_mapping(tmp_expr_data, tmp_mapping_file)
+      expression_compression(tmp_expr_data, tmp_mapping_df)
     Message
       0 exprs_data rows could not be linked using the mapping file, resulting in 10 rows. 
       These rows link to 10 distinct gene symbols. 

@@ -25,7 +25,7 @@
 
 ### New Features
 
-`gene_mapping()` function for converting between gene types (i.e. ENTREZ to
+`expression_compression()` function for converting between gene types (i.e. ENTREZ to
 Hugo), which many options for compression of duplicate rows.
 
 ### Other Changes
