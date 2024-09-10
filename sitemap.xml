@@ -1,69 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/404.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/CODE_OF_CONDUCT.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/index.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/RfastTOMdist.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/compute_MSigDB_enrichment.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/compute_eigengene_matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/compute_panglaoDB_enrichment.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/compute_xCell_enrichment.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/eigenMapMatMult.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/fastTOMwrapper.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/find_unique_top_genes.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/gene_mapping.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/icwgcna.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/make_network_umap.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/map_eigengenes_on_seurat.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/pangDB_link.html</loc>
-  </url>
-  <url>
-    <loc>https://systems-methods.github.io/icWGCNA/reference/prolif_names.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://systems-methods.github.io/icWGCNA/404.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/LICENSE-text.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/LICENSE.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/authors.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/index.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/news/index.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/RfastTOMdist.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/compute_MSigDB_enrichment.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/compute_eigengene_matrix.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/compute_panglaoDB_enrichment.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/compute_xCell_enrichment.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/display_top_genes.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/eigenMapMatMult.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/expression_compression.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/fastTOMwrapper.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/find_unique_top_genes.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/gene_mapping.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/icWGCNA-package.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/icwgcna.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/index.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/make_network_umap.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/map_eigengenes_on_seurat.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/pangDB_link.html</loc></url>
+<url><loc>https://systems-methods.github.io/icWGCNA/reference/prolif_names.html</loc></url>
 </urlset>
+
