@@ -924,7 +924,7 @@ display_top_genes <- function(
 #' results <- icwgcna(ex)
 #'
 #' unique_top_genes <- map_eigengenes_on_seurat(
-#'     SeuratObject::pbmc_small
+#'     SeuratObject::pbmc_small,
 #'     results$community_membership
 #'     )
 #' }
@@ -957,7 +957,7 @@ map_eigengenes_on_seurat <- function(
 
   message('Collecting signatures...')
 
-  if (cutoff_method %in% c('kme', 'both')) {
+  if (cutoff_method %in% c('value', 'both')) {
 
     genelist <- lapply(
       membership,
