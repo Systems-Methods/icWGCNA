@@ -136,7 +136,7 @@ test_that('requireNamespace stubbing (MSigDB)', {
 
   expect_error(
     compute_MSigDB_enrichment(testing_results$community_membership),
-    "Must have the following R packages installed for this function: msigdbr, foreach, tidyr")
+    "Must have the following R packages installed for this function: msigdbdf, foreach, tidyr")
 
 })
 

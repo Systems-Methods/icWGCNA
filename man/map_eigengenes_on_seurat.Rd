@@ -67,7 +67,7 @@ ex <- as.matrix(data.table::fread(luad$destfiles), rownames = 1)
 results <- icwgcna(ex)
 
 unique_top_genes <- map_eigengenes_on_seurat(
-    SeuratObject::pbmc_small
+    SeuratObject::pbmc_small,
     results$community_membership
     )
 }
