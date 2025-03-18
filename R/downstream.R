@@ -292,7 +292,7 @@ compute_MSigDB_enrichment <- function(membership_matrix,
                                       memb_cut = .65,
                                       cats = c("H", "C3", "C6", "C7", "C8"),
                                       p_cut = 0.001) {
-  needed_packages <- c('msigdbr', 'foreach', 'tidyr')
+  needed_packages <- c('msigdbdf', 'foreach', 'tidyr')
   missing_packages <- !vapply(needed_packages,
                           FUN = requireNamespace, quietly = TRUE,
                           FUN.VALUE = logical(1))
@@ -308,8 +308,8 @@ compute_MSigDB_enrichment <- function(membership_matrix,
     stop("membership_matrix values can't be <-1 or >1")
   }
 
-  m_df_simp <- msigdbr::msigdbr(species = "Homo sapiens")
-  gs_cat_levels <- sort(unique(m_df_simp$gs_cat))
+  m_df_simp <- msigdbdf::msigdbdf(target_species = "HS")
+  gs_cat_levels <- sort(unique(m_df_simp$gs_collection))
 
   if (all(!cats %in% gs_cat_levels)) {
     stop('No "cats" found in MSigDB. Must use at least one of: ',
@@ -322,8 +322,8 @@ compute_MSigDB_enrichment <- function(membership_matrix,
   }
 
   sig_list <- lapply(cats, function(xx) {
-    tmp_data <- m_df_simp[m_df_simp$gs_cat == xx, ]
-    split(x = tmp_data$gene_symbol, f = tmp_data$gs_name)
+    tmp_data <- m_df_simp[m_df_simp$gs_collection == xx, ]
+    split(x = tmp_data$db_gene_symbol, f = tmp_data$gs_name)
   })
   names(sig_list) <- cats
 
@@ -924,7 +924,7 @@ display_top_genes <- function(
 #' results <- icwgcna(ex)
 #'
 #' unique_top_genes <- map_eigengenes_on_seurat(
-#'     SeuratObject::pbmc_small
+#'     SeuratObject::pbmc_small,
 #'     results$community_membership
 #'     )
 #' }
@@ -957,7 +957,7 @@ map_eigengenes_on_seurat <- function(
 
   message('Collecting signatures...')
 
-  if (cutoff_method %in% c('kme', 'both')) {
+  if (cutoff_method %in% c('value', 'both')) {
 
     genelist <- lapply(
       membership,
