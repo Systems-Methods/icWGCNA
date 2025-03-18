@@ -1,3 +1,8 @@
+# icWGCNA 0.4.1
+
+- Fixed bug in `map_eigengenes_on_seurat()` when cutoff method is "value"
+- Updated MSigDB data for `compute_MSigDB_enrichment()` 
+
 # icWGCNA 0.4.0
 
 ### New Features
